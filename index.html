@@ -21,13 +21,16 @@
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
         appId: "39ffebaf-3ca2-445a-b1e9-04a9732357d9",
+        allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false }
       });
+      // Ask user permission automatically on page open
+      await OneSignal.Slidedown.promptPush();
     });
   </script>
 
   <style>
-    /* PURPLE / LAVENDER & WHITE CLEAN PROFESSIONAL THEME */
+    /* PURPLE / LAVENDER & WHITE CLEAN THEME */
     :root {
       --primary: #63589f;
       --primary-dark: #4d4285;
@@ -118,7 +121,7 @@
       box-shadow: 0 4px 12px rgba(99, 88, 159, 0.25);
     }
 
-    /* EXACT LOGIN SCREEN AS USER IMAGE */
+    /* AUTH SCREEN */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -144,7 +147,6 @@
       .auth-phone-mockup { border-radius: 36px; border: 8px solid #ffffff; height: 92vh; }
     }
 
-    /* CURVED WHITE SHAPE LIKE THE PROVIDED IMAGE */
     .auth-curved-white-bg {
       position: absolute;
       top: 0;
@@ -189,7 +191,6 @@
       font-weight: 500;
     }
 
-    /* LOGIN BUTTON LIKE THE IMAGE */
     .btn-login-now {
       margin-top: 25px;
       background: #ffffff;
@@ -219,7 +220,6 @@
       text-decoration: underline;
     }
 
-    /* BOTTOM SOCIAL LOGIN SECTION */
     .auth-bottom-social {
       position: absolute;
       bottom: 28px;
@@ -243,7 +243,6 @@
       color: #ffffff;
     }
 
-    /* NORMAL FORM ELEMENTS FOR APP INNER PAGES */
     input, select {
       width: 100%;
       padding: 12px 14px;
@@ -331,7 +330,7 @@
     }
     .badge-free { background: #5b4d96; color: white; }
     .badge-vip { background: var(--gold-gradient); color: #000; font-weight: 900; }
-    .badge-pass { background: var(--success); color: white; float: right; font-weight: 900; }
+    .badge-pass { background: var(--success); color: white; float: right; font-weight: 900; margin-left: 4px; margin-bottom: 4px; }
 
     .game-title { font-size: 1.3rem; font-weight: 900; margin-top: 8px; color: var(--primary-dark); }
     .game-date-time { font-size: 0.78rem; color: var(--accent); margin-bottom: 12px; font-weight: 600; }
@@ -400,6 +399,7 @@
       color: #2b254a;
       font-weight: 800;
       border: 1px solid #d9d6ea;
+      transition: all 0.2s ease;
     }
     .jodi-cell .digit-box {
       color: var(--primary);
@@ -436,6 +436,7 @@
       font-weight: 900;
       padding: 2px 6px;
       border-radius: 4px;
+      z-index: 2;
     }
 
     .blur-mask { filter: blur(8px); user-select: none; pointer-events: none; }
@@ -553,7 +554,33 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* USER DETAIL MODAL POPUP */
+    .admin-pass-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #10b981;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: bold;
+      margin: 3px 4px 3px 0;
+    }
+    .admin-pass-tag button {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      cursor: pointer;
+    }
+
     #userDetailModal {
       position: fixed;
       inset: 0;
@@ -599,7 +626,6 @@
     .status-approved { background: #10b981; color: #fff; }
     .status-rejected { background: #ef4444; color: #fff; }
 
-    /* CURVED BOTTOM NAVIGATION (IMAGE 2 DESIGN) */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -630,10 +656,9 @@
   <!-- TOP HIGHLIGHT NOTICE BANNER -->
   <div id="topNoticeBanner"></div>
 
-  <!-- AUTH SCREEN DESIGNED EXACTLY LIKE YOUR SHARED IMAGE -->
+  <!-- AUTH SCREEN -->
   <div id="authOverlay">
     <div class="auth-phone-mockup">
-      <!-- White Curved Container -->
       <div class="auth-curved-white-bg">
         <h2 id="authHeading" style="color: #4d4285; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px;">Login</h2>
         
@@ -653,7 +678,6 @@
           <span style="cursor:pointer; color:#928aa8; font-size:0.9rem;" onclick="togglePassVisibility('userPass')">👁️</span>
         </div>
 
-        <!-- Rounded Pill Login Button with Right Arrow -->
         <button class="btn-login-now" id="authSubmitBtn" onclick="handleAuthSubmit()">
           <span id="authSubmitText">LOGIN NOW</span>
           <span style="font-size: 1.2rem; font-weight: bold;">❯</span>
@@ -664,7 +688,6 @@
         </div>
       </div>
 
-      <!-- Bottom Right 'login via' & Social Icons -->
       <div class="auth-bottom-social">
         <span class="lbl">login via</span>
         <div class="auth-social-icons">
@@ -778,7 +801,6 @@
         <b style="color:var(--primary); font-size:1.25rem;" id="vPrice30">₹1499</b>
       </div>
 
-      <!-- Payment Section -->
       <div style="background: #f7f6fc; padding: 18px; border-radius: 18px; margin-top: 15px; border: 1.5px solid var(--card-border);">
         <span id="txtUpiNotice" style="font-size:0.8rem; color:#7b7597; display:block; margin-bottom: 6px;">Pay to Official UPI ID:</span>
         <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; padding:12px 14px; border-radius:12px; border: 1.5px solid var(--card-border);">
@@ -835,7 +857,8 @@
       <div id="userPaymentHistoryList"><p style="color:#7b7597; font-size:0.85rem;">Loading status...</p></div>
     </div>
 
-    <button id="btnLogout" class="btn btn-secondary" onclick="logOut()">Logout Account</button>
+    <!-- LOGOUT BUTTON -->
+    <button id="btnLogout" class="btn btn-secondary" onclick="logOut()" style="background:#e7e5f3; color:#ef4444; font-weight:bold; cursor:pointer;">Logout Account</button>
   </div>
 
   <!-- HIDDEN ADMIN VIEW -->
@@ -863,18 +886,15 @@
           <option value="VIP">Premium Game (VIP)</option>
         </select>
         
-        <!-- OPEN PANA & DIGITS -->
         <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma for multiple):</label>
         <input type="text" id="admOpenPana" placeholder="e.g. 128, 137, 236">
 
         <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits (Space/Comma for 1, 3, 5+ numbers):</label>
         <input type="text" id="admOpen" placeholder="e.g. 1, 4, 7, 9">
 
-        <!-- JODI NUMBERS -->
         <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers (Space/Comma for 1, 3, 6+ numbers):</label>
         <input type="text" id="admJodi" placeholder="e.g. 14, 47, 79, 91, 55">
 
-        <!-- CLOSE DIGITS & PANA -->
         <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits (Space/Comma for 1, 3, 5+ numbers):</label>
         <input type="text" id="admClose" placeholder="e.g. 2, 5, 8">
 
@@ -884,11 +904,11 @@
         <button class="btn" onclick="saveGame()">Publish / Live Update & Send Notification</button>
       </div>
 
-      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games (Select Exactly Which Single Number Passed)</h4>
+      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games (Mark Open, Close, Jodi Passes & Remove Mistakes)</h4>
       <div id="admGamesList"></div>
     </div>
 
-    <!-- 2. ADMIN USERS SECTION (WITH INDIVIDUAL VIEW & PASSWORDS) -->
+    <!-- 2. ADMIN USERS SECTION -->
     <div id="admSecUsers" class="admin-section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
         <h4 style="color: var(--primary-dark);">Registered Users & Passwords</h4>
@@ -936,7 +956,7 @@
     </div>
   </div>
 
-  <!-- CURVED BOTTOM NAVIGATION (IMAGE 2 STYLE) -->
+  <!-- CURVED BOTTOM NAVIGATION -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
     <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
@@ -945,7 +965,6 @@
   </div>
 
   <script>
-    // CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyBr47Pc-j_IWkDBn7LIruxGsPTTgrV1LR4",
       authDomain: "live--update.firebaseapp.com",
@@ -1042,7 +1061,9 @@
       field.type = field.type === "password" ? "text" : "password";
     }
 
+    // RELIABLE ONESIGNAL PUSH NOTIFICATION FUNCTION
     function sendPushNotification(title, message) {
+      // 1. Send with Key
       fetch("https://onesignal.com/api/v1/notifications", {
         method: "POST",
         headers: {
@@ -1051,13 +1072,33 @@
         },
         body: JSON.stringify({
           app_id: ONESIGNAL_APP_ID,
-          included_segments: ["Total Subscriptions"],
+          included_segments: ["Total Subscriptions", "Subscribed Users"],
           headings: { "en": title },
-          contents: { "en": message }
+          contents: { "en": message },
+          url: "https://sandeeppkdos.github.io/Online-App/"
         })
       })
       .then(res => res.json())
-      .then(data => console.log("Push sent:", data))
+      .then(data => {
+        console.log("Push sent:", data);
+        // Fallback with Basic auth if Key error
+        if (data.errors) {
+          fetch("https://onesignal.com/api/v1/notifications", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              "Authorization": "Basic " + ONESIGNAL_REST_KEY
+            },
+            body: JSON.stringify({
+              app_id: ONESIGNAL_APP_ID,
+              included_segments: ["Total Subscriptions"],
+              headings: { "en": title },
+              contents: { "en": message },
+              url: "https://sandeeppkdos.github.io/Online-App/"
+            })
+          });
+        }
+      })
       .catch(err => console.error("Push error:", err));
     }
 
@@ -1098,6 +1139,7 @@
       if (!phone) return;
 
       function setOnline() {
+        if (!currentUser) return;
         db.collection("users").doc(phone).update({
           isOnline: true,
           lastSeen: Date.now()
@@ -1105,6 +1147,7 @@
       }
 
       function setOffline() {
+        if (!currentUser) return;
         db.collection("users").doc(phone).update({
           isOnline: false,
           lastSeen: Date.now()
@@ -1116,15 +1159,11 @@
       presenceInterval = setInterval(setOnline, 30000);
 
       window.addEventListener("beforeunload", setOffline);
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) setOffline();
-        else setOnline();
-      });
     }
 
     function syncUserData(phone) {
       db.collection("users").doc(phone).onSnapshot(doc => {
-        if (doc.exists) {
+        if (doc.exists && currentUser) {
           currentUser = doc.data();
           localStorage.setItem("app_current_user", JSON.stringify(currentUser));
           renderProfile();
@@ -1333,13 +1372,30 @@
     }
 
     function logOut() {
-      if (currentUser && currentUser.phone) {
-        db.collection("users").doc(currentUser.phone).update({ isOnline: false, lastSeen: Date.now() }).catch(()=>{});
+      if (confirm(currentLang === "kn" ? "ಖಾತೆಯಿಂದ ಲಾಗ್‌ಔಟ್ ಮಾಡಬೇಕೆ?" : "Are you sure you want to logout?")) {
+        try {
+          clearInterval(timerInterval);
+          clearInterval(presenceInterval);
+
+          if (currentUser && currentUser.phone) {
+            db.collection("users").doc(currentUser.phone).update({
+              isOnline: false,
+              lastSeen: Date.now()
+            }).catch(() => {});
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        currentUser = null;
+        localStorage.removeItem("app_current_user");
+
+        const auth = document.getElementById("authOverlay");
+        if (auth) {
+          auth.style.display = "flex";
+        }
+        window.location.reload();
       }
-      clearInterval(timerInterval);
-      clearInterval(presenceInterval);
-      localStorage.removeItem("app_current_user");
-      location.reload();
     }
 
     function listenUserPayments() {
@@ -1435,14 +1491,29 @@
       return rawInput.toString().split(/[\s,]+/).filter(x => x && x.trim() !== "");
     }
 
-    function renderDynamicNumberList(rawInput, passedNumber) {
+    function isNumberPassed(item, passList) {
+      if (!passList || !Array.isArray(passList)) return false;
+      return passList.some(p => p.number && p.number.toString().trim() === item.toString().trim());
+    }
+
+    function renderDynamicNumberList(rawInput, passListForType) {
       const items = splitNumbers(rawInput);
       if (items.length === 0) return "<span style='color:#a09cb0;'>-</span>";
 
       return items.map(item => {
-        const isPassed = (passedNumber && item.toString().trim() === passedNumber.toString().trim());
+        const isPassed = isNumberPassed(item, passListForType);
         return `<span class="digit-box ${isPassed ? 'passed' : ''}">${item}</span>`;
       }).join("");
+    }
+
+    function getGamePasses(g) {
+      let list = [];
+      if (Array.isArray(g.passes) && g.passes.length > 0) {
+        list = g.passes;
+      } else if (g.isPassed && g.passType && g.passedNumber) {
+        list = [{ type: g.passType, number: g.passedNumber }];
+      }
+      return list;
     }
 
     function listenRealtimeGames() {
@@ -1465,12 +1536,14 @@
 
           games.forEach(g => {
             const locked = (g.type === "VIP" && !userHasVip);
+            const allPasses = getGamePasses(g);
+            const isAnyPassed = allPasses.length > 0;
 
-            const isPassedOpenPana = (g.passType === "OPEN_PANA");
-            const isPassedOpen = (g.passType === "OPEN");
-            const isPassedJodi = (g.passType === "JODI");
-            const isPassedClose = (g.passType === "CLOSE");
-            const isPassedClosePana = (g.passType === "CLOSE_PANA");
+            const passesOpenPana = allPasses.filter(p => p.type === "OPEN_PANA");
+            const passesOpen = allPasses.filter(p => p.type === "OPEN");
+            const passesJodi = allPasses.filter(p => p.type === "JODI");
+            const passesClose = allPasses.filter(p => p.type === "CLOSE");
+            const passesClosePana = allPasses.filter(p => p.type === "CLOSE_PANA");
 
             const openData = g.open || [g.open1, g.open2, g.open3].filter(Boolean).join(" ");
             const jodiData = g.jodi || [g.jodi1, g.jodi2, g.jodi3].filter(Boolean).join(" ");
@@ -1481,10 +1554,19 @@
             const hasPana = (openPanaData || closePanaData);
             const postTime = g.postTime ? ` • ⏰ ${g.postTime}` : "";
 
+            let passBadgesHTML = "";
+            if (isAnyPassed) {
+              allPasses.forEach(p => {
+                passBadgesHTML += `<span class="badge badge-pass">✓ ${p.type}: ${p.number} BLAST</span>`;
+              });
+            }
+
             box.innerHTML += `
-              <div class="game-card ${g.isPassed ? 'passed-card' : ''}">
-                <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
-                ${g.isPassed ? `<span class="badge badge-pass">✓ ${g.passedNumber || ''} BLAST</span>` : ''}
+              <div class="game-card ${isAnyPassed ? 'passed-card' : ''}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
+                  <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
+                  <div>${passBadgesHTML}</div>
+                </div>
                 <div class="game-title">${g.market}</div>
                 <div class="game-date-time">📅 ${g.date}${postTime}</div>
 
@@ -1492,46 +1574,46 @@
                   <div class="matka-grid-custom ${locked ? 'blur-mask' : ''}">
                     
                     <div class="grid-row-3">
-                      <div class="matka-cell ${isPassedOpen ? 'cell-passed' : ''}">
-                        ${isPassedOpen ? '<div class="passed-tag">PASSED</div>' : ''}
+                      <div class="matka-cell ${passesOpen.length ? 'cell-passed' : ''}">
+                        ${passesOpen.length ? '<div class="passed-tag">PASSED</div>' : ''}
                         <span class="cell-lbl">OPEN</span>
                         <div class="digits-wrap">
-                          ${renderDynamicNumberList(openData, isPassedOpen ? g.passedNumber : null)}
+                          ${renderDynamicNumberList(openData, passesOpen)}
                         </div>
                       </div>
 
-                      <div class="matka-cell jodi-cell ${isPassedJodi ? 'cell-passed' : ''}">
-                        ${isPassedJodi ? '<div class="passed-tag">PASSED</div>' : ''}
+                      <div class="matka-cell jodi-cell ${passesJodi.length ? 'cell-passed' : ''}">
+                        ${passesJodi.length ? '<div class="passed-tag">PASSED</div>' : ''}
                         <span class="cell-lbl">JODI</span>
                         <div class="digits-wrap">
-                          ${renderDynamicNumberList(jodiData, isPassedJodi ? g.passedNumber : null)}
+                          ${renderDynamicNumberList(jodiData, passesJodi)}
                         </div>
                       </div>
 
-                      <div class="matka-cell ${isPassedClose ? 'cell-passed' : ''}">
-                        ${isPassedClose ? '<div class="passed-tag">PASSED</div>' : ''}
+                      <div class="matka-cell ${passesClose.length ? 'cell-passed' : ''}">
+                        ${passesClose.length ? '<div class="passed-tag">PASSED</div>' : ''}
                         <span class="cell-lbl">CLOSE</span>
                         <div class="digits-wrap">
-                          ${renderDynamicNumberList(closeData, isPassedClose ? g.passedNumber : null)}
+                          ${renderDynamicNumberList(closeData, passesClose)}
                         </div>
                       </div>
                     </div>
 
                     ${hasPana ? `
                       <div class="grid-row-2">
-                        <div class="matka-cell pana-cell ${isPassedOpenPana ? 'cell-passed' : ''}">
-                          ${isPassedOpenPana ? '<div class="passed-tag">PASSED</div>' : ''}
+                        <div class="matka-cell pana-cell ${passesOpenPana.length ? 'cell-passed' : ''}">
+                          ${passesOpenPana.length ? '<div class="passed-tag">PASSED</div>' : ''}
                           <span class="cell-lbl">OPEN PANA</span>
                           <div class="digits-wrap">
-                            ${renderDynamicNumberList(openPanaData, isPassedOpenPana ? g.passedNumber : null)}
+                            ${renderDynamicNumberList(openPanaData, passesOpenPana)}
                           </div>
                         </div>
 
-                        <div class="matka-cell pana-cell ${isPassedClosePana ? 'cell-passed' : ''}">
-                          ${isPassedClosePana ? '<div class="passed-tag">PASSED</div>' : ''}
+                        <div class="matka-cell pana-cell ${passesClosePana.length ? 'cell-passed' : ''}">
+                          ${passesClosePana.length ? '<div class="passed-tag">PASSED</div>' : ''}
                           <span class="cell-lbl">CLOSE PANA</span>
                           <div class="digits-wrap">
-                            ${renderDynamicNumberList(closePanaData, isPassedClosePana ? g.passedNumber : null)}
+                            ${renderDynamicNumberList(closePanaData, passesClosePana)}
                           </div>
                         </div>
                       </div>
@@ -1564,11 +1646,12 @@
         passedGames.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
 
         passedGames.forEach(g => {
-          const isPassedOpenPana = (g.passType === "OPEN_PANA");
-          const isPassedOpen = (g.passType === "OPEN");
-          const isPassedJodi = (g.passType === "JODI");
-          const isPassedClose = (g.passType === "CLOSE");
-          const isPassedClosePana = (g.passType === "CLOSE_PANA");
+          const allPasses = getGamePasses(g);
+          const passesOpenPana = allPasses.filter(p => p.type === "OPEN_PANA");
+          const passesOpen = allPasses.filter(p => p.type === "OPEN");
+          const passesJodi = allPasses.filter(p => p.type === "JODI");
+          const passesClose = allPasses.filter(p => p.type === "CLOSE");
+          const passesClosePana = allPasses.filter(p => p.type === "CLOSE_PANA");
 
           const openData = g.open || [g.open1, g.open2, g.open3].filter(Boolean).join(" ");
           const jodiData = g.jodi || [g.jodi1, g.jodi2, g.jodi3].filter(Boolean).join(" ");
@@ -1579,55 +1662,62 @@
           const hasPana = (openPanaData || closePanaData);
           const postTime = g.postTime ? ` • ⏰ ${g.postTime}` : "";
 
+          let passBadgesHTML = "";
+          allPasses.forEach(p => {
+            passBadgesHTML += `<span class="badge badge-pass">✓ ${p.type}: ${p.number} BLAST</span>`;
+          });
+
           box.innerHTML += `
             <div class="game-card passed-card">
-              <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
-              <span class="badge badge-pass">✓ ${g.passedNumber || ''} BLAST</span>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
+                <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
+                <div>${passBadgesHTML}</div>
+              </div>
               <div class="game-title">${g.market}</div>
               <div class="game-date-time">📅 ${g.date}${postTime}</div>
 
               <div class="matka-grid-custom">
                 <div class="grid-row-3">
-                  <div class="matka-cell ${isPassedOpen ? 'cell-passed' : ''}">
-                    ${isPassedOpen ? '<div class="passed-tag">PASSED</div>' : ''}
+                  <div class="matka-cell ${passesOpen.length ? 'cell-passed' : ''}">
+                    ${passesOpen.length ? '<div class="passed-tag">PASSED</div>' : ''}
                     <span class="cell-lbl">OPEN</span>
                     <div class="digits-wrap">
-                      ${renderDynamicNumberList(openData, isPassedOpen ? g.passedNumber : null)}
+                      ${renderDynamicNumberList(openData, passesOpen)}
                     </div>
                   </div>
 
-                  <div class="matka-cell jodi-cell ${isPassedJodi ? 'cell-passed' : ''}">
-                    ${isPassedJodi ? '<div class="passed-tag">PASSED</div>' : ''}
+                  <div class="matka-cell jodi-cell ${passesJodi.length ? 'cell-passed' : ''}">
+                    ${passesJodi.length ? '<div class="passed-tag">PASSED</div>' : ''}
                     <span class="cell-lbl">JODI</span>
                     <div class="digits-wrap">
-                      ${renderDynamicNumberList(jodiData, isPassedJodi ? g.passedNumber : null)}
+                      ${renderDynamicNumberList(jodiData, passesJodi)}
                     </div>
                   </div>
 
-                  <div class="matka-cell ${isPassedClose ? 'cell-passed' : ''}">
-                    ${isPassedClose ? '<div class="passed-tag">PASSED</div>' : ''}
+                  <div class="matka-cell ${passesClose.length ? 'cell-passed' : ''}">
+                    ${passesClose.length ? '<div class="passed-tag">PASSED</div>' : ''}
                     <span class="cell-lbl">CLOSE</span>
                     <div class="digits-wrap">
-                      ${renderDynamicNumberList(closeData, isPassedClose ? g.passedNumber : null)}
+                      ${renderDynamicNumberList(closeData, passesClose)}
                     </div>
                   </div>
                 </div>
 
                 ${hasPana ? `
                   <div class="grid-row-2">
-                    <div class="matka-cell pana-cell ${isPassedOpenPana ? 'cell-passed' : ''}">
-                      ${isPassedOpenPana ? '<div class="passed-tag">PASSED</div>' : ''}
+                    <div class="matka-cell pana-cell ${passesOpenPana.length ? 'cell-passed' : ''}">
+                      ${passesOpenPana.length ? '<div class="passed-tag">PASSED</div>' : ''}
                       <span class="cell-lbl">OPEN PANA</span>
                       <div class="digits-wrap">
-                        ${renderDynamicNumberList(openPanaData, isPassedOpenPana ? g.passedNumber : null)}
+                        ${renderDynamicNumberList(openPanaData, passesOpenPana)}
                       </div>
                     </div>
 
-                    <div class="matka-cell pana-cell ${isPassedClosePana ? 'cell-passed' : ''}">
-                      ${isPassedClosePana ? '<div class="passed-tag">PASSED</div>' : ''}
+                    <div class="matka-cell pana-cell ${passesClosePana.length ? 'cell-passed' : ''}">
+                      ${passesClosePana.length ? '<div class="passed-tag">PASSED</div>' : ''}
                       <span class="cell-lbl">CLOSE PANA</span>
                       <div class="digits-wrap">
-                        ${renderDynamicNumberList(closePanaData, isPassedClosePana ? g.passedNumber : null)}
+                        ${renderDynamicNumberList(closePanaData, passesClosePana)}
                       </div>
                     </div>
                   </div>
@@ -1736,10 +1826,10 @@
         date: today,
         postTime: postTime,
         isPassed: false,
-        passType: "NONE",
-        passedNumber: null,
+        passes: [],
         createdTime: Date.now()
       }, { merge: true }).then(() => {
+        // Send Background Push Notification to all users
         const pushTitle = `🎯 ${market} (${type}) LIVE!`;
         const pushBody = `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`;
         sendPushNotification(pushTitle, pushBody);
@@ -1778,12 +1868,27 @@
           const closePanaNums = splitNumbers(g.closePana || "");
 
           let dropdownOptions = "";
+          openPanaNums.forEach(num => { dropdownOptions += `<option value="OPEN_PANA:${num}">Open Pana: ${num}</option>`; });
+          openNums.forEach(num => { dropdownOptions += `<option value="OPEN:${num}">Open Digit: ${num}</option>`; });
+          jodiNums.forEach(num => { dropdownOptions += `<option value="JODI:${num}">Jodi: ${num}</option>`; });
+          closeNums.forEach(num => { dropdownOptions += `<option value="CLOSE:${num}">Close Digit: ${num}</option>`; });
+          closePanaNums.forEach(num => { dropdownOptions += `<option value="CLOSE_PANA:${num}">Close Pana: ${num}</option>`; });
 
-          openPanaNums.forEach(num => { dropdownOptions += `<option value="OPEN_PANA:${num}">Open Pana: ${num} Pass</option>`; });
-          openNums.forEach(num => { dropdownOptions += `<option value="OPEN:${num}">Open Digit: ${num} Pass</option>`; });
-          jodiNums.forEach(num => { dropdownOptions += `<option value="JODI:${num}">Jodi: ${num} Pass</option>`; });
-          closeNums.forEach(num => { dropdownOptions += `<option value="CLOSE:${num}">Close Digit: ${num} Pass</option>`; });
-          closePanaNums.forEach(num => { dropdownOptions += `<option value="CLOSE_PANA:${num}">Close Pana: ${num} Pass</option>`; });
+          const allPasses = getGamePasses(g);
+
+          let passTagsHTML = "";
+          if (allPasses.length > 0) {
+            allPasses.forEach((p, idx) => {
+              passTagsHTML += `
+                <span class="admin-pass-tag">
+                  ✓ ${p.type}: [${p.number}]
+                  <button title="Remove" onclick="removeSpecificPass('${g.id}', ${idx})">✕</button>
+                </span>
+              `;
+            });
+          } else {
+            passTagsHTML = "<span style='font-size:0.75rem; color:#94a3b8;'>No passes yet.</span>";
+          }
 
           box.innerHTML += `
             <div class="game-card">
@@ -1804,19 +1909,29 @@
               </div>
 
               <div style="margin-top:10px; background:#f7f6fc; padding:12px; border-radius:14px; border:1.5px solid var(--card-border);">
-                <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-bottom:6px;">Select Exact Single Number to Mark as PASSED:</label>
+                <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-bottom:6px;">
+                  Select Number to Add as PASSED:
+                </label>
                 <div style="display:flex; gap:6px;">
                   <select id="selPass_${g.id}" style="margin-bottom:0; font-size:0.82rem;">
                     ${dropdownOptions}
                   </select>
-                  <button class="btn" style="width:auto; white-space:nowrap; padding:6px 14px; margin-top:0;" onclick="confirmPassSelected('${g.id}', '${g.market}')">Confirm Pass</button>
+                  <button class="btn" style="width:auto; white-space:nowrap; padding:6px 14px; margin-top:0;" onclick="confirmAddPass('${g.id}', '${g.market}')">Add Pass</button>
                 </div>
 
-                ${g.isPassed ? `
-                  <div style="color:var(--success); font-weight:bold; font-size:0.82rem; margin-top:8px;">
-                    ✓ Currently Marked: ${g.passType} [${g.passedNumber}] PASSED
+                <div style="margin-top:10px;">
+                  <div style="font-size:0.75rem; font-weight:bold; color:var(--text-sub); margin-bottom:4px;">Currently Active Passes:</div>
+                  <div style="display:flex; flex-wrap:wrap; align-items:center;">
+                    ${passTagsHTML}
                   </div>
-                ` : ''}
+                  ${allPasses.length > 0 ? `
+                    <div style="margin-top:6px;">
+                      <button style="background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:bold; text-decoration:underline; cursor:pointer;" onclick="resetAllPasses('${g.id}')">
+                        Reset All Passes
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
               </div>
             </div>
           `;
@@ -1824,23 +1939,75 @@
       });
     }
 
-    function confirmPassSelected(docId, marketName) {
+    function confirmAddPass(docId, marketName) {
       const sel = document.getElementById("selPass_" + docId);
       if (!sel || !sel.value) return;
 
       const [type, number] = sel.value.split(":");
 
-      if (confirm(`Confirm: Mark ${type} Number [${number}] as PASSED?`)) {
+      db.collection("games").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        const g = doc.data();
+        let passes = getGamePasses(g);
+
+        const exists = passes.some(p => p.type === type && p.number === number);
+        if (exists) {
+          alert(`${type} [${number}] already passed!`);
+          return;
+        }
+
+        passes.push({ type: type, number: number });
+
         db.collection("games").doc(docId).update({
           isPassed: true,
+          passes: passes,
           passType: type,
           passedNumber: number
         }).then(() => {
           sendPushNotification(`🏆 ${marketName} BLAST RESULT!`, `${type} Number [${number}] PASSED! Check App Now!`);
-          alert(`Successfully marked ${type} [${number}] as PASSED!`);
+          alert(`Successfully added ${type} [${number}] as PASSED!`);
           renderAdminGames();
         });
-      }
+      });
+    }
+
+    function removeSpecificPass(docId, indexToRemove) {
+      if (!confirm("Remove this pass?")) return;
+
+      db.collection("games").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        const g = doc.data();
+        let passes = getGamePasses(g);
+
+        passes.splice(indexToRemove, 1);
+
+        const isStillPassed = passes.length > 0;
+        const lastPass = isStillPassed ? passes[passes.length - 1] : null;
+
+        db.collection("games").doc(docId).update({
+          isPassed: isStillPassed,
+          passes: passes,
+          passType: lastPass ? lastPass.type : "NONE",
+          passedNumber: lastPass ? lastPass.number : null
+        }).then(() => {
+          alert("Pass removed successfully!");
+          renderAdminGames();
+        });
+      });
+    }
+
+    function resetAllPasses(docId) {
+      if (!confirm("Clear all passes for this game?")) return;
+
+      db.collection("games").doc(docId).update({
+        isPassed: false,
+        passes: [],
+        passType: "NONE",
+        passedNumber: null
+      }).then(() => {
+        alert("All passes cleared.");
+        renderAdminGames();
+      });
     }
 
     function deleteGame(docId) {
@@ -1852,7 +2019,6 @@
       }
     }
 
-    // ADMIN USERS RENDERING WITH PASSWORD & INDIVIDUAL MODAL VIEW
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
@@ -1910,7 +2076,6 @@
                 Expiry: <b style="color:${isVip ? 'var(--vip)' : '#4a4269'};">${expText}</b>
               </div>
 
-              <!-- VIEW SINGLE USER DETAIL BUTTON -->
               <div style="margin-bottom:8px;">
                 <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Password</button>
               </div>
@@ -1928,7 +2093,6 @@
       });
     }
 
-    // OPEN SINGLE USER FULL DETAILS MODAL
     function openUserDetail(phone) {
       const u = usersCache.find(x => x.phone === phone);
       if (!u) return;
