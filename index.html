@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <title>MATKA KING</title>
+  <title>MATKA KING PRO</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -27,407 +27,602 @@
   </script>
 
   <style>
+    /* PURPLE / LAVENDER & WHITE CLEAN PROFESSIONAL THEME */
     :root {
-      --primary: #f59e0b;
-      --bg: #070d19;
-      --card: #131d31;
-      --border: #26354d;
-      --text: #f8fafc;
+      --primary: #63589f;
+      --primary-dark: #4d4285;
+      --primary-light: #8579c4;
+      --accent: #7868c7;
+      --bg: #f4f3fa;
+      --surface: #ffffff;
+      --card-border: #e2e0f0;
+      --text-main: #2d264d;
+      --text-sub: #7b7597;
       --success: #10b981;
-      --vip: #facc15;
+      --vip: #f59e0b;
       --danger: #ef4444;
-      --gold-gradient: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #fef08a 100%);
+      --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      --purple-gradient: linear-gradient(135deg, #7464b8 0%, #52448f 100%);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding-bottom: 90px;
+      min-height: 100vh;
+    }
 
+    /* HEADER */
     header {
-      background: #060913;
-      padding: 10px 14px;
+      background: #ffffff;
+      padding: 12px 18px;
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1.5px solid var(--card-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 15px rgba(99, 88, 159, 0.08);
     }
-    .header-brand { display: flex; align-items: center; gap: 10px; }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
     .matka-logo {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: var(--gold-gradient);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+      background: var(--purple-gradient);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(99, 88, 159, 0.35);
       cursor: pointer;
       user-select: none;
-      border: 1px solid #fef08a;
+      transition: transform 0.2s ease;
     }
-    .matka-logo span.crown { font-size: 0.8rem; line-height: 1; }
-    .matka-logo span.text { font-size: 0.5rem; font-weight: 900; color: #000; letter-spacing: 0.5px; line-height: 1; margin-top: 1px; }
+    .matka-logo:active { transform: scale(0.92); }
+    .matka-logo span.crown { font-size: 1.1rem; line-height: 1; }
+    .matka-logo span.text { font-size: 0.52rem; font-weight: 900; color: #fff; letter-spacing: 0.6px; line-height: 1; margin-top: 2px; }
     
     .brand-title { display: flex; flex-direction: column; }
-    .brand-title h1 { font-size: 1.1rem; color: #fff; font-weight: 800; letter-spacing: 0.8px; line-height: 1.1; }
-    .brand-title span { font-size: 0.62rem; color: var(--primary); font-weight: 700; letter-spacing: 0.8px; }
+    .brand-title h1 { font-size: 1.25rem; color: var(--primary-dark); font-weight: 900; letter-spacing: 0.5px; line-height: 1.1; }
+    .brand-title span { font-size: 0.65rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
 
     .lang-round-btn {
-      background: #111a2d;
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      background: #f0eef9;
+      border: 1.5px solid var(--card-border);
+      color: var(--primary-dark);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 800;
+      font-size: 0.8rem;
+      font-weight: 900;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
+    .lang-round-btn:hover { background: var(--primary); color: #fff; }
 
     #topNoticeBanner {
-      background: linear-gradient(90deg, #b45309, #f59e0b);
-      color: #000;
-      padding: 8px 12px;
-      font-size: 0.82rem;
-      font-weight: 800;
+      background: var(--purple-gradient);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
       display: none;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 4px 12px rgba(99, 88, 159, 0.25);
     }
 
+    /* EXACT LOGIN SCREEN AS USER IMAGE */
     #authOverlay {
       position: fixed;
       inset: 0;
-      background: var(--bg);
+      background: #b1a7d6;
       z-index: 1000;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
     }
-    .auth-box {
+    .auth-phone-mockup {
       width: 100%;
-      max-width: 380px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      max-width: 400px;
+      height: 100%;
+      max-height: 750px;
+      background: linear-gradient(145deg, #5b4d96 0%, #7666b3 40%, #51428c 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(45, 38, 77, 0.4);
+    }
+    @media (min-width: 480px) {
+      .auth-phone-mockup { border-radius: 36px; border: 8px solid #ffffff; height: 92vh; }
     }
 
+    /* CURVED WHITE SHAPE LIKE THE PROVIDED IMAGE */
+    .auth-curved-white-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 88%;
+      height: 78%;
+      background: #ffffff;
+      border-bottom-right-radius: 200px 220px;
+      z-index: 1;
+      padding: 70px 28px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .auth-input-line-group {
+      display: flex;
+      align-items: center;
+      border-bottom: 1.5px solid #d4cfe6;
+      margin-bottom: 24px;
+      padding-bottom: 6px;
+      position: relative;
+    }
+    .auth-input-line-group span.icon {
+      font-size: 1.15rem;
+      color: #928aa8;
+      margin-right: 12px;
+    }
+    .auth-input-line-group input {
+      border: none !important;
+      background: transparent !important;
+      padding: 6px 0 !important;
+      font-size: 0.95rem;
+      color: #332b53 !important;
+      outline: none;
+      width: 100%;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .auth-input-line-group input::placeholder {
+      color: #aaa4be;
+      font-weight: 500;
+    }
+
+    /* LOGIN BUTTON LIKE THE IMAGE */
+    .btn-login-now {
+      margin-top: 25px;
+      background: #ffffff;
+      border: 2px solid #5b4d96;
+      color: #5b4d96;
+      padding: 13px 24px;
+      border-radius: 30px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 0.6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(91, 77, 150, 0.2);
+      transition: all 0.2s ease;
+    }
+    .btn-login-now:active { transform: scale(0.97); }
+
+    .auth-switch-text {
+      font-size: 0.8rem;
+      color: #5b4d96;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* BOTTOM SOCIAL LOGIN SECTION */
+    .auth-bottom-social {
+      position: absolute;
+      bottom: 28px;
+      right: 28px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      color: #ffffff;
+    }
+    .auth-bottom-social span.lbl {
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    .auth-social-icons {
+      display: flex;
+      gap: 14px;
+      font-size: 1.25rem;
+      color: #ffffff;
+    }
+
+    /* NORMAL FORM ELEMENTS FOR APP INNER PAGES */
     input, select {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 8px;
-      background: #0a1120;
-      border: 1px solid var(--border);
-      color: #fff;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      color: var(--text-main);
+      border-radius: 12px;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
     }
     input:focus, select:focus {
       outline: none;
       border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(99, 88, 159, 0.2);
     }
 
     .btn {
       width: 100%;
-      padding: 11px;
-      background: var(--primary);
-      color: #000;
+      padding: 13px;
+      background: var(--purple-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.96rem;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 15px rgba(99, 88, 159, 0.35);
+      transition: transform 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-secondary {
+      background: #e7e5f3;
+      color: var(--primary-dark);
+      margin-top: 10px;
+      box-shadow: none;
+      border: 1px solid var(--card-border);
+    }
+    .btn-danger {
+      background: #f43f5e;
+      color: #fff;
       border: none;
       border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.95rem;
+      padding: 7px 12px;
       cursor: pointer;
-      margin-top: 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
     }
-    .btn-secondary { background: #334155; color: #fff; margin-top: 8px; }
-    .btn-danger { background: var(--danger); color: #fff; border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+    .btn-info {
+      background: #5b4d96;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: bold;
+    }
     
-    .tab-view { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
+    .tab-view { display: none; padding: 16px; max-width: 650px; margin: 0 auto; }
     .tab-view.active { display: block; }
 
+    /* CARD STYLING */
     .game-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
       position: relative;
+      box-shadow: 0 6px 20px rgba(99, 88, 159, 0.08);
     }
     .game-card.passed-card {
-      border: 1.5px solid var(--success);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+      border: 2px solid var(--success);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
     }
 
     .badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 8px;
       font-size: 0.72rem;
-      font-weight: bold;
+      font-weight: 800;
+      letter-spacing: 0.5px;
     }
-    .badge-free { background: #3b82f6; color: white; }
-    .badge-vip { background: var(--vip); color: #000; }
-    .badge-pass { background: var(--success); color: white; float: right; }
+    .badge-free { background: #5b4d96; color: white; }
+    .badge-vip { background: var(--gold-gradient); color: #000; font-weight: 900; }
+    .badge-pass { background: var(--success); color: white; float: right; font-weight: 900; }
 
-    .game-title { font-size: 1.15rem; font-weight: 700; margin-top: 6px; }
-    .game-date-time { font-size: 0.75rem; color: #38bdf8; margin-bottom: 10px; font-weight: 600; }
+    .game-title { font-size: 1.3rem; font-weight: 900; margin-top: 8px; color: var(--primary-dark); }
+    .game-date-time { font-size: 0.78rem; color: var(--accent); margin-bottom: 12px; font-weight: 600; }
 
     .matka-grid-custom {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 6px;
-      background: #080e1a;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #1e293b;
-      margin-top: 8px;
+      gap: 8px;
+      background: #f7f6fc;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      margin-top: 10px;
     }
     .grid-row-3 {
       display: grid;
-      grid-template-columns: 1fr 1.1fr 1fr;
-      gap: 6px;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 8px;
     }
     .grid-row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 6px;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .matka-cell {
-      background: #111a2d;
-      padding: 8px 4px;
-      border-radius: 8px;
-      border: 1px solid #26354d;
+      background: #ffffff;
+      padding: 10px 4px;
+      border-radius: 12px;
+      border: 1.5px solid var(--card-border);
       position: relative;
       text-align: center;
     }
     .matka-cell.jodi-cell {
       border: 1.5px solid var(--primary);
-      background: #162035;
+      background: #f0eef9;
     }
     .matka-cell.pana-cell {
-      border: 1px dashed #38bdf8;
-      background: #0b172a;
+      border: 1.5px dashed var(--accent);
+      background: #fbfaff;
     }
 
     .matka-cell span.cell-lbl {
       display: block;
-      font-size: 0.65rem;
-      color: #94a3b8;
-      margin-bottom: 5px;
-      font-weight: 700;
-      text-transform: uppercase;
+      font-size: 0.68rem;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
     }
 
     .digits-wrap {
       display: flex;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
       align-items: center;
       flex-wrap: wrap;
     }
     .digit-box {
       display: inline-block;
-      padding: 2px 6px;
-      background: #1e293b;
-      border-radius: 4px;
-      font-size: 0.95rem;
-      color: #fff;
-      font-weight: bold;
-      transition: all 0.3s ease;
+      padding: 4px 9px;
+      background: #eef0f8;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #2b254a;
+      font-weight: 800;
+      border: 1px solid #d9d6ea;
     }
     .jodi-cell .digit-box {
       color: var(--primary);
-      font-size: 1rem;
+      font-size: 1.05rem;
+      background: #ffffff;
+      border-color: #baaee6;
     }
 
     .digit-box.passed {
-      background: #059669 !important;
+      background: var(--success) !important;
       color: #fff !important;
-      border: 1.5px solid var(--success) !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.9) !important;
-      transform: scale(1.18);
+      border: 1.5px solid #059669 !important;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.8) !important;
       animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
-      0% { transform: scale(1.1); }
-      50% { transform: scale(1.22); }
-      100% { transform: scale(1.1); }
+      0% { transform: scale(1.05); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1.05); }
     }
 
     .cell-passed {
-      background: #064e3b !important;
+      background: #ecfdf5 !important;
       border: 1.5px solid var(--success) !important;
     }
 
     .passed-tag {
       position: absolute;
-      top: -7px;
-      right: 4px;
+      top: -8px;
+      right: 6px;
       background: var(--success);
-      color: #000;
-      font-size: 0.55rem;
+      color: #fff;
+      font-size: 0.58rem;
       font-weight: 900;
-      padding: 1px 4px;
-      border-radius: 3px;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
-    .blur-mask { filter: blur(7px); user-select: none; pointer-events: none; }
+    .blur-mask { filter: blur(8px); user-select: none; pointer-events: none; }
     .vip-lock-btn {
       position: absolute;
       top: 55%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.9);
-      border: 1.5px solid var(--vip);
-      color: var(--vip);
-      padding: 9px 18px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.85rem;
+      background: var(--purple-gradient);
+      color: #fff;
+      padding: 11px 24px;
+      border-radius: 30px;
+      font-weight: 900;
+      font-size: 0.92rem;
       cursor: pointer;
       white-space: nowrap;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 25px rgba(91, 77, 150, 0.4);
     }
 
+    /* VIP CARD & PROFILE */
     .rich-vip-card {
-      background: linear-gradient(135deg, #131c31 0%, #1e293b 100%);
-      border-radius: 16px;
-      padding: 22px;
-      border: 1px solid #3b4d6b;
+      background: var(--purple-gradient);
+      color: #fff;
+      border-radius: 24px;
+      padding: 24px;
       position: relative;
-      overflow: hidden;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(91, 77, 150, 0.3);
     }
     .rich-vip-card.active-vip {
-      background: linear-gradient(135deg, #181406 0%, #2a1f05 50%, #171103 100%);
-      border: 1.5px solid var(--vip);
-      box-shadow: 0 0 20px rgba(250, 204, 21, 0.25);
+      background: linear-gradient(135deg, #4d3a8e 0%, #2f235a 100%);
+      border: 2px solid #fbbf24;
     }
     .vip-badge-pill {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 800;
+      font-size: 0.78rem;
+      font-weight: 900;
     }
     .vip-pill-gold { background: var(--gold-gradient); color: #000; }
-    .vip-pill-free { background: #334155; color: #cbd5e1; }
+    .vip-pill-free { background: rgba(255,255,255,0.2); color: #fff; }
 
     .timer-box {
       margin-top: 15px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px dashed var(--vip);
-      border-radius: 8px;
-      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px dashed #fbbf24;
+      border-radius: 12px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .timer-text {
       font-family: monospace;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 800;
-      color: var(--vip);
+      color: #fbbf24;
     }
 
     .plan-card {
-      background: #0d1525;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 15px;
-      margin-bottom: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 15px 18px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
     .plan-card.selected {
-      border-color: var(--vip);
-      background: #192338;
+      border-color: var(--primary);
+      background: #f6f4fd;
+      box-shadow: 0 4px 15px rgba(91, 77, 150, 0.15);
     }
 
+    /* ADMIN DASHBOARD */
     .admin-subnav {
       display: flex;
-      gap: 4px;
-      margin-bottom: 15px;
-      background: #080e1a;
-      padding: 5px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
+      gap: 6px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      padding: 6px;
+      border-radius: 14px;
+      border: 1.5px solid var(--card-border);
       overflow-x: auto;
     }
     .admin-subnav-btn {
       flex: 1;
-      padding: 8px 4px;
+      padding: 10px 8px;
       background: transparent;
       border: none;
-      color: #94a3b8;
-      font-size: 0.72rem;
-      font-weight: 700;
-      border-radius: 6px;
+      color: var(--text-sub);
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 10px;
       cursor: pointer;
-      text-align: center;
       white-space: nowrap;
     }
     .admin-subnav-btn.active {
-      background: var(--primary);
-      color: #000;
+      background: var(--purple-gradient);
+      color: #fff;
     }
     .admin-section { display: none; }
     .admin-section.active { display: block; }
 
     .admin-user-card {
-      background: #080e1a;
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
+
+    /* USER DETAIL MODAL POPUP */
+    #userDetailModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 38, 77, 0.7);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .detail-card {
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 24px;
+      padding: 26px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    .user-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0eef9;
+      font-size: 0.88rem;
+    }
+    .user-detail-row:last-child { border-bottom: none; }
+    .user-detail-lbl { color: var(--text-sub); font-weight: 600; }
+    .user-detail-val { color: var(--text-main); font-weight: 800; text-align: right; }
 
     .status-badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
       font-size: 0.75rem;
       font-weight: bold;
     }
     .status-online { background: #10b981; color: #fff; }
-    .status-offline { background: #475569; color: #cbd5e1; }
+    .status-offline { background: #94a3b8; color: #fff; }
     .status-pending { background: #f59e0b; color: #000; }
     .status-approved { background: #10b981; color: #fff; }
     .status-rejected { background: #ef4444; color: #fff; }
 
+    /* CURVED BOTTOM NAVIGATION (IMAGE 2 DESIGN) */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      height: 60px;
-      background: #060913;
-      border-top: 1px solid var(--border);
+      height: 68px;
+      background: var(--purple-gradient);
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 100;
+      box-shadow: 0 -5px 25px rgba(91, 77, 150, 0.35);
     }
     .nav-btn {
       flex: 1;
       text-align: center;
-      color: #94a3b8;
+      color: #cdc7ec;
       font-size: 0.75rem;
       cursor: pointer;
+      transition: all 0.2s;
     }
-    .nav-btn.active { color: var(--primary); font-weight: bold; }
-    .nav-btn span { display: block; font-size: 1.2rem; }
+    .nav-btn.active { color: #ffffff; font-weight: 900; transform: translateY(-4px); }
+    .nav-btn span { display: block; font-size: 1.35rem; margin-bottom: 2px; }
   </style>
 </head>
 <body>
@@ -435,17 +630,92 @@
   <!-- TOP HIGHLIGHT NOTICE BANNER -->
   <div id="topNoticeBanner"></div>
 
-  <!-- AUTH MODAL -->
+  <!-- AUTH SCREEN DESIGNED EXACTLY LIKE YOUR SHARED IMAGE -->
   <div id="authOverlay">
-    <div class="auth-box">
-      <h2 id="authHeading" style="color: var(--primary); text-align: center; margin-bottom: 15px;">Login</h2>
-      <div id="nameInputWrap" style="display: none;">
-        <input type="text" id="userName" placeholder="Your Full Name">
+    <div class="auth-phone-mockup">
+      <!-- White Curved Container -->
+      <div class="auth-curved-white-bg">
+        <h2 id="authHeading" style="color: #4d4285; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px;">Login</h2>
+        
+        <div id="nameInputWrap" class="auth-input-line-group" style="display: none;">
+          <span class="icon">👤</span>
+          <input type="text" id="userName" placeholder="Full Name">
+        </div>
+
+        <div class="auth-input-line-group">
+          <span class="icon">👤</span>
+          <input type="tel" id="userPhone" placeholder="User name / Mobile">
+        </div>
+
+        <div class="auth-input-line-group">
+          <span class="icon">🔒</span>
+          <input type="password" id="userPass" placeholder="Password">
+          <span style="cursor:pointer; color:#928aa8; font-size:0.9rem;" onclick="togglePassVisibility('userPass')">👁️</span>
+        </div>
+
+        <!-- Rounded Pill Login Button with Right Arrow -->
+        <button class="btn-login-now" id="authSubmitBtn" onclick="handleAuthSubmit()">
+          <span id="authSubmitText">LOGIN NOW</span>
+          <span style="font-size: 1.2rem; font-weight: bold;">❯</span>
+        </button>
+
+        <div class="auth-switch-text" id="authSwitchBtn" onclick="toggleAuth()">
+          Don't have an account? Register
+        </div>
       </div>
-      <input type="tel" id="userPhone" placeholder="Mobile Number (10 digits)">
-      <input type="password" id="userPass" placeholder="Password">
-      <button class="btn" id="authSubmitBtn" onclick="handleAuthSubmit()">Login</button>
-      <button class="btn btn-secondary" id="authSwitchBtn" onclick="toggleAuth()">Create New Account (Register)</button>
+
+      <!-- Bottom Right 'login via' & Social Icons -->
+      <div class="auth-bottom-social">
+        <span class="lbl">login via</span>
+        <div class="auth-social-icons">
+          <span>📷</span>
+          <span>🌐</span>
+          <span>🐦</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER DETAIL POPUP MODAL (ADMIN ONLY) -->
+  <div id="userDetailModal">
+    <div class="detail-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:2px solid #f0eef9; padding-bottom:10px;">
+        <h3 style="color:var(--primary-dark); font-size:1.2rem; font-weight:900;">👤 User Full Details</h3>
+        <button onclick="closeUserDetailModal()" style="background:none; border:none; color:var(--text-sub); font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">User Name:</span>
+        <span class="user-detail-val" id="mdlName">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Mobile Number:</span>
+        <span class="user-detail-val" id="mdlPhone">-</span>
+      </div>
+      <div class="user-detail-row" style="background: #f4f2fb; padding: 8px 12px; border-radius: 10px; margin: 5px 0;">
+        <span class="user-detail-lbl" style="color: var(--primary-dark); font-weight:bold;">Account Password:</span>
+        <span class="user-detail-val" id="mdlPassword" style="color: #63589f; font-size:1.15rem; font-family: monospace;">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Live Status:</span>
+        <span class="user-detail-val" id="mdlStatus">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Membership:</span>
+        <span class="user-detail-val" id="mdlVip">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">VIP Expiry:</span>
+        <span class="user-detail-val" id="mdlExpiry">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Account Created:</span>
+        <span class="user-detail-val" id="mdlCreated">-</span>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-secondary" style="width:100%; margin-top:0;" onclick="closeUserDetailModal()">Close Window</button>
+      </div>
     </div>
   </div>
 
@@ -474,52 +744,52 @@
 
   <!-- TAB 2: PERMANENT HISTORY -->
   <div id="tabHistory" class="tab-view">
-    <h3 id="txtHistoryHeader" style="color: var(--success); margin-bottom: 15px;">🏆 All-Time Success History</h3>
+    <h3 id="txtHistoryHeader" style="color: var(--success); margin-bottom: 15px; font-weight:900;">🏆 All-Time Success History</h3>
     <div id="historyContainer"><p style="text-align:center; color:#94a3b8; margin-top:20px;">Loading history...</p></div>
   </div>
 
   <!-- TAB 3: VIP -->
   <div id="tabVip" class="tab-view">
-    <div class="game-card" style="border-color: var(--vip); padding: 18px;">
-      <h2 id="txtVipHeader" style="color: var(--vip); margin-bottom: 4px; text-align: center;">🌟 VIP Membership</h2>
-      <p id="txtVipSub" style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px; text-align: center;">Select a plan and pay to unlock VIP games</p>
+    <div class="game-card" style="border-color: #fbbf24; padding: 22px;">
+      <h2 id="txtVipHeader" style="color: var(--primary-dark); margin-bottom: 4px; text-align: center; font-weight:900;">🌟 VIP Membership</h2>
+      <p id="txtVipSub" style="font-size: 0.82rem; color: #7b7597; margin-bottom: 16px; text-align: center;">Select a plan and pay to unlock VIP games</p>
       
       <div class="plan-card selected" id="p1Card" onclick="selectPlan(1)">
         <div>
           <b>1 DAY PASS</b>
-          <div id="txtP1Sub" style="font-size:0.75rem; color:#94a3b8;">Today's games unlock</div>
+          <div id="txtP1Sub" style="font-size:0.75rem; color:#7b7597;">Today's games unlock</div>
         </div>
-        <b style="color:var(--vip); font-size:1.15rem;" id="vPrice1">₹99</b>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice1">₹99</b>
       </div>
 
       <div class="plan-card" id="p7Card" onclick="selectPlan(7)">
         <div>
           <b>7 DAYS VIP (1 Week)</b>
-          <div id="txtP7Sub" style="font-size:0.75rem; color:#94a3b8;">Full week access</div>
+          <div id="txtP7Sub" style="font-size:0.75rem; color:#7b7597;">Full week access</div>
         </div>
-        <b style="color:var(--vip); font-size:1.15rem;" id="vPrice7">₹499</b>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice7">₹499</b>
       </div>
 
       <div class="plan-card" id="p30Card" onclick="selectPlan(30)">
         <div>
           <b>30 DAYS VIP (1 Month)</b>
-          <div id="txtP30Sub" style="font-size:0.75rem; color:#94a3b8;">Full month blast games</div>
+          <div id="txtP30Sub" style="font-size:0.75rem; color:#7b7597;">Full month blast games</div>
         </div>
-        <b style="color:var(--vip); font-size:1.15rem;" id="vPrice30">₹1499</b>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice30">₹1499</b>
       </div>
 
       <!-- Payment Section -->
-      <div style="background: #080e1a; padding: 14px; border-radius: 10px; margin-top: 15px; border: 1px solid #1e293b;">
-        <span id="txtUpiNotice" style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom: 4px;">Pay to Official UPI ID:</span>
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#111a2d; padding:8px 12px; border-radius:6px;">
-          <b id="vipUpiText" style="color:#38bdf8; font-size:0.95rem;">mkmatka@upi</b>
-          <button style="background:var(--border); color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer;" onclick="copyUpi()">COPY</button>
+      <div style="background: #f7f6fc; padding: 18px; border-radius: 18px; margin-top: 15px; border: 1.5px solid var(--card-border);">
+        <span id="txtUpiNotice" style="font-size:0.8rem; color:#7b7597; display:block; margin-bottom: 6px;">Pay to Official UPI ID:</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; padding:12px 14px; border-radius:12px; border: 1.5px solid var(--card-border);">
+          <b id="vipUpiText" style="color:var(--primary); font-size:0.95rem;">mkmatka@upi</b>
+          <button style="background:var(--purple-gradient); color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:0.75rem; font-weight:900; cursor:pointer;" onclick="copyUpi()">COPY</button>
         </div>
 
         <div style="margin-top: 15px;">
-          <label id="txtTrxLabel" style="font-size:0.8rem; color:#cbd5e1; display:block; margin-bottom:5px;">Enter Transaction ID / UTR:</label>
+          <label id="txtTrxLabel" style="font-size:0.8rem; color:#4a4269; display:block; margin-bottom:6px;">Enter Transaction ID / UTR:</label>
           <input type="text" id="userTrxId" placeholder="Enter 12-digit UTR number">
-          <button id="btnSubmitTrx" class="btn" style="background:var(--vip); color:#000;" onclick="submitPaymentRequest()">Submit for Approval</button>
+          <button id="btnSubmitTrx" class="btn" onclick="submitPaymentRequest()">Submit for Approval</button>
         </div>
       </div>
     </div>
@@ -528,41 +798,41 @@
   <!-- TAB 4: PROFILE -->
   <div id="tabProfile" class="tab-view">
     <div id="profileCardBox" class="rich-vip-card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
         <div>
-          <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">MK Guessing Member</span>
-          <h2 id="richName" style="color: #fff; font-size: 1.4rem; margin-top: 3px;">User</h2>
-          <p id="richPhone" style="font-size: 0.85rem; color: #94a3b8;">+91 0000000000</p>
+          <span style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; font-weight:700;">MK Guessing Member</span>
+          <h2 id="richName" style="color: #fff; font-size: 1.5rem; margin-top: 4px; font-weight:900;">User</h2>
+          <p id="richPhone" style="font-size: 0.88rem; opacity: 0.85;">+91 0000000000</p>
         </div>
         <span id="richPill" class="vip-badge-pill vip-pill-free">FREE USER</span>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 14px;">
         <div>
-          <span id="txtMemStatusLbl" style="font-size: 0.7rem; color: #94a3b8; display: block;">MEMBERSHIP STATUS</span>
+          <span id="txtMemStatusLbl" style="font-size: 0.7rem; opacity: 0.8; display: block; font-weight:700;">MEMBERSHIP STATUS</span>
           <b id="richStatusText" style="font-size: 0.95rem; color: #fff;">Free Account</b>
         </div>
         <div style="text-align: right;">
-          <span id="txtExpLbl" style="font-size: 0.7rem; color: #94a3b8; display: block;">VIP EXPIRY DATE</span>
-          <b id="richExpiryText" style="font-size: 0.95rem; color: var(--vip);">None</b>
+          <span id="txtExpLbl" style="font-size: 0.7rem; opacity: 0.8; display: block; font-weight:700;">VIP EXPIRY DATE</span>
+          <b id="richExpiryText" style="font-size: 0.95rem; color: #fbbf24;">None</b>
         </div>
       </div>
 
       <div id="vipCountdownBox" class="timer-box" style="display: none;">
-        <span style="font-size: 0.75rem; color: #cbd5e1;">⏳ VIP Time Left:</span>
+        <span style="font-size: 0.75rem; color: #ffffff; font-weight:bold;">⏳ VIP Time Left:</span>
         <span id="vipCountdownTimer" class="timer-text">00:00:00</span>
       </div>
     </div>
 
     <div class="game-card">
-      <h4 id="txtEditProfTitle" style="margin-bottom: 8px;">Edit Profile</h4>
+      <h4 id="txtEditProfTitle" style="margin-bottom: 10px; color:var(--primary-dark);">Edit Profile</h4>
       <input type="text" id="editUserName" placeholder="Enter Correct Name">
-      <button id="btnSaveName" class="btn" style="padding:8px;" onclick="updateProfileName()">Update Name</button>
+      <button id="btnSaveName" class="btn" style="padding:11px; margin-top:6px;" onclick="updateProfileName()">Update Name</button>
     </div>
 
     <div class="game-card">
-      <h4 id="txtPayHistoryTitle" style="margin-bottom: 8px; color:#38bdf8;">Your VIP Payment Requests</h4>
-      <div id="userPaymentHistoryList"><p style="color:#94a3b8; font-size:0.85rem;">Loading status...</p></div>
+      <h4 id="txtPayHistoryTitle" style="margin-bottom: 10px; color:var(--primary);">Your VIP Payment Requests</h4>
+      <div id="userPaymentHistoryList"><p style="color:#7b7597; font-size:0.85rem;">Loading status...</p></div>
     </div>
 
     <button id="btnLogout" class="btn btn-secondary" onclick="logOut()">Logout Account</button>
@@ -570,23 +840,23 @@
 
   <!-- HIDDEN ADMIN VIEW -->
   <div id="tabAdmin" class="tab-view">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h2 style="color: var(--primary); font-size: 1.2rem;">⚙️ Admin Dashboard</h2>
-      <button onclick="exitAdmin()" style="background: var(--danger); border: none; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold;">Exit</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h2 style="color: var(--primary-dark); font-size: 1.3rem; font-weight:900;">⚙️ Admin Dashboard</h2>
+      <button onclick="exitAdmin()" style="background: var(--danger); border: none; color: white; padding: 6px 14px; border-radius: 8px; font-weight: bold; cursor:pointer;">Exit</button>
     </div>
 
     <div class="admin-subnav">
       <button class="admin-subnav-btn active" onclick="switchAdminTab('admSecGames', this)">🎯 Games</button>
-      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Live Status</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Passwords</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice & Alert</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecApprovals', this)">🔔 Approvals</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
     </div>
 
-    <!-- 1. ADMIN GAMES SECTION (WITH MULTI-NUMBERS & PANA) -->
+    <!-- 1. ADMIN GAMES SECTION -->
     <div id="admSecGames" class="admin-section active">
       <div class="game-card">
-        <h4 style="margin-bottom: 8px; color:var(--primary);">Post Numbers (Multiple Digits & Pana Supported)</h4>
+        <h4 style="margin-bottom: 10px; color:var(--primary-dark);">Post Numbers (Multiple Digits & Pana Supported)</h4>
         <input type="text" id="admMarket" placeholder="Game Name (e.g. KALYAN, MILAN DAY)">
         <select id="admType">
           <option value="FREE">Free Game (FREE)</option>
@@ -594,69 +864,69 @@
         </select>
         
         <!-- OPEN PANA & DIGITS -->
-        <label style="font-size:0.75rem; color:#38bdf8; font-weight:bold;">Open Pana (Space/Comma for multiple):</label>
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma for multiple):</label>
         <input type="text" id="admOpenPana" placeholder="e.g. 128, 137, 236">
 
-        <label style="font-size:0.75rem; color:#94a3b8;">Open Digits (Space/Comma for 1, 3, 5+ numbers):</label>
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits (Space/Comma for 1, 3, 5+ numbers):</label>
         <input type="text" id="admOpen" placeholder="e.g. 1, 4, 7, 9">
 
         <!-- JODI NUMBERS -->
-        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold;">Jodi Numbers (Space/Comma for 1, 3, 6+ numbers):</label>
+        <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers (Space/Comma for 1, 3, 6+ numbers):</label>
         <input type="text" id="admJodi" placeholder="e.g. 14, 47, 79, 91, 55">
 
         <!-- CLOSE DIGITS & PANA -->
-        <label style="font-size:0.75rem; color:#94a3b8;">Close Digits (Space/Comma for 1, 3, 5+ numbers):</label>
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits (Space/Comma for 1, 3, 5+ numbers):</label>
         <input type="text" id="admClose" placeholder="e.g. 2, 5, 8">
 
-        <label style="font-size:0.75rem; color:#38bdf8; font-weight:bold;">Close Pana (Space/Comma for multiple):</label>
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Close Pana (Space/Comma for multiple):</label>
         <input type="text" id="admClosePana" placeholder="e.g. 345, 679">
 
         <button class="btn" onclick="saveGame()">Publish / Live Update & Send Notification</button>
       </div>
 
-      <h4 style="margin: 15px 0 8px;">Live Games (Select Exactly Which Single Number Passed)</h4>
+      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games (Select Exactly Which Single Number Passed)</h4>
       <div id="admGamesList"></div>
     </div>
 
-    <!-- 2. ADMIN USERS & LIVE ONLINE STATUS -->
+    <!-- 2. ADMIN USERS SECTION (WITH INDIVIDUAL VIEW & PASSWORDS) -->
     <div id="admSecUsers" class="admin-section">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-        <h4 style="color: #38bdf8;">Registered Users & Live Status</h4>
-        <span id="onlineCountBadge" style="font-size:0.75rem; color:#10b981; font-weight:bold;">Online: 0</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h4 style="color: var(--primary-dark);">Registered Users & Passwords</h4>
+        <span id="onlineCountBadge" style="font-size:0.78rem; color:#10b981; font-weight:bold;">Online: 0</span>
       </div>
-      <div id="admUsersList"><p style="color:#94a3b8;">Loading users...</p></div>
+      <div id="admUsersList"><p style="color:#7b7597;">Loading users...</p></div>
     </div>
 
-    <!-- 3. ADMIN NOTICE & POPUP BROADCAST -->
+    <!-- 3. ADMIN NOTICE & BROADCAST -->
     <div id="admSecBroadcast" class="admin-section">
       <div class="game-card">
-        <h4 style="color:var(--vip); margin-bottom:8px;">📢 App Top Highlight Notice Banner</h4>
-        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">This text will show permanently at the top of user screens.</p>
+        <h4 style="color:var(--primary-dark); margin-bottom:8px;">📢 App Top Highlight Notice Banner</h4>
+        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">This text will show permanently at the top of user screens.</p>
         <input type="text" id="admTopNoticeText" placeholder="Enter breaking notice or update text">
-        <div style="display:flex; gap:6px;">
+        <div style="display:flex; gap:8px;">
           <button class="btn" style="flex:2;" onclick="saveTopNotice()">Show Banner</button>
           <button class="btn-danger" style="flex:1;" onclick="clearTopNotice()">Hide Banner</button>
         </div>
       </div>
 
       <div class="game-card">
-        <h4 style="color:#38bdf8; margin-bottom:8px;">🔔 Send Instant Alert Notification</h4>
-        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Sends instant alert popup & OneSignal Mobile Push Notification.</p>
+        <h4 style="color:var(--primary); margin-bottom:8px;">🔔 Send Instant Alert Notification</h4>
+        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">Sends instant alert popup & OneSignal Mobile Push Notification.</p>
         <input type="text" id="admAlertMsg" placeholder="Alert message (e.g. Kalyan Result Blast!)">
-        <button class="btn" style="background:#38bdf8; color:#000;" onclick="sendInstantBroadcast()">Send Push Alert Now</button>
+        <button class="btn" style="background:#5b4d96;" onclick="sendInstantBroadcast()">Send Push Alert Now</button>
       </div>
     </div>
 
     <!-- 4. ADMIN APPROVALS SECTION -->
     <div id="admSecApprovals" class="admin-section">
-      <h4 style="color: var(--vip); margin-bottom: 8px;">VIP Payment Requests (Approve / Reject)</h4>
+      <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Payment Requests (Approve / Reject)</h4>
       <div id="adminApprovalsList">Loading...</div>
     </div>
 
     <!-- 5. ADMIN SETTINGS SECTION -->
     <div id="admSecSettings" class="admin-section">
       <div class="game-card">
-        <h4 style="color: var(--vip); margin-bottom: 8px;">VIP Prices & UPI Setup</h4>
+        <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Prices & UPI Setup</h4>
         <input type="number" id="admP1" placeholder="1 Day Price">
         <input type="number" id="admP7" placeholder="7 Days Price">
         <input type="number" id="admP30" placeholder="30 Days Price">
@@ -666,7 +936,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- CURVED BOTTOM NAVIGATION (IMAGE 2 STYLE) -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
     <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
@@ -675,7 +945,7 @@
   </div>
 
   <script>
-    // 1. CONFIGURATION
+    // CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyBr47Pc-j_IWkDBn7LIruxGsPTTgrV1LR4",
       authDomain: "live--update.firebaseapp.com",
@@ -692,7 +962,6 @@
     }
     const db = firebase.firestore();
 
-    // ONESIGNAL KEYS
     const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
     const ONESIGNAL_REST_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
 
@@ -703,6 +972,7 @@
     let timerInterval = null;
     let presenceInterval = null;
     let lastHandledNoticeId = localStorage.getItem("last_alert_id") || "";
+    let usersCache = [];
 
     const translations = {
       en: {
@@ -767,7 +1037,11 @@
       }
     };
 
-    // ONESIGNAL AUTOMATIC PUSH SENDER FUNCTION
+    function togglePassVisibility(inputId) {
+      const field = document.getElementById(inputId);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+
     function sendPushNotification(title, message) {
       fetch("https://onesignal.com/api/v1/notifications", {
         method: "POST",
@@ -783,7 +1057,7 @@
         })
       })
       .then(res => res.json())
-      .then(data => console.log("OneSignal push sent:", data))
+      .then(data => console.log("Push sent:", data))
       .catch(err => console.error("Push error:", err));
     }
 
@@ -887,10 +1161,10 @@
 
     function toggleAuth() {
       isRegister = !isRegister;
-      document.getElementById("authHeading").innerText = isRegister ? "Create New Account" : "Login";
-      document.getElementById("nameInputWrap").style.display = isRegister ? "block" : "none";
-      document.getElementById("authSubmitBtn").innerText = isRegister ? "Register Account" : "Login";
-      document.getElementById("authSwitchBtn").innerText = isRegister ? "Already have account? Login" : "Create New Account (Register)";
+      document.getElementById("authHeading").innerText = isRegister ? "Register" : "Login";
+      document.getElementById("nameInputWrap").style.display = isRegister ? "flex" : "none";
+      document.getElementById("authSubmitText").innerText = isRegister ? "REGISTER NOW" : "LOGIN NOW";
+      document.getElementById("authSwitchBtn").innerText = isRegister ? "Already registered? Login" : "Don't have an account? Register";
     }
 
     function handleAuthSubmit() {
@@ -933,7 +1207,7 @@
           } else {
             const data = doc.data();
             if (data.password !== pass) {
-              alert("Wrong password!");
+              alert("Wrong password! Please check again.");
             } else {
               alert("Login successful!");
               finishAuth(data);
@@ -1076,7 +1350,7 @@
           box.innerHTML = "";
 
           if (snapshot.empty) {
-            box.innerHTML = `<p style="color:#94a3b8; font-size:0.85rem;">${currentLang === "kn" ? "ಯಾವುದೇ ಪಾವತಿ ರಿಕ್ವೆಸ್ಟ್‌ಗಳಿಲ್ಲ." : "No payment requests submitted yet."}</p>`;
+            box.innerHTML = `<p style="color:#7b7597; font-size:0.85rem;">${currentLang === "kn" ? "ಯಾವುದೇ ಪಾವತಿ ರಿಕ್ವೆಸ್ಟ್‌ಗಳಿಲ್ಲ." : "No payment requests submitted yet."}</p>`;
             return;
           }
 
@@ -1095,12 +1369,12 @@
             }
 
             box.innerHTML += `
-              <div style="background:#0a1120; border:1px solid #1e293b; padding:8px 12px; border-radius:8px; margin-bottom:8px; font-size:0.85rem;">
+              <div style="background:#ffffff; border:1.5px solid var(--card-border); padding:10px 14px; border-radius:12px; margin-bottom:8px; font-size:0.85rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                   <b>${r.days} Days VIP Pass</b>
                   ${statusPill}
                 </div>
-                <div style="color:#94a3b8; font-size:0.75rem;">UTR / Trx ID: <span style="color:#38bdf8;">${r.trxId}</span></div>
+                <div style="color:#7b7597; font-size:0.75rem;">UTR / Trx ID: <span style="color:var(--primary); font-family:monospace; font-weight:bold;">${r.trxId}</span></div>
               </div>
             `;
           });
@@ -1163,7 +1437,7 @@
 
     function renderDynamicNumberList(rawInput, passedNumber) {
       const items = splitNumbers(rawInput);
-      if (items.length === 0) return "<span style='color:#64748b;'>-</span>";
+      if (items.length === 0) return "<span style='color:#a09cb0;'>-</span>";
 
       return items.map(item => {
         const isPassed = (passedNumber && item.toString().trim() === passedNumber.toString().trim());
@@ -1178,7 +1452,7 @@
           box.innerHTML = "";
 
           if (snapshot.empty) {
-            box.innerHTML = `<p style='text-align:center; color:#94a3b8; margin-top:25px;'>${currentLang === "kn" ? "ಇನ್ನೂ ಯಾವುದೇ ಆಟ ಲೈವ್ ಆಗಿಲ್ಲ." : "No games live right now."}</p>`;
+            box.innerHTML = `<p style='text-align:center; color:#7b7597; margin-top:25px;'>${currentLang === "kn" ? "ಇನ್ನೂ ಯಾವುದೇ ಆಟ ಲೈವ್ ಆಗಿಲ್ಲ." : "No games live right now."}</p>`;
             return;
           }
 
@@ -1274,7 +1548,7 @@
 
     function loadAllHistory() {
       const box = document.getElementById("historyContainer");
-      box.innerHTML = "<p style='text-align:center; color:#94a3b8; margin-top:20px;'>Loading history...</p>";
+      box.innerHTML = "<p style='text-align:center; color:#7b7597; margin-top:20px;'>Loading history...</p>";
 
       db.collection("games").where("isPassed", "==", true).onSnapshot(snapshot => {
         box.innerHTML = "";
@@ -1283,7 +1557,7 @@
         snapshot.forEach(doc => passedGames.push({ id: doc.id, ...doc.data() }));
 
         if (passedGames.length === 0) {
-          box.innerHTML = `<p style='text-align:center; color:#94a3b8; margin-top:25px;'>${currentLang === "kn" ? "ಯಾವುದೇ ಪಾಸ್ ಆದ ಹಿಸ್ಟರಿ ಲಭ್ಯವಿಲ್ಲ." : "No passed history records found."}</p>`;
+          box.innerHTML = `<p style='text-align:center; color:#7b7597; margin-top:25px;'>${currentLang === "kn" ? "ಯಾವುದೇ ಪಾಸ್ ಆದ ಹಿಸ್ಟರಿ ಲಭ್ಯವಿಲ್ಲ." : "No passed history records found."}</p>`;
           return;
         }
 
@@ -1433,7 +1707,6 @@
       btn.classList.add('active');
     }
 
-    // ADMIN: POST GAME & AUTOMATIC ONESIGNAL PUSH
     function saveGame() {
       const market = document.getElementById("admMarket").value.trim().toUpperCase();
       const type = document.getElementById("admType").value;
@@ -1467,7 +1740,6 @@
         passedNumber: null,
         createdTime: Date.now()
       }, { merge: true }).then(() => {
-        // Automatic Mobile Push Notification
         const pushTitle = `🎯 ${market} (${type}) LIVE!`;
         const pushBody = `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`;
         sendPushNotification(pushTitle, pushBody);
@@ -1485,12 +1757,12 @@
 
     function renderAdminGames() {
       const box = document.getElementById("admGamesList");
-      box.innerHTML = "<p style='color:#94a3b8;'>Loading...</p>";
+      box.innerHTML = "<p style='color:#7b7597;'>Loading...</p>";
 
       db.collection("games").get().then(snapshot => {
         box.innerHTML = "";
         if (snapshot.empty) {
-          box.innerHTML = "<p style='color:#94a3b8;'>No games posted.</p>";
+          box.innerHTML = "<p style='color:#7b7597;'>No games posted.</p>";
           return;
         }
 
@@ -1518,12 +1790,12 @@
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                   <span class="badge badge-free">${g.type}</span>
-                  <b>${g.market}</b> <span style="font-size:0.75rem; color:#38bdf8;">(${g.date} • ${g.postTime || ''})</span>
+                  <b style="color:var(--primary-dark); font-size:1.1rem; margin-left:4px;">${g.market}</b> <span style="font-size:0.75rem; color:var(--primary);">(${g.date} • ${g.postTime || ''})</span>
                 </div>
                 <button class="btn-danger" onclick="deleteGame('${g.id}')">Delete</button>
               </div>
 
-              <div style="font-size:0.78rem; margin: 8px 0; color:#cbd5e1; line-height: 1.4;">
+              <div style="font-size:0.82rem; margin: 10px 0; color:#4a4269; line-height: 1.5;">
                 ${openPanaNums.length ? `Open Pana: <b>[${openPanaNums.join(', ')}]</b><br>` : ''}
                 Open: <b>[${openNums.join(', ')}]</b><br>
                 Jodi: <b>[${jodiNums.join(', ')}]</b><br>
@@ -1531,17 +1803,17 @@
                 ${closePanaNums.length ? `Close Pana: <b>[${closePanaNums.join(', ')}]</b>` : ''}
               </div>
 
-              <div style="margin-top:10px; background:#080e1a; padding:10px; border-radius:8px; border:1px solid #26354d;">
-                <label style="font-size:0.75rem; color:#facc15; font-weight:bold; display:block; margin-bottom:5px;">Select Exact Single Number to Mark as PASSED:</label>
+              <div style="margin-top:10px; background:#f7f6fc; padding:12px; border-radius:14px; border:1.5px solid var(--card-border);">
+                <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-bottom:6px;">Select Exact Single Number to Mark as PASSED:</label>
                 <div style="display:flex; gap:6px;">
                   <select id="selPass_${g.id}" style="margin-bottom:0; font-size:0.82rem;">
                     ${dropdownOptions}
                   </select>
-                  <button class="btn" style="width:auto; white-space:nowrap; padding:6px 12px; margin-top:0;" onclick="confirmPassSelected('${g.id}', '${g.market}')">Confirm Pass</button>
+                  <button class="btn" style="width:auto; white-space:nowrap; padding:6px 14px; margin-top:0;" onclick="confirmPassSelected('${g.id}', '${g.market}')">Confirm Pass</button>
                 </div>
 
                 ${g.isPassed ? `
-                  <div style="color:var(--success); font-weight:bold; font-size:0.8rem; margin-top:6px;">
+                  <div style="color:var(--success); font-weight:bold; font-size:0.82rem; margin-top:8px;">
                     ✓ Currently Marked: ${g.passType} [${g.passedNumber}] PASSED
                   </div>
                 ` : ''}
@@ -1564,7 +1836,6 @@
           passType: type,
           passedNumber: number
         }).then(() => {
-          // Push notification on Pass result
           sendPushNotification(`🏆 ${marketName} BLAST RESULT!`, `${type} Number [${number}] PASSED! Check App Now!`);
           alert(`Successfully marked ${type} [${number}] as PASSED!`);
           renderAdminGames();
@@ -1581,20 +1852,21 @@
       }
     }
 
+    // ADMIN USERS RENDERING WITH PASSWORD & INDIVIDUAL MODAL VIEW
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
-      box.innerHTML = "<p style='color:#94a3b8;'>Loading users...</p>";
+      box.innerHTML = "<p style='color:#7b7597;'>Loading users...</p>";
 
       db.collection("users").onSnapshot(snapshot => {
         box.innerHTML = "";
         if (snapshot.empty) {
-          box.innerHTML = "<p style='color:#94a3b8;'>No users registered yet.</p>";
+          box.innerHTML = "<p style='color:#7b7597;'>No users registered yet.</p>";
           onlineBadge.innerText = "Online: 0";
           return;
         }
 
-        let users = [];
+        usersCache = [];
         let onlineCount = 0;
         const now = Date.now();
 
@@ -1603,50 +1875,79 @@
           const isUserOnline = (u.isOnline === true) && (u.lastSeen && (now - u.lastSeen < 60000));
           if (isUserOnline) onlineCount++;
           u.activeOnline = isUserOnline;
-          users.push(u);
+          usersCache.push(u);
         });
 
-        onlineBadge.innerText = `Online: ${onlineCount} / Total: ${users.length}`;
-        users.sort((a,b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+        onlineBadge.innerText = `Online: ${onlineCount} / Total: ${usersCache.length}`;
+        usersCache.sort((a,b) => (b.lastSeen || 0) - (a.lastSeen || 0));
 
-        users.forEach(u => {
+        usersCache.forEach(u => {
           const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
           const expText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : 'N/A';
-          const lastSeenTime = u.lastSeen ? new Date(u.lastSeen).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : 'Never';
+          const userPass = u.password || 'No Pass Set';
 
           box.innerHTML += `
             <div class="admin-user-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                 <div>
-                  <b style="font-size:0.95rem; color:#fff;">${u.name || 'User'}</b>
-                  <div style="font-size:0.8rem; color:#94a3b8;">📱 +91 ${u.phone}</div>
+                  <b style="font-size:1.05rem; color:var(--primary-dark);">${u.name || 'User'}</b>
+                  <div style="font-size:0.82rem; color:#7b7597; margin-top:2px;">📱 +91 ${u.phone}</div>
+                  <div style="font-size:0.82rem; color:var(--primary); margin-top:4px;">
+                    🔑 Pass: <b style="color:#5b4d96; font-family:monospace; font-size:1rem; font-weight:900;">${userPass}</b>
+                  </div>
                 </div>
-                <div>
+                <div style="text-align:right;">
                   <span class="status-badge ${u.activeOnline ? 'status-online' : 'status-offline'}">
                     ${u.activeOnline ? '● ONLINE' : '○ Offline'}
-                  </span>
-                  <span class="badge ${isVip ? 'badge-vip' : 'badge-free'}">
+                  </span><br>
+                  <span class="badge ${isVip ? 'badge-vip' : 'badge-free'}" style="margin-top:5px;">
                     ${isVip ? '★ VIP' : 'FREE'}
                   </span>
                 </div>
               </div>
 
-              <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">
-                Last Seen: <b style="color:#cbd5e1;">${u.activeOnline ? 'Just Now' : lastSeenTime}</b> • 
-                Expiry: <b style="color:${isVip ? 'var(--vip)' : '#cbd5e1'};">${expText}</b>
+              <div style="font-size:0.75rem; color:#7b7597; margin-bottom:10px;">
+                Expiry: <b style="color:${isVip ? 'var(--vip)' : '#4a4269'};">${expText}</b>
+              </div>
+
+              <!-- VIEW SINGLE USER DETAIL BUTTON -->
+              <div style="margin-bottom:8px;">
+                <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Password</button>
               </div>
 
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:var(--vip); flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
-                <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:var(--vip); flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
-                <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:var(--vip); flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
-                <button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeVip('${u.phone}')">Cancel VIP</button>
-                <button class="btn-danger" style="padding:4px 8px; font-size:0.75rem; background:#b91c1c;" onclick="deleteUserAccount('${u.phone}')">🗑 Delete</button>
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem;" onclick="removeVip('${u.phone}')">Cancel VIP</button>
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem; background:#b91c1c;" onclick="deleteUserAccount('${u.phone}')">🗑 Delete</button>
               </div>
             </div>
           `;
         });
       });
+    }
+
+    // OPEN SINGLE USER FULL DETAILS MODAL
+    function openUserDetail(phone) {
+      const u = usersCache.find(x => x.phone === phone);
+      if (!u) return;
+
+      const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
+      
+      document.getElementById("mdlName").innerText = u.name || "N/A";
+      document.getElementById("mdlPhone").innerText = "+91 " + u.phone;
+      document.getElementById("mdlPassword").innerText = u.password || "N/A";
+      document.getElementById("mdlStatus").innerHTML = u.activeOnline ? "<span style='color:#10b981;'>● ONLINE LIVE</span>" : "<span style='color:#94a3b8;'>○ Offline</span>";
+      document.getElementById("mdlVip").innerHTML = isVip ? "<span style='color:#f59e0b;'>★ ACTIVE VIP</span>" : "FREE USER";
+      document.getElementById("mdlExpiry").innerText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : "None";
+      document.getElementById("mdlCreated").innerText = u.createdTime ? new Date(u.createdTime).toLocaleString() : "Earlier Records";
+
+      document.getElementById("userDetailModal").style.display = "flex";
+    }
+
+    function closeUserDetailModal() {
+      document.getElementById("userDetailModal").style.display = "none";
     }
 
     function setVipDuration(phone, days) {
@@ -1708,13 +2009,11 @@
       const msg = document.getElementById("admAlertMsg").value.trim();
       if (!msg) { alert("Please enter message to alert!"); return; }
 
-      // 1. In-app popup
       db.collection("settings").doc("instant_alert").set({
         message: msg,
         id: "alert_" + Date.now(),
         timestamp: Date.now()
       }).then(() => {
-        // 2. Mobile push notification
         sendPushNotification("📢 IMPORTANT ALERT", msg);
         alert("Instant popup alert & OneSignal Push sent!");
         document.getElementById("admAlertMsg").value = "";
@@ -1723,7 +2022,7 @@
 
     function renderVipApprovals() {
       const box = document.getElementById("adminApprovalsList");
-      box.innerHTML = "<p style='color:#94a3b8;'>Searching requests...</p>";
+      box.innerHTML = "<p style='color:#7b7597;'>Searching requests...</p>";
 
       db.collection("vip_requests").onSnapshot(snapshot => {
         box.innerHTML = "";
@@ -1737,7 +2036,7 @@
         });
 
         if (pending.length === 0) {
-          box.innerHTML = "<p style='color:#94a3b8; font-size:0.85rem;'>No pending payment requests.</p>";
+          box.innerHTML = "<p style='color:#7b7597; font-size:0.85rem;'>No pending payment requests.</p>";
           return;
         }
 
@@ -1745,16 +2044,16 @@
 
         pending.forEach(req => {
           box.innerHTML += `
-            <div style="background:#080e1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;">
+            <div style="background:#ffffff; padding:14px; border-radius:14px; margin-bottom:10px; border:1.5px solid var(--card-border);">
               <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                 <b>${req.userName} (${req.userPhone})</b>
-                <b style="color:var(--vip);">${req.days} Days Pass</b>
+                <b style="color:var(--primary); font-size:0.95rem;">${req.days} Days Pass</b>
               </div>
-              <div style="font-size:0.8rem; color:#38bdf8; margin-bottom:8px;">
-                Trx ID: <b>${req.trxId}</b>
+              <div style="font-size:0.8rem; color:#7b7597; margin-bottom:8px;">
+                Trx ID: <b style="color:var(--primary-dark);">${req.trxId}</b>
               </div>
               <div style="display:flex; gap:6px;">
-                <button class="btn" style="background:var(--success); color:#000; flex:1; padding:6px; font-size:0.8rem;" onclick="approveVipRequest('${req.id}', '${req.userPhone}', ${req.days})">✓ Approve (Success)</button>
+                <button class="btn" style="background:var(--success); color:#fff; flex:1; padding:8px; font-size:0.82rem; margin-top:0;" onclick="approveVipRequest('${req.id}', '${req.userPhone}', ${req.days})">✓ Approve (Success)</button>
                 <button class="btn-danger" style="flex:1;" onclick="rejectVipRequest('${req.id}')">✕ Reject</button>
               </div>
             </div>
