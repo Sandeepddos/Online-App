@@ -24,7 +24,14 @@
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false }
       });
-      // Ask user permission automatically on page open
+
+      // Display in-app alert when notification arrives while app is open
+      OneSignal.Notifications.addEventListener("foregroundWillDisplay", function(event) {
+        const notif = event.notification;
+        showInAppNotification(notif.title || "🎯 Matka King Alert", notif.body || "");
+      });
+
+      // Prompt user for notification permissions automatically
       await OneSignal.Slidedown.promptPush();
     });
   </script>
@@ -56,6 +63,31 @@
       padding-bottom: 90px;
       min-height: 100vh;
     }
+
+    /* IN-APP TOAST NOTIFICATION POPUP (WHEN APP IS OPEN) */
+    #inAppToast {
+      position: fixed;
+      top: -100px;
+      left: 14px;
+      right: 14px;
+      max-width: 440px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 30px rgba(99, 88, 159, 0.35);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: top 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    #inAppToast.show { top: 16px; }
+    #inAppToast .toast-icon { font-size: 1.8rem; line-height: 1; }
+    #inAppToast .toast-content { flex: 1; }
+    #inAppToast .toast-title { font-size: 0.95rem; font-weight: 900; color: var(--primary-dark); }
+    #inAppToast .toast-body { font-size: 0.82rem; color: var(--text-sub); margin-top: 2px; }
 
     /* HEADER */
     header {
@@ -92,6 +124,24 @@
     .brand-title { display: flex; flex-direction: column; }
     .brand-title h1 { font-size: 1.25rem; color: var(--primary-dark); font-weight: 900; letter-spacing: 0.5px; line-height: 1.1; }
     .brand-title span { font-size: 0.65rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+
+    .bell-btn {
+      background: #f0eef9;
+      border: 1.5px solid var(--card-border);
+      color: var(--primary-dark);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .bell-btn:hover { background: var(--primary); color: #fff; }
 
     .lang-round-btn {
       background: #f0eef9;
@@ -653,6 +703,15 @@
 </head>
 <body>
 
+  <!-- IN-APP TOAST NOTIFICATION POPUP -->
+  <div id="inAppToast">
+    <div class="toast-icon">🔔</div>
+    <div class="toast-content">
+      <div class="toast-title" id="toastTitle">New Alert</div>
+      <div class="toast-body" id="toastBody">Game numbers updated live!</div>
+    </div>
+  </div>
+
   <!-- TOP HIGHLIGHT NOTICE BANNER -->
   <div id="topNoticeBanner"></div>
 
@@ -755,8 +814,13 @@
       </div>
     </div>
     
-    <div class="lang-round-btn" id="langToggleBtn" onclick="toggleLang()" title="Switch Language">
-      EN
+    <div class="header-actions">
+      <button class="bell-btn" onclick="requestNotificationPermission()" title="Enable Notification">
+        🔔
+      </button>
+      <div class="lang-round-btn" id="langToggleBtn" onclick="toggleLang()" title="Switch Language">
+        EN
+      </div>
     </div>
   </header>
 
@@ -992,6 +1056,7 @@
     let presenceInterval = null;
     let lastHandledNoticeId = localStorage.getItem("last_alert_id") || "";
     let usersCache = [];
+    let initialGamesLoaded = false;
 
     const translations = {
       en: {
@@ -1056,14 +1121,44 @@
       }
     };
 
+    function requestNotificationPermission() {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          await OneSignal.Slidedown.promptPush();
+        });
+      }
+    }
+
+    // IN-APP POPUP NOTIFICATION BANNER
+    function showInAppNotification(title, message) {
+      const toast = document.getElementById("inAppToast");
+      document.getElementById("toastTitle").innerText = title;
+      document.getElementById("toastBody").innerText = message;
+      toast.classList.add("show");
+
+      // Play soft audio beep if supported
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch(e) {}
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 5000);
+    }
+
     function togglePassVisibility(inputId) {
       const field = document.getElementById(inputId);
       field.type = field.type === "password" ? "text" : "password";
     }
 
-    // RELIABLE ONESIGNAL PUSH NOTIFICATION FUNCTION
+    // RELIABLE ONESIGNAL PUSH SENDER FOR BOTH BACKGROUND & FOREGROUND
     function sendPushNotification(title, message) {
-      // 1. Send with Key
       fetch("https://onesignal.com/api/v1/notifications", {
         method: "POST",
         headers: {
@@ -1075,31 +1170,17 @@
           included_segments: ["Total Subscriptions", "Subscribed Users"],
           headings: { "en": title },
           contents: { "en": message },
-          url: "https://sandeeppkdos.github.io/Online-App/"
+          url: "https://sandeeppkdos.github.io/Online-App/",
+          web_buttons: [
+            { id: "read-more", text: "Open App", icon: "https://sandeeppkdos.github.io/Online-App/favicon.ico" }
+          ]
         })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("Push sent:", data);
-        // Fallback with Basic auth if Key error
-        if (data.errors) {
-          fetch("https://onesignal.com/api/v1/notifications", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              "Authorization": "Basic " + ONESIGNAL_REST_KEY
-            },
-            body: JSON.stringify({
-              app_id: ONESIGNAL_APP_ID,
-              included_segments: ["Total Subscriptions"],
-              headings: { "en": title },
-              contents: { "en": message },
-              url: "https://sandeeppkdos.github.io/Online-App/"
-            })
-          });
-        }
+        console.log("Push dispatch status:", data);
       })
-      .catch(err => console.error("Push error:", err));
+      .catch(err => console.error("Push network error:", err));
     }
 
     function toggleLang() {
@@ -1192,7 +1273,8 @@
           if (alertData && alertData.id && alertData.id !== lastHandledNoticeId) {
             lastHandledNoticeId = alertData.id;
             localStorage.setItem("last_alert_id", alertData.id);
-            alert("🔔 " + (alertData.message || "New Update Released!"));
+            // Show toast popup
+            showInAppNotification("📢 Announcement", alertData.message || "New Update Released!");
           }
         }
       });
@@ -1265,6 +1347,8 @@
       renderProfile();
       listenRealtimeGames();
       listenUserPayments();
+      // Ask push permission on login
+      requestNotificationPermission();
     }
 
     function isVipActive() {
@@ -1519,6 +1603,17 @@
     function listenRealtimeGames() {
       db.collection("games").limit(50)
         .onSnapshot(snapshot => {
+          // If games change while app is open, show in-app banner to user
+          if (initialGamesLoaded) {
+            snapshot.docChanges().forEach(change => {
+              if (change.type === "added" || change.type === "modified") {
+                const g = change.doc.data();
+                showInAppNotification(`🎯 ${g.market} Updated!`, `Check live numbers now.`);
+              }
+            });
+          }
+          initialGamesLoaded = true;
+
           const box = document.getElementById("gamesContainer");
           box.innerHTML = "";
 
@@ -1829,12 +1924,12 @@
         passes: [],
         createdTime: Date.now()
       }, { merge: true }).then(() => {
-        // Send Background Push Notification to all users
+        // Instant Push Trigger
         const pushTitle = `🎯 ${market} (${type}) LIVE!`;
         const pushBody = `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`;
         sendPushNotification(pushTitle, pushBody);
 
-        alert("Game posted & Push Notification sent to all users!");
+        alert("Game posted & Notification sent!");
         document.getElementById("admMarket").value = "";
         document.getElementById("admOpenPana").value = "";
         document.getElementById("admOpen").value = "";
