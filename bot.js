@@ -12,7 +12,6 @@ function fetchUrl(url) {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
     }, (res) => {
-      // Redirect handle ಮಾಡುವುದು
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         return resolve(fetchUrl(res.headers.location));
       }
@@ -46,7 +45,6 @@ function postPush(title, message) {
 }
 
 function parseResultsFromHTML(html) {
-  // HTML ಟ್ಯಾಗ್‌ಗಳನ್ನು ತೆಗೆದು ಶುದ್ಧ ಟೆಕ್ಸ್ಟ್ ಮಾಡುವುದು
   const cleanText = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
                         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
                         .replace(/<[^>]+>/g, ' ')
@@ -54,7 +52,6 @@ function parseResultsFromHTML(html) {
                         .replace(/\s+/g, ' ');
 
   const results = {};
-  // ರಿಸಲ್ಟ್ ಪ್ಯಾಟರ್ನ್ ಹುಡುಕುವುದು (ಉದಾ: MILAN MORNING 246-21-128 ಅಥವಾ 133-7)
   const regex = /([A-Z\s]{3,25}?)\s+(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
   let match;
 
@@ -73,15 +70,13 @@ async function runBot() {
     console.log("Checking DPBoss live results...");
     let results = {};
 
-    // 1st Source
     try {
       const html1 = await fetchUrl("https://sattamatkadpboss.org/");
       results = parseResultsFromHTML(html1);
     } catch(e) {
-      console.log("Source 1 failed, trying source 2...");
+      console.log("Source 1 failed...");
     }
 
-    // 2nd Source (Backup)
     if (Object.keys(results).length === 0) {
       try {
         const html2 = await fetchUrl("https://dpboss.net/");
@@ -92,9 +87,7 @@ async function runBot() {
     }
 
     console.log("Found Results count:", Object.keys(results).length);
-    console.log("Found Results Sample:", Object.entries(results).slice(0, 10));
 
-    // Firebase ಗೇಮ್‌ಗಳನ್ನು ತರುವುದು
     const firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
     const fbRes = await fetchUrl(firebaseUrl);
     const fbData = JSON.parse(fbRes);
@@ -119,16 +112,14 @@ async function runBot() {
         }
       }
 
-      if (!liveScore) {
-        console.log(`No live result on DPBoss yet for: ${market}`);
-        continue;
-      }
+      if (!liveScore) continue;
 
       console.log(`Checking match for ${market} with result ${liveScore}`);
 
       const parts = liveScore.split('-');
       let matched = false;
       let matchedNumbers = [];
+      let passesList = [];
 
       const openPana = fields.openPana ? fields.openPana.stringValue : "";
       const open = fields.open ? fields.open.stringValue : "";
@@ -138,30 +129,41 @@ async function runBot() {
 
       parts.forEach(p => {
         if (p.length === 3) {
-          if (openPana.includes(p)) { matched = true; matchedNumbers.push(`Open Pana: ${p}`); }
-          if (closePana.includes(p)) { matched = true; matchedNumbers.push(`Close Pana: ${p}`); }
+          if (openPana.split(/[\s,]+/).includes(p)) { matched = true; matchedNumbers.push(`Open Pana: ${p}`); passesList.push({ type: "OPEN_PANA", number: p }); }
+          if (closePana.split(/[\s,]+/).includes(p)) { matched = true; matchedNumbers.push(`Close Pana: ${p}`); passesList.push({ type: "CLOSE_PANA", number: p }); }
         } else if (p.length === 2) {
-          if (jodi.includes(p)) { matched = true; matchedNumbers.push(`Jodi: ${p}`); }
-          if (open.includes(p[0])) { matched = true; matchedNumbers.push(`Open Digit: ${p[0]}`); }
-          if (close.includes(p[1])) { matched = true; matchedNumbers.push(`Close Digit: ${p[1]}`); }
+          if (jodi.split(/[\s,]+/).includes(p)) { matched = true; matchedNumbers.push(`Jodi: ${p}`); passesList.push({ type: "JODI", number: p }); }
+          if (open.split(/[\s,]+/).includes(p[0])) { matched = true; matchedNumbers.push(`Open Digit: ${p[0]}`); passesList.push({ type: "OPEN", number: p[0] }); }
+          if (close.split(/[\s,]+/).includes(p[1])) { matched = true; matchedNumbers.push(`Close Digit: ${p[1]}`); passesList.push({ type: "CLOSE", number: p[1] }); }
         } else if (p.length === 1) {
-          if (open.includes(p)) { matched = true; matchedNumbers.push(`Open Digit: ${p}`); }
-          if (close.includes(p)) { matched = true; matchedNumbers.push(`Close Digit: ${p}`); }
+          if (open.split(/[\s,]+/).includes(p)) { matched = true; matchedNumbers.push(`Open Digit: ${p}`); passesList.push({ type: "OPEN", number: p }); }
+          if (close.split(/[\s,]+/).includes(p)) { matched = true; matchedNumbers.push(`Close Digit: ${p}`); passesList.push({ type: "CLOSE", number: p }); }
         }
       });
 
-      if (matched) {
+      if (matched && passesList.length > 0) {
         console.log(`🎉 Market ${market} PASSED! Updating Firebase...`);
+
+        const passesArrayValues = passesList.map(item => ({
+          mapValue: {
+            fields: {
+              type: { stringValue: item.type },
+              number: { stringValue: item.number }
+            }
+          }
+        }));
+
         const updatePayload = JSON.stringify({
           fields: {
             ...fields,
             isPassed: { booleanValue: true },
             passType: { stringValue: "AUTO_DPBOSS" },
-            passedNumber: { stringValue: matchedNumbers.join(", ") }
+            passedNumber: { stringValue: passesList[0].number },
+            passes: { arrayValue: { values: passesArrayValues } }
           }
         });
 
-        const patchReq = https.request(`https://firestore.googleapis.com/v1/${docName}?updateMask.fieldPaths=isPassed&updateMask.fieldPaths=passType&updateMask.fieldPaths=passedNumber`, {
+        const patchReq = https.request(`https://firestore.googleapis.com/v1/${docName}?updateMask.fieldPaths=isPassed&updateMask.fieldPaths=passType&updateMask.fieldPaths=passedNumber&updateMask.fieldPaths=passes`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' }
         });
