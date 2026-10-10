@@ -879,7 +879,6 @@
       <div id="userPaymentHistoryList"><p style="color:#7b7597; font-size:0.85rem;">Loading status...</p></div>
     </div>
 
-    <!-- LOGOUT BUTTON -->
     <button id="btnLogout" class="btn btn-secondary" onclick="logOut()" style="background:#e7e5f3; color:#ef4444; font-weight:bold; cursor:pointer;">Logout Account</button>
   </div>
 
@@ -898,45 +897,45 @@
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
     </div>
 
-    <!-- 1. ADMIN GAMES SECTION -->
+    <!-- 1. ADMIN GAMES SECTION (WITH REFINED MAGIC AUTO-PARSER) -->
     <div id="admSecGames" class="admin-section active">
       
       <!-- MAGIC AUTO-FILL -->
       <div class="game-card" style="border: 2px dashed var(--primary); background: #fdfcff;">
         <h4 style="color: var(--primary-dark); margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
-          <span>🪄</span> Paste Full Copied Game (Auto-Filter)
+          <span>🪄</span> Paste Full Copied Game (Auto-Clean & Filter)
         </h4>
         <p style="font-size: 0.76rem; color: var(--text-sub); margin-bottom: 8px;">
-          WhatsApp / Telegram ನಲ್ಲಿ ಕಾಪಿ ಮಾಡಿದ ಮೆಸೇಜ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ Auto-Fill ಬಟನ್ ಒತ್ತಿ:
+          ಯಾವುದೇ ಸಿಂಬಲ್, ಸ್ಟಾರ್ (*), ಬ್ರಾಕೆಟ್ ([ ], ( )) ಇದ್ದರೂ ಪರವಾಗಿಲ್ಲ, ನೇರವಾಗಿ ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ:
         </p>
-        <textarea id="admRawInput" rows="4" placeholder="BAJRANG MORNING&#10;DT == 10/10/2026&#10;4 == 43-48- 112,130..."></textarea>
-        <button class="btn" style="background: var(--purple-gradient); padding: 10px; font-size: 0.88rem;" onclick="magicParseAndFill()">
-          ⚡ Auto-Fill Game (ತಾನೇ ಫಿಲ್ಟರ್ ಮಾಡಿ ಸೆಟ್ ಮಾಡಿ)
+        <textarea id="admRawInput" rows="5" placeholder="*MILAN MORNING (OTC)*&#10;(( *2 - 6 - 8 - 9* ))&#10;[[ *21 - 60 - 83 - 91* ]]&#10;[[ *246 - 178 - 350* ]]"></textarea>
+        <button class="btn" style="background: var(--purple-gradient); padding: 11px; font-size: 0.88rem;" onclick="magicParseAndFill()">
+          ⚡ Auto-Clean & Fill Game (ಶುದ್ಧವಾಗಿ ಸೆಟ್ ಮಾಡಿ)
         </button>
       </div>
 
       <div class="game-card">
         <h4 style="margin-bottom: 10px; color:var(--primary-dark);">Post Numbers (Multiple Digits & Pana Supported)</h4>
-        <input type="text" id="admMarket" placeholder="Game Name (e.g. KALYAN, MILAN DAY)">
+        <input type="text" id="admMarket" placeholder="Game Name (e.g. MILAN MORNING)">
         <select id="admType">
           <option value="FREE">Free Game (FREE)</option>
           <option value="VIP">Premium Game (VIP)</option>
         </select>
         
-        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma for multiple):</label>
-        <input type="text" id="admOpenPana" placeholder="e.g. 112, 130, 115, 340">
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma):</label>
+        <input type="text" id="admOpenPana" placeholder="e.g. 246, 178, 350, 126">
 
         <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits / OTC (Space/Comma):</label>
-        <input type="text" id="admOpen" placeholder="e.g. 4, 7, 0">
+        <input type="text" id="admOpen" placeholder="e.g. 2, 6, 8, 9">
 
         <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers (Space/Comma):</label>
-        <input type="text" id="admJodi" placeholder="e.g. 43, 48, 73, 78, 03, 08">
+        <input type="text" id="admJodi" placeholder="e.g. 21, 60, 83, 91, 26, 65">
 
         <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits (Space/Comma):</label>
-        <input type="text" id="admClose" placeholder="e.g. 3, 8">
+        <input type="text" id="admClose" placeholder="e.g. 1, 0, 3">
 
         <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Close Pana (Space/Comma):</label>
-        <input type="text" id="admClosePana" placeholder="e.g. 345, 679">
+        <input type="text" id="admClosePana" placeholder="e.g. 570, 367">
 
         <button class="btn" onclick="saveGame()">Publish & Send Background Push Notification</button>
       </div>
@@ -1101,64 +1100,84 @@
       }
     }
 
-    // 🪄 SMART AUTO-PARSER
+    // 🪄 ROBUST MAGIC PARSER (CLEANS ALL BRACKETS, STARS, EMOJIS, SYMBOLS)
     function magicParseAndFill() {
-      const text = document.getElementById("admRawInput").value;
-      if (!text || text.trim() === "") {
+      const rawText = document.getElementById("admRawInput").value;
+      if (!rawText || rawText.trim() === "") {
         alert("ದಯವಿಟ್ಟು ಕಾಪಿ ಮಾಡಿದ ಗೇಮ್ ಟೆಕ್ಸ್ಟ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ!");
         return;
       }
 
-      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-      let market = "";
+      let marketName = "";
       let openDigits = new Set();
       let jodiList = new Set();
       let panaList = new Set();
 
-      if (lines.length > 0) {
-        let firstLine = lines[0].replace(/[\*\=\:\#\_]/g, ' ').trim();
-        if (!/http|play|download|luck|date|dt/i.test(firstLine)) {
-          market = firstLine.toUpperCase();
+      // 1. Detect Market Name from lines
+      for (let l of lines) {
+        // Strip symbols: *, (, ), [, ], -, =, emojis, bullets
+        let cleanL = l.replace(/[^\w\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+        
+        // Skip decorative, link, date, or good luck lines
+        if (/http|play|google|download|luck|good|dosto|date|\bdt\b/i.test(cleanL)) continue;
+        if (/^\d+$/.test(cleanL)) continue; // purely numbers
+
+        // Remove OTC word from market title if attached
+        cleanL = cleanL.replace(/\botc\b/gi, '').trim();
+
+        // If line contains English words (letters), it is the Market title
+        if (/[A-Za-z]{3,}/.test(cleanL)) {
+          marketName = cleanL.toUpperCase();
+          break;
         }
       }
 
+      // 2. Scan every line and clean out all symbols
       for (let line of lines) {
-        if (/http|\.com|play\.google|download|dosto|good luck/i.test(line)) continue;
-        if (/^dt\b|date/i.test(line)) continue;
+        // Ignore links, dates, and promo greetings
+        if (/http|\.com|play\.google|download|dosto|good\s*luck/i.test(line)) continue;
+        if (/^\s*\*?\s*(date|\bdt\b)/i.test(line)) continue;
 
-        if (/otc/i.test(line)) {
-          let otcMatches = line.match(/\b\d\b/g);
-          if (otcMatches) {
-            otcMatches.forEach(d => openDigits.add(d));
-          }
-        }
-
-        let leadingMatch = line.match(/^(\d)\s*==/);
-        if (leadingMatch) {
-          openDigits.add(leadingMatch[1]);
-        }
-
-        let clean = line.replace(/[\=\-\,\:\/]/g, ' ');
-        let tokens = clean.split(/\s+/).filter(Boolean);
+        // Clean out all non-alphanumeric characters except digits and spaces
+        let cleanedLine = line.replace(/[^\d\s]/g, ' ');
+        let tokens = cleanedLine.split(/\s+/).filter(Boolean);
 
         for (let tok of tokens) {
+          // Year or Date exclusion (like 2026, 2025, 10-10)
+          if (tok.length === 4 && (tok.startsWith("202") || tok.startsWith("199"))) continue;
+
+          // 3 Digits -> Pana
           if (/^\d{3}$/.test(tok)) {
             panaList.add(tok);
-          } else if (/^\d{2}$/.test(tok)) {
+          }
+          // 2 Digits -> Jodi
+          else if (/^\d{2}$/.test(tok)) {
             jodiList.add(tok);
-          } else if (/^\d{1}$/.test(tok)) {
+          }
+          // 1 Digit -> OTC / Open Digit
+          else if (/^\d{1}$/.test(tok)) {
             openDigits.add(tok);
           }
         }
       }
 
-      if (market) document.getElementById("admMarket").value = market;
-      if (openDigits.size > 0) document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
-      if (jodiList.size > 0) document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
-      if (panaList.size > 0) document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
+      // 3. Populate Form Fields Cleanly
+      if (marketName) {
+        document.getElementById("admMarket").value = marketName;
+      }
+      if (openDigits.size > 0) {
+        document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
+      }
+      if (jodiList.size > 0) {
+        document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
+      }
+      if (panaList.size > 0) {
+        document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
+      }
 
-      alert("🎉 ಗೇಮ್ ತಾನಾಗಿಯೇ ಯಶಸ್ವಿಯಾಗಿ Auto-Fill ಆಗಿದೆ! (ಬಾಕ್ಸ್‌ಗಳನ್ನು ಚೆಕ್ ಮಾಡಿ Publish ಒತ್ತಿ)");
+      alert("🎉 ಗೇಮ್ ಶುದ್ಧವಾಗಿ Auto-Fill ಆಗಿದೆ! (ಯಾವುದೇ ಸಿಂಬಲ್ ಇಲ್ಲದೆ ಬಾಕ್ಸ್‌ಗಳಲ್ಲಿ ಸೆಟ್ ಆಗಿದೆ)");
     }
 
     function togglePassVisibility(inputId) {
@@ -1182,10 +1201,8 @@
         })
       })
       .then(res => res.json())
-      .then(data => {
-        console.log("Push dispatch status:", data);
-      })
-      .catch(err => console.error("Push network error:", err));
+      .then(data => console.log("Push status:", data))
+      .catch(err => console.error("Push error:", err));
     }
 
     function toggleLang() {
@@ -1602,7 +1619,6 @@
       return list;
     }
 
-    // ⚡ FIX: REALTIME GAMES LISTENER (INSTANT UPDATE FOR USERS)
     function listenRealtimeGames() {
       db.collection("games")
         .onSnapshot(snapshot => {
@@ -1616,8 +1632,6 @@
 
           let games = [];
           snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
-          
-          // Latest posted game will ALWAYS appear on top
           games.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
 
           const lockTxt = currentLang === "kn" ? "🔒 VIP ಅನ್‌ಲಾಕ್" : "🔒 Unlock VIP";
@@ -1888,7 +1902,6 @@
       btn.classList.add('active');
     }
 
-    // ⚡ FIX: UNIQUE GAME POSTING WITHOUT OVERWRITING
     function saveGame() {
       const market = document.getElementById("admMarket").value.trim().toUpperCase();
       const type = document.getElementById("admType").value;
@@ -1902,10 +1915,9 @@
       if (!market) { alert("Please enter game name!"); return; }
 
       const now = new Date();
-      const today = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+      const today = now.toLocaleDateString('en-GB');
       const postTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 
-      // Unique timestamp-based ID to ensure every new game gets saved and rendered separately
       const docId = market.replace(/\s+/g, '_') + "_" + Date.now();
 
       db.collection("games").doc(docId).set({
@@ -1935,7 +1947,7 @@
         document.getElementById("admClosePana").value = "";
         document.getElementById("admRawInput").value = "";
         renderAdminGames();
-        listenRealtimeGames(); // Trigger immediate user-view refresh
+        listenRealtimeGames();
       }).catch(err => {
         alert("Error saving game: " + err.message);
       });
