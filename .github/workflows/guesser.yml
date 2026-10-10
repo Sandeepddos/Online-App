@@ -1,9 +1,9 @@
-name: Auto Matka Guesser 24x7
+name: Auto Matka Guesser 1-Minute Live
 
 on:
   schedule:
-    # 24 ಗಂಟೆಯೂ ಪ್ರತಿ 15 ನಿಮಿಷಕ್ಕೆ ಆಟೋಮ್ಯಾಟಿಕ್ ಸ್ಕ್ಯಾನ್ ಆಗುತ್ತದೆ
-    - cron: '*/15 * * * *'
+    # GitHub ಪ್ರತಿ 5 ನಿಮಿಷಕ್ಕೆ ವರ್ಕ್‌ಫ್ಲೋ ಟ್ರಿಗರ್ ಮಾಡುತ್ತದೆ
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,5 +18,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run Auto Guesser
-        run: node auto-guesser.js
+      - name: Run Guesser Every 1 Minute Loop
+        run: |
+          for i in {1..5}
+          do
+            echo "--- Scan Run #$i at $(date) ---"
+            node auto-guesser.js
+            echo "Sleeping for 60 seconds..."
+            sleep 60
+          done
