@@ -2,7 +2,8 @@ const https = require('https');
 
 const FIREBASE_PROJECT_ID = "live--update";
 const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
-const ONESIGNAL_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
+// GitHub Secret ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಕೀ ಪಡೆಯುವುದು
+const ONESIGNAL_KEY = process.env.ONESIGNAL_KEY;
 
 function fetchUrl(url) {
   return new Promise((resolve, reject) => {
@@ -23,6 +24,10 @@ function fetchUrl(url) {
 }
 
 function postPush(title, message) {
+  if (!ONESIGNAL_KEY) {
+    console.log("OneSignal Key is missing or not provided in environment variables.");
+    return;
+  }
   const payload = JSON.stringify({
     app_id: ONESIGNAL_APP_ID,
     included_segments: ["Total Subscriptions"],
