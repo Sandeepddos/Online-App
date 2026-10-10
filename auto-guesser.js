@@ -73,7 +73,6 @@ async function fetchWebsiteData() {
   return webData;
 }
 
-// ಹಳೆಯ ಅಪೂರ್ಣ ಡಾಕ್ಯುಮೆಂಟ್ ಇದ್ದರೆ ಅದರ ID ಪಡೆಯುವುದು
 async function getExistingDocId(marketName) {
   try {
     const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
@@ -86,7 +85,7 @@ async function getExistingDocId(marketName) {
       const m = doc.fields && doc.fields.market ? normalizeMarketName(doc.fields.market.stringValue) : "";
       const created = doc.fields && doc.fields.createdAt ? doc.fields.createdAt.timestampValue : "";
       if (m === marketName && created.startsWith(todayStr)) {
-        return doc.name; // ಪೂರ್ಣ Firestore Path
+        return doc.name;
       }
     }
   } catch (e) {}
@@ -94,7 +93,7 @@ async function getExistingDocId(marketName) {
 }
 
 async function saveGameToFirebase(game, existingDocPath) {
-  const isUpdate = !!existingDocPath;
+  const isUpdate = Boolean(existingDocPath);
   const url = isUpdate 
     ? `https://firestore.googleapis.com/v1/${existingDocPath}`
     : `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
@@ -166,7 +165,6 @@ async function runEngine() {
       if (!cleanMarket) continue;
       cleanMarket = cleanMarket.replace(/\bOTC\b/g, '').trim();
 
-      // ಅಂಕಿಗಳನ್ನು ಹುಡುಕುವುದು
       const sanitized = msg.replace(/[•➜➤:\-–|*👑🎯🔥💥⚡🪴🤞🏻]/g, ' ');
       const lines = sanitized.split('\n').map(l => l.trim()).filter(Boolean);
 
@@ -191,7 +189,6 @@ async function runEngine() {
         tgDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1).slice(0, 4);
       }
 
-      // ವೆಬ್‌ಸೈಟ್ ಜೊತೆ ಕಂಬೈನ್
       let webDigits = [];
       let webPanas = [];
       for (let wMarket in webData) {
@@ -208,7 +205,6 @@ async function runEngine() {
       let derivedClose = tgJodis.map(j => j[1]);
       let finalClose = [...new Set([...derivedClose, ...webDigits])].slice(0, 4);
 
-      // ಯಾವುದೇ ಫೀಲ್ಡ್ ಖಾಲಿ ಇರದಂತೆ ಗ್ಯಾರಂಟಿ ಫಿಲ್
       if (finalOpen.length === 0 && finalClose.length > 0) finalOpen = [...finalClose];
       if (finalClose.length === 0 && finalOpen.length > 0) finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
       if (finalOpen.length === 0) finalOpen = ["9", "0", "8", "7"];
@@ -252,9 +248,8 @@ async function runEngine() {
         gameType: finalGameType
       };
 
-      // ಈಗಾಗಲೇ ಇದ್ದರೆ ಅಪ್‌ಡೇಟ್ ಮಾಡುತ್ತದೆ, ಇಲ್ಲದಿದ್ದರೆ ಹೊಸದಾಗಿ ಸೇರಿಸುತ್ತದೆ
       const existingDocPath = await getExistingDocId(cleanMarket);
-      console.log(`⚡ [SYNCING] ${cleanMarket} (${isUpdate ? 'UPDATING EXISTING' : 'INSERTING NEW'})...`);
+      console.log(`⚡ [SYNCING] ${cleanMarket} (${existingDocPath ? 'UPDATING EXISTING' : 'INSERTING NEW'})...`);
       await saveGameToFirebase(payload, existingDocPath);
       console.log(`✅ [SUCCESS] ${cleanMarket} fully saved to Firebase!`);
     }
