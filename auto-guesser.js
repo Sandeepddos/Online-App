@@ -3,6 +3,7 @@ const https = require('https');
 const FIREBASE_PROJECT_ID = "live--update";
 const TELEGRAM_CHANNEL = "CHART_MARKET_MATKA_FIX_DPBOSS";
 
+// ಕೇವಲ ಮುಖ್ಯ ಆಟಗಳು ಮಾತ್ರ VIP
 const VIP_MARKETS = [
   "KALYAN", "MAIN BAZAR", "SRIDEVI", "SRI DEVI",
   "SRIDEVI NIGHT", "RAJDHANI NIGHT", "MILAN NIGHT", "KALYAN NIGHT", "TIME BAZAR"
@@ -144,8 +145,6 @@ async function runEngine() {
     const recentMessages = messages.slice(-10);
 
     for (const msg of recentMessages) {
-      // 1. ಮಾರ್ಕೆಟ್ ಹೆಸರು ಹುಡುಕುವುದು (ಯಾವುದೇ ಎಮೋಜಿ ಅಥವಾ ವಿನ್ಯಾಸವಿದ್ದರೂ)
-      const firstLine = msg.split('\n')[0] || "";
       let cleanMarket = "";
 
       const knownMarkets = [
@@ -162,6 +161,7 @@ async function runEngine() {
       }
 
       if (!cleanMarket) {
+        const firstLine = msg.split('\n')[0] || "";
         const fallbackMatch = firstLine.match(/([A-Z\s]{3,20}?)(?:NIGHT|DAY|MORNING|BAZAR|OTC)/i);
         if (fallbackMatch) cleanMarket = normalizeMarketName(fallbackMatch[0]);
       }
@@ -171,13 +171,12 @@ async function runEngine() {
 
       console.log(`Detected Market: "${cleanMarket}"`);
 
-      // ಇಂದಿನ ಪೋಸ್ಟ್ ಆಗಿದ್ದರೆ ಪರಿಶೀಲನೆ
       if (existingToday.some(g => g.market === cleanMarket)) {
         console.log(`Market "${cleanMarket}" already posted today. Skipping.`);
         continue;
       }
 
-      // 2. ಅಂಕಿಗಳನ್ನು ಹೊರತೆಗೆಯುವುದು
+      // ನಂಬರ್ ಪ್ರತ್ಯೇಕಿಸುವಿಕೆ
       const sanitized = msg.replace(/[•➜➤:\-–|*👑🎯🔥💥⚡🪴🤞🏻]/g, ' ');
       const lines = sanitized.split('\n').map(l => l.trim()).filter(Boolean);
 
@@ -199,10 +198,11 @@ async function runEngine() {
       });
 
       if (tgDigits.length === 0) {
-        tgDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1).slice(0, 4);
+        const fallbackDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1);
+        tgDigits.push(...fallbackDigits.slice(0, 4));
       }
 
-      // 3. ವೆಬ್‌ಸೈಟ್ ಜೊತೆ ಕಂಬೈನ್
+      // ವೆಬ್‌ಸೈಟ್ ಡೇಟಾ ಮ್ಯಾಚ್
       let webDigits = [];
       let webPanas = [];
       for (let wMarket in webData) {
@@ -213,19 +213,38 @@ async function runEngine() {
         }
       }
 
+      // 3-ವೇ ಕಂಬೈನ್
       let matchedDigits = tgDigits.filter(d => webDigits.includes(d));
       let finalOpen = [...new Set([...matchedDigits, ...tgDigits, ...webDigits])].slice(0, 4);
 
       let derivedClose = tgJodis.map(j => j[1]);
       let finalClose = [...new Set([...derivedClose, ...webDigits])].slice(0, 4);
-      if (finalClose.length === 0) {
+
+      // ಯಾವುದೇ ಫೀಲ್ಡ್ ಖಾಲಿ ಇರದಂತೆ ಆಟೋ-ಫಿಲ್ ಲಾಜಿಕ್
+      if (finalOpen.length === 0 && finalClose.length > 0) {
+        finalOpen = [...finalClose];
+      }
+      if (finalClose.length === 0 && finalOpen.length > 0) {
         finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
       }
+      if (finalOpen.length === 0) finalOpen = ["1", "2", "3", "4"];
+      if (finalClose.length === 0) finalClose = ["6", "7", "8", "9"];
 
       let filteredJodis = tgJodis.filter(j => finalOpen.includes(j[0]));
-      if (filteredJodis.length < 4) filteredJodis = tgJodis.slice(0, 8);
-      else filteredJodis = filteredJodis.slice(0, 8);
+      if (filteredJodis.length < 4) {
+        filteredJodis = tgJodis.length > 0 ? tgJodis.slice(0, 8) : [];
+      }
 
+      // ಜೋಡಿ ಖಾಲಿ ಇದ್ದರೆ ಓಪನ್ ಮತ್ತು ಕ್ಲೋಸ್ ಅಂಕಿಗಳಿಂದಲೇ 8 ಜೋಡಿ ಸೃಷ್ಟಿಸುವುದು
+      if (filteredJodis.length === 0) {
+        finalOpen.forEach(o => {
+          finalClose.forEach(c => {
+            if (filteredJodis.length < 8) filteredJodis.push(`${o}${c}`);
+          });
+        });
+      }
+
+      // ಪ್ಯಾನಾ ಭರ್ತಿ
       let finalOpenPanas = [...tgPanas.slice(0, 4)];
       if (finalOpenPanas.length < 3) {
         finalOpen.forEach(d => {
@@ -240,6 +259,7 @@ async function runEngine() {
       });
       finalClosePanas = [...new Set(finalClosePanas)].slice(0, 4);
 
+      // VIP ಅಥವಾ FREE
       const isMainGame = VIP_MARKETS.some(m => cleanMarket.includes(m));
       const finalGameType = isMainGame ? "VIP" : "FREE";
 
