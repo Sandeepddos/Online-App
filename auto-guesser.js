@@ -3,17 +3,9 @@ const https = require('https');
 const FIREBASE_PROJECT_ID = "live--update";
 const TELEGRAM_CHANNEL = "CHART_MARKET_MATKA_FIX_DPBOSS";
 
-// ಕೇವಲ ಮುಖ್ಯ ಆಟಗಳು ಮಾತ್ರ VIP
 const VIP_MARKETS = [
-  "KALYAN",
-  "MAIN BAZAR",
-  "SRIDEVI",
-  "SRI DEVI",
-  "SRIDEVI NIGHT",
-  "RAJDHANI NIGHT",
-  "MILAN NIGHT",
-  "KALYAN NIGHT",
-  "TIME BAZAR"
+  "KALYAN", "MAIN BAZAR", "SRIDEVI", "SRI DEVI",
+  "SRIDEVI NIGHT", "RAJDHANI NIGHT", "MILAN NIGHT", "KALYAN NIGHT", "TIME BAZAR"
 ];
 
 const MASTER_PANAS = {
@@ -33,23 +25,14 @@ function fetchUrl(url, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
       }
     }, res => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return resolve(fetchUrl(res.headers.location, timeoutMs));
-      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
     });
-
-    req.setTimeout(timeoutMs, () => {
-      req.destroy();
-      reject(new Error(`Timeout: ${url}`));
-    });
-
+    req.setTimeout(timeoutMs, () => { req.destroy(); reject(new Error(`Timeout: ${url}`)); });
     req.on('error', err => reject(err));
   });
 }
@@ -65,38 +48,14 @@ function normalizeMarketName(name) {
   return name.replace(/[^A-Za-z]/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
 }
 
-async function fetchChartTrendDigits(normalizedMarket) {
-  try {
-    const slug = normalizedMarket.toLowerCase().replace(/\s+/g, '-');
-    const chartUrl = `https://dpboss.net/${slug}-panel-chart.php`;
-    const html = await fetchUrl(chartUrl, 5000);
-
-    const jodiMatches = html.match(/\b\d{2}\b/g) || [];
-    if (jodiMatches.length === 0) return [];
-
-    const recentJodis = jodiMatches.slice(-30);
-    const counts = {};
-    recentJodis.forEach(jodi => {
-      counts[jodi[0]] = (counts[jodi[0]] || 0) + 1;
-      counts[jodi[1]] = (counts[jodi[1]] || 0) + 1;
-    });
-
-    return Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 4);
-  } catch (e) {
-    return [];
-  }
-}
-
 async function fetchWebsiteData() {
   const webData = {};
   const urls = ["https://dpboss.net/", "https://sattamatkadpboss.org/"];
-
   for (const targetUrl of urls) {
     try {
-      const html = await fetchUrl(targetUrl, 6000);
+      const html = await fetchUrl(targetUrl, 5000);
       const text = cleanText(html);
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-      
       lines.forEach(line => {
         const match = line.match(/([A-Z\s]{3,20}?)\s*(?:OTC|FIX|DTC)?\s*[:\-]?\s*([0-9\s,\-–]{3,25})/i);
         if (match) {
@@ -104,12 +63,9 @@ async function fetchWebsiteData() {
           const nums = match[2].replace(/[^0-9]/g, ' ').split(/\s+/).filter(Boolean);
           const digits = nums.filter(n => n.length === 1);
           const panas = nums.filter(n => n.length === 3);
-          if (mKey.length >= 3 && digits.length > 0) {
-            webData[mKey] = { digits, panas };
-          }
+          if (mKey.length >= 3 && digits.length > 0) webData[mKey] = { digits, panas };
         }
       });
-
       if (Object.keys(webData).length > 0) break;
     } catch (e) {}
   }
@@ -122,7 +78,6 @@ async function getExistingGamesToday() {
     const res = await fetchUrl(url, 6000);
     const data = JSON.parse(res);
     if (!data.documents) return [];
-
     const todayStr = new Date().toISOString().slice(0, 10);
     return data.documents.filter(d => {
       const created = d.fields.createdAt ? d.fields.createdAt.timestampValue : "";
@@ -137,7 +92,6 @@ async function getExistingGamesToday() {
 
 async function postGameToFirebase(game) {
   const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
-  
   const payload = JSON.stringify({
     fields: {
       market: { stringValue: game.market },
@@ -183,62 +137,72 @@ async function runEngine() {
       messages.push(match[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''));
     }
 
+    console.log(`Retrieved ${messages.length} total messages from Telegram.`);
     if (messages.length === 0) return;
 
     const existingToday = await getExistingGamesToday();
-    const recentMessages = messages.slice(-15);
+    const recentMessages = messages.slice(-10);
 
     for (const msg of recentMessages) {
-      // ಮಾರ್ಕೆಟ್ ಹೆಸರಿನಲ್ಲಿ ಬರುವ ಎಮೋಜಿಗಳನ್ನು ತೆಗೆದು ನೇರವಾಗಿ ಹೆಸರನ್ನು ಕಂಡುಹಿಡಿಯುವ ಸುಧಾರಿತ ರೆಜೆಕ್ಸ್
-      const marketMatch = msg.match(/(?:👑|⚡|\*|🎯|\b)([A-Za-z\s]{3,20}?)(?:NIGHT|DAY|MORNING|BAZAR|OTC)/i);
-      if (!marketMatch) continue;
+      // 1. ಮಾರ್ಕೆಟ್ ಹೆಸರು ಹುಡುಕುವುದು (ಯಾವುದೇ ಎಮೋಜಿ ಅಥವಾ ವಿನ್ಯಾಸವಿದ್ದರೂ)
+      const firstLine = msg.split('\n')[0] || "";
+      let cleanMarket = "";
 
-      let cleanMarket = normalizeMarketName(marketMatch[0]);
+      const knownMarkets = [
+        "SRIDEVI NIGHT", "SRIDEVI DAY", "SRIDEVI MORNING", "SRIDEVI",
+        "KALYAN NIGHT", "KALYAN", "MAIN BAZAR", "RAJDHANI NIGHT", "MILAN NIGHT",
+        "MILAN DAY", "TIME BAZAR", "MADHUR DAY", "MADHUR NIGHT"
+      ];
+
+      for (const km of knownMarkets) {
+        if (msg.toUpperCase().includes(km)) {
+          cleanMarket = km;
+          break;
+        }
+      }
+
+      if (!cleanMarket) {
+        const fallbackMatch = firstLine.match(/([A-Z\s]{3,20}?)(?:NIGHT|DAY|MORNING|BAZAR|OTC)/i);
+        if (fallbackMatch) cleanMarket = normalizeMarketName(fallbackMatch[0]);
+      }
+
+      if (!cleanMarket) continue;
       cleanMarket = cleanMarket.replace(/\bOTC\b/g, '').trim();
 
-      if (cleanMarket.length < 3) continue;
+      console.log(`Detected Market: "${cleanMarket}"`);
 
+      // ಇಂದಿನ ಪೋಸ್ಟ್ ಆಗಿದ್ದರೆ ಪರಿಶೀಲನೆ
       if (existingToday.some(g => g.market === cleanMarket)) {
+        console.log(`Market "${cleanMarket}" already posted today. Skipping.`);
         continue;
       }
 
-      // ಟೆಲಿಗ್ರಾಂನ ವಿಶೇಷ ಚಿಹ್ನೆಗಳನ್ನು (•, ➜, ➤) ಸ್ಪೇಸ್‌ಗಳಾಗಿ ಬದಲಾಯಿಸಿ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರತ್ಯೇಕಿಸುವುದು
-      const sanitizedText = msg.replace(/[•➜➤:\-–|*👑🎯🔥💥⚡]/g, ' ');
-      const lines = sanitizedText.split('\n').map(l => l.trim()).filter(Boolean);
+      // 2. ಅಂಕಿಗಳನ್ನು ಹೊರತೆಗೆಯುವುದು
+      const sanitized = msg.replace(/[•➜➤:\-–|*👑🎯🔥💥⚡🪴🤞🏻]/g, ' ');
+      const lines = sanitized.split('\n').map(l => l.trim()).filter(Boolean);
 
       let tgDigits = [];
       let tgJodis = [];
       let tgPanas = [];
 
       lines.forEach(line => {
-        // ಸಿಂಗಲ್ ಅಂಕಿಗಳನ್ನು (SINGLE, OTC, FIXX) ಓದುವುದು
         if (/SINGLE|FIXX|OTC/i.test(line)) {
-          const digits = line.replace(/[^0-9]/g, ' ').split(/\s+/).filter(d => d.length === 1);
-          tgDigits.push(...digits);
+          const d = line.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1);
+          tgDigits.push(...d);
         }
-        
-        // ಜೋಡಿಗಳನ್ನು ಗುರುತಿಸುವುದು
-        const jodis = line.match(/\b\d{2}\b/g);
-        if (jodis && !line.toLowerCase().includes('date') && !line.toLowerCase().includes('oct')) {
-          tgJodis.push(...jodis);
+        const j = line.match(/\b\d{2}\b/g);
+        if (j && !line.toLowerCase().includes('date') && !line.toLowerCase().includes('oct')) {
+          tgJodis.push(...j);
         }
-
-        // ಪ್ಯಾನಾಗಳನ್ನು (PENAL ಅಥವಾ PANA) ಗುರುತಿಸುವುದು
-        const panas = line.match(/\b\d{3}\b/g);
-        if (panas) {
-          tgPanas.push(...panas);
-        }
+        const p = line.match(/\b\d{3}\b/g);
+        if (p) tgPanas.push(...p);
       });
 
-      // ಸಾಲುಗಳಲ್ಲಿ ಸಿಗದಿದ್ದರೆ ಸಂಪೂರ್ಣ ಮೆಸೇಜ್‌ನಿಂದ ಒಮ್ಮೆ ಕ್ರಾಸ್-ಚೆಕ್
       if (tgDigits.length === 0) {
-        const fallbackDigits = sanitizedText.replace(/[^0-9]/g, ' ').split(/\s+/).filter(d => d.length === 1);
-        tgDigits.push(...fallbackDigits.slice(0, 4));
+        tgDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1).slice(0, 4);
       }
 
-      if (tgDigits.length === 0 && tgJodis.length === 0) continue;
-
-      // ವೆಬ್‌ಸೈಟ್ ಮತ್ತು DPBoss ಚಾರ್ಟ್ ಮ್ಯಾಚಿಂಗ್
+      // 3. ವೆಬ್‌ಸೈಟ್ ಜೊತೆ ಕಂಬೈನ್
       let webDigits = [];
       let webPanas = [];
       for (let wMarket in webData) {
@@ -249,14 +213,11 @@ async function runEngine() {
         }
       }
 
-      const chartDigits = await fetchChartTrendDigits(cleanMarket);
-
-      // 3-ವೇ ಕಂಬೈನ್ ಲಾಜಿಕ್
-      let matchedDigits = tgDigits.filter(d => webDigits.includes(d) || chartDigits.includes(d));
+      let matchedDigits = tgDigits.filter(d => webDigits.includes(d));
       let finalOpen = [...new Set([...matchedDigits, ...tgDigits, ...webDigits])].slice(0, 4);
 
       let derivedClose = tgJodis.map(j => j[1]);
-      let finalClose = [...new Set([...derivedClose, ...chartDigits, ...webDigits])].slice(0, 4);
+      let finalClose = [...new Set([...derivedClose, ...webDigits])].slice(0, 4);
       if (finalClose.length === 0) {
         finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
       }
@@ -279,7 +240,6 @@ async function runEngine() {
       });
       finalClosePanas = [...new Set(finalClosePanas)].slice(0, 4);
 
-      // VIP ಅಥವಾ FREE
       const isMainGame = VIP_MARKETS.some(m => cleanMarket.includes(m));
       const finalGameType = isMainGame ? "VIP" : "FREE";
 
@@ -293,12 +253,11 @@ async function runEngine() {
         gameType: finalGameType
       };
 
-      console.log(`✅ [POSTED ${payload.gameType}] ${cleanMarket}:`, payload);
+      console.log(`✅ [POSTING TO FIREBASE] ${payload.gameType} -> ${cleanMarket}:`, payload);
       await postGameToFirebase(payload);
     }
 
     console.log("3-Way Scan Completed Successfully.");
-
   } catch (err) {
     console.error("Fusion engine error:", err);
   }
