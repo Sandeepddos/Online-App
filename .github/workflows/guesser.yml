@@ -1,0 +1,22 @@
+name: Auto Matka Guesser 24x7
+
+on:
+  schedule:
+    # 24 ಗಂಟೆಯೂ ಪ್ರತಿ 15 ನಿಮಿಷಕ್ಕೆ ಆಟೋಮ್ಯಾಟಿಕ್ ಸ್ಕ್ಯಾನ್ ಆಗುತ್ತದೆ
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-guesser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Auto Guesser
+        run: node auto-guesser.js
