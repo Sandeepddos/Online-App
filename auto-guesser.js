@@ -73,26 +73,32 @@ async function fetchWebsiteData() {
   return webData;
 }
 
-async function getExistingGamesToday() {
+// ಹಳೆಯ ಅಪೂರ್ಣ ಡಾಕ್ಯುಮೆಂಟ್ ಇದ್ದರೆ ಅದರ ID ಪಡೆಯುವುದು
+async function getExistingDocId(marketName) {
   try {
     const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
     const res = await fetchUrl(url, 6000);
     const data = JSON.parse(res);
-    if (!data.documents) return [];
+    if (!data.documents) return null;
+
     const todayStr = new Date().toISOString().slice(0, 10);
-    return data.documents.filter(d => {
-      const created = d.fields.createdAt ? d.fields.createdAt.timestampValue : "";
-      return created.startsWith(todayStr);
-    }).map(d => ({
-      market: d.fields.market ? normalizeMarketName(d.fields.market.stringValue) : ""
-    }));
-  } catch (e) {
-    return [];
-  }
+    for (const doc of data.documents) {
+      const m = doc.fields && doc.fields.market ? normalizeMarketName(doc.fields.market.stringValue) : "";
+      const created = doc.fields && doc.fields.createdAt ? doc.fields.createdAt.timestampValue : "";
+      if (m === marketName && created.startsWith(todayStr)) {
+        return doc.name; // ಪೂರ್ಣ Firestore Path
+      }
+    }
+  } catch (e) {}
+  return null;
 }
 
-async function postGameToFirebase(game) {
-  const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
+async function saveGameToFirebase(game, existingDocPath) {
+  const isUpdate = !!existingDocPath;
+  const url = isUpdate 
+    ? `https://firestore.googleapis.com/v1/${existingDocPath}`
+    : `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
+
   const payload = JSON.stringify({
     fields: {
       market: { stringValue: game.market },
@@ -109,7 +115,7 @@ async function postGameToFirebase(game) {
 
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
-      method: 'POST',
+      method: isUpdate ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' }
     }, res => {
       let data = '';
@@ -138,10 +144,7 @@ async function runEngine() {
       messages.push(match[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''));
     }
 
-    console.log(`Retrieved ${messages.length} total messages from Telegram.`);
     if (messages.length === 0) return;
-
-    const existingToday = await getExistingGamesToday();
     const recentMessages = messages.slice(-10);
 
     for (const msg of recentMessages) {
@@ -160,23 +163,10 @@ async function runEngine() {
         }
       }
 
-      if (!cleanMarket) {
-        const firstLine = msg.split('\n')[0] || "";
-        const fallbackMatch = firstLine.match(/([A-Z\s]{3,20}?)(?:NIGHT|DAY|MORNING|BAZAR|OTC)/i);
-        if (fallbackMatch) cleanMarket = normalizeMarketName(fallbackMatch[0]);
-      }
-
       if (!cleanMarket) continue;
       cleanMarket = cleanMarket.replace(/\bOTC\b/g, '').trim();
 
-      console.log(`Detected Market: "${cleanMarket}"`);
-
-      if (existingToday.some(g => g.market === cleanMarket)) {
-        console.log(`Market "${cleanMarket}" already posted today. Skipping.`);
-        continue;
-      }
-
-      // ನಂಬರ್ ಪ್ರತ್ಯೇಕಿಸುವಿಕೆ
+      // ಅಂಕಿಗಳನ್ನು ಹುಡುಕುವುದು
       const sanitized = msg.replace(/[•➜➤:\-–|*👑🎯🔥💥⚡🪴🤞🏻]/g, ' ');
       const lines = sanitized.split('\n').map(l => l.trim()).filter(Boolean);
 
@@ -198,11 +188,10 @@ async function runEngine() {
       });
 
       if (tgDigits.length === 0) {
-        const fallbackDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1);
-        tgDigits.push(...fallbackDigits.slice(0, 4));
+        tgDigits = sanitized.replace(/[^0-9]/g, ' ').split(/\s+/).filter(n => n.length === 1).slice(0, 4);
       }
 
-      // ವೆಬ್‌ಸೈಟ್ ಡೇಟಾ ಮ್ಯಾಚ್
+      // ವೆಬ್‌ಸೈಟ್ ಜೊತೆ ಕಂಬೈನ್
       let webDigits = [];
       let webPanas = [];
       for (let wMarket in webData) {
@@ -213,29 +202,21 @@ async function runEngine() {
         }
       }
 
-      // 3-ವೇ ಕಂಬೈನ್
       let matchedDigits = tgDigits.filter(d => webDigits.includes(d));
       let finalOpen = [...new Set([...matchedDigits, ...tgDigits, ...webDigits])].slice(0, 4);
 
       let derivedClose = tgJodis.map(j => j[1]);
       let finalClose = [...new Set([...derivedClose, ...webDigits])].slice(0, 4);
 
-      // ಯಾವುದೇ ಫೀಲ್ಡ್ ಖಾಲಿ ಇರದಂತೆ ಆಟೋ-ಫಿಲ್ ಲಾಜಿಕ್
-      if (finalOpen.length === 0 && finalClose.length > 0) {
-        finalOpen = [...finalClose];
-      }
-      if (finalClose.length === 0 && finalOpen.length > 0) {
-        finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
-      }
-      if (finalOpen.length === 0) finalOpen = ["1", "2", "3", "4"];
-      if (finalClose.length === 0) finalClose = ["6", "7", "8", "9"];
+      // ಯಾವುದೇ ಫೀಲ್ಡ್ ಖಾಲಿ ಇರದಂತೆ ಗ್ಯಾರಂಟಿ ಫಿಲ್
+      if (finalOpen.length === 0 && finalClose.length > 0) finalOpen = [...finalClose];
+      if (finalClose.length === 0 && finalOpen.length > 0) finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
+      if (finalOpen.length === 0) finalOpen = ["9", "0", "8", "7"];
+      if (finalClose.length === 0) finalClose = ["1", "2", "3", "5"];
 
       let filteredJodis = tgJodis.filter(j => finalOpen.includes(j[0]));
-      if (filteredJodis.length < 4) {
-        filteredJodis = tgJodis.length > 0 ? tgJodis.slice(0, 8) : [];
-      }
+      if (filteredJodis.length < 4) filteredJodis = tgJodis.length > 0 ? tgJodis.slice(0, 8) : [];
 
-      // ಜೋಡಿ ಖಾಲಿ ಇದ್ದರೆ ಓಪನ್ ಮತ್ತು ಕ್ಲೋಸ್ ಅಂಕಿಗಳಿಂದಲೇ 8 ಜೋಡಿ ಸೃಷ್ಟಿಸುವುದು
       if (filteredJodis.length === 0) {
         finalOpen.forEach(o => {
           finalClose.forEach(c => {
@@ -244,7 +225,6 @@ async function runEngine() {
         });
       }
 
-      // ಪ್ಯಾನಾ ಭರ್ತಿ
       let finalOpenPanas = [...tgPanas.slice(0, 4)];
       if (finalOpenPanas.length < 3) {
         finalOpen.forEach(d => {
@@ -259,7 +239,6 @@ async function runEngine() {
       });
       finalClosePanas = [...new Set(finalClosePanas)].slice(0, 4);
 
-      // VIP ಅಥವಾ FREE
       const isMainGame = VIP_MARKETS.some(m => cleanMarket.includes(m));
       const finalGameType = isMainGame ? "VIP" : "FREE";
 
@@ -273,8 +252,11 @@ async function runEngine() {
         gameType: finalGameType
       };
 
-      console.log(`✅ [POSTING TO FIREBASE] ${payload.gameType} -> ${cleanMarket}:`, payload);
-      await postGameToFirebase(payload);
+      // ಈಗಾಗಲೇ ಇದ್ದರೆ ಅಪ್‌ಡೇಟ್ ಮಾಡುತ್ತದೆ, ಇಲ್ಲದಿದ್ದರೆ ಹೊಸದಾಗಿ ಸೇರಿಸುತ್ತದೆ
+      const existingDocPath = await getExistingDocId(cleanMarket);
+      console.log(`⚡ [SYNCING] ${cleanMarket} (${isUpdate ? 'UPDATING EXISTING' : 'INSERTING NEW'})...`);
+      await saveGameToFirebase(payload, existingDocPath);
+      console.log(`✅ [SUCCESS] ${cleanMarket} fully saved to Firebase!`);
     }
 
     console.log("3-Way Scan Completed Successfully.");
