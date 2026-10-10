@@ -24,7 +24,6 @@
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false }
       });
-      // App open iddaga notification display aagodu beda (Silent)
       await OneSignal.Slidedown.promptPush();
     });
   </script>
@@ -899,10 +898,10 @@
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
     </div>
 
-    <!-- 1. ADMIN GAMES SECTION (WITH MAGIC AUTO-PARSER) -->
+    <!-- 1. ADMIN GAMES SECTION -->
     <div id="admSecGames" class="admin-section active">
       
-      <!-- MAGIC AUTO-FILL FROM COPIED TEXT -->
+      <!-- MAGIC AUTO-FILL -->
       <div class="game-card" style="border: 2px dashed var(--primary); background: #fdfcff;">
         <h4 style="color: var(--primary-dark); margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
           <span>🪄</span> Paste Full Copied Game (Auto-Filter)
@@ -1102,7 +1101,7 @@
       }
     }
 
-    // 🪄 SMART AUTO-PARSER: Extracts Market, Open, Jodi, Pana & Removes unwanted links
+    // 🪄 SMART AUTO-PARSER
     function magicParseAndFill() {
       const text = document.getElementById("admRawInput").value;
       if (!text || text.trim() === "") {
@@ -1117,7 +1116,6 @@
       let jodiList = new Set();
       let panaList = new Set();
 
-      // 1. First line usually has market name
       if (lines.length > 0) {
         let firstLine = lines[0].replace(/[\*\=\:\#\_]/g, ' ').trim();
         if (!/http|play|download|luck|date|dt/i.test(firstLine)) {
@@ -1125,13 +1123,10 @@
         }
       }
 
-      // 2. Scan through all lines to extract tokens
       for (let line of lines) {
-        // Skip links, promotions, and dates
         if (/http|\.com|play\.google|download|dosto|good luck/i.test(line)) continue;
         if (/^dt\b|date/i.test(line)) continue;
 
-        // Check for OTC line e.g. OTC= 4-7-0 or OTC 4,7,0
         if (/otc/i.test(line)) {
           let otcMatches = line.match(/\b\d\b/g);
           if (otcMatches) {
@@ -1139,33 +1134,25 @@
           }
         }
 
-        // Match leading digit before "==" e.g. "4 == 43-48- 112,130"
         let leadingMatch = line.match(/^(\d)\s*==/);
         if (leadingMatch) {
           openDigits.add(leadingMatch[1]);
         }
 
-        // Clean tokens from the line
         let clean = line.replace(/[\=\-\,\:\/]/g, ' ');
         let tokens = clean.split(/\s+/).filter(Boolean);
 
         for (let tok of tokens) {
-          // If 3 digits -> Pana
           if (/^\d{3}$/.test(tok)) {
             panaList.add(tok);
-          }
-          // If 2 digits -> Jodi
-          else if (/^\d{2}$/.test(tok)) {
+          } else if (/^\d{2}$/.test(tok)) {
             jodiList.add(tok);
-          }
-          // If 1 digit -> Open digit
-          else if (/^\d{1}$/.test(tok)) {
+          } else if (/^\d{1}$/.test(tok)) {
             openDigits.add(tok);
           }
         }
       }
 
-      // Populate input boxes
       if (market) document.getElementById("admMarket").value = market;
       if (openDigits.size > 0) document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
       if (jodiList.size > 0) document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
@@ -1179,7 +1166,6 @@
       field.type = field.type === "password" ? "text" : "password";
     }
 
-    // SILENT PUSH TRIGGER (ONLY SENDS SYSTEM PUSH WHEN APP IS CLOSED)
     function sendPushNotification(title, message) {
       fetch("https://onesignal.com/api/v1/notifications", {
         method: "POST",
@@ -1616,8 +1602,9 @@
       return list;
     }
 
+    // ⚡ FIX: REALTIME GAMES LISTENER (INSTANT UPDATE FOR USERS)
     function listenRealtimeGames() {
-      db.collection("games").limit(50)
+      db.collection("games")
         .onSnapshot(snapshot => {
           const box = document.getElementById("gamesContainer");
           box.innerHTML = "";
@@ -1629,6 +1616,8 @@
 
           let games = [];
           snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
+          
+          // Latest posted game will ALWAYS appear on top
           games.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
 
           const lockTxt = currentLang === "kn" ? "🔒 VIP ಅನ್‌ಲಾಕ್" : "🔒 Unlock VIP";
@@ -1725,6 +1714,8 @@
               </div>
             `;
           });
+        }, error => {
+          console.error("Games listener error:", error);
         });
     }
 
@@ -1897,6 +1888,7 @@
       btn.classList.add('active');
     }
 
+    // ⚡ FIX: UNIQUE GAME POSTING WITHOUT OVERWRITING
     function saveGame() {
       const market = document.getElementById("admMarket").value.trim().toUpperCase();
       const type = document.getElementById("admType").value;
@@ -1910,10 +1902,11 @@
       if (!market) { alert("Please enter game name!"); return; }
 
       const now = new Date();
-      const today = now.toISOString().split('T')[0];
+      const today = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
       const postTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 
-      const docId = market.replace(/\s+/g, '_') + "_" + today;
+      // Unique timestamp-based ID to ensure every new game gets saved and rendered separately
+      const docId = market.replace(/\s+/g, '_') + "_" + Date.now();
 
       db.collection("games").doc(docId).set({
         market: market,
@@ -1928,13 +1921,12 @@
         isPassed: false,
         passes: [],
         createdTime: Date.now()
-      }, { merge: true }).then(() => {
-        // Send background push notification
+      }).then(() => {
         const pushTitle = `🎯 ${market} (${type}) LIVE!`;
         const pushBody = `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`;
         sendPushNotification(pushTitle, pushBody);
 
-        alert("Game posted & Background Push Notification sent!");
+        alert("Game posted successfully! Users will see it immediately.");
         document.getElementById("admMarket").value = "";
         document.getElementById("admOpenPana").value = "";
         document.getElementById("admOpen").value = "";
@@ -1943,6 +1935,9 @@
         document.getElementById("admClosePana").value = "";
         document.getElementById("admRawInput").value = "";
         renderAdminGames();
+        listenRealtimeGames(); // Trigger immediate user-view refresh
+      }).catch(err => {
+        alert("Error saving game: " + err.message);
       });
     }
 
@@ -2068,6 +2063,7 @@
           sendPushNotification(`🏆 ${marketName} BLAST RESULT!`, `${type} Number [${number}] PASSED! Check App Now!`);
           alert(`Successfully added ${type} [${number}] as PASSED!`);
           renderAdminGames();
+          listenRealtimeGames();
         });
       });
     }
@@ -2093,6 +2089,7 @@
         }).then(() => {
           alert("Pass removed successfully!");
           renderAdminGames();
+          listenRealtimeGames();
         });
       });
     }
@@ -2108,6 +2105,7 @@
       }).then(() => {
         alert("All passes cleared.");
         renderAdminGames();
+        listenRealtimeGames();
       });
     }
 
@@ -2116,6 +2114,7 @@
         db.collection("games").doc(docId).delete().then(() => {
           alert("Game deleted!");
           renderAdminGames();
+          listenRealtimeGames();
         });
       }
     }
