@@ -15,7 +15,7 @@ const VIP_MARKETS = [
   "TIME BAZAR"
 ];
 
-// ಮಾಸ್ಟರ್ ಪ್ಯಾನಾ ಕೋಷ್ಟಕ
+// ಮಾಸ್ಟರ್ ಪ್ಯಾನಾ ಚಾರ್ಟ್
 const MASTER_PANAS = {
   "0": ["127", "136", "145", "235", "389", "479", "569", "578"],
   "1": ["128", "137", "146", "236", "245", "380", "470", "560"],
@@ -29,17 +29,29 @@ const MASTER_PANAS = {
   "9": ["180", "199", "270", "289", "360", "379", "450", "568"]
 };
 
-function fetchUrl(url) {
+// ನೆಟ್‌ವರ್ಕ್ ಟೈಮೌಟ್ (8 ಸೆಕೆಂಡ್) ಜೊತೆಗೆ ವೇಗವಾಗಿ ತರುವ ಫಂಕ್ಷನ್
+function fetchUrl(url, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
-    https.get(url, {
+    const req = https.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
     }, res => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchUrl(res.headers.location, timeoutMs));
+      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
-    }).on('error', err => reject(err));
+    });
+
+    req.setTimeout(timeoutMs, () => {
+      req.destroy();
+      reject(new Error(`Timeout: ${url}`));
+    });
+
+    req.on('error', err => reject(err));
   });
 }
 
@@ -50,17 +62,16 @@ function cleanText(html) {
              .replace(/\s+/g, ' ');
 }
 
-// ಮಾರ್ಕೆಟ್ ಹೆಸರುಗಳನ್ನು ಕ್ಲೀನ್ ಮಾಡುವ ಫಂಕ್ಷನ್ (ಉದಾ: "Bajrang Day____" -> "BAJRANG DAY")
 function normalizeMarketName(name) {
   return name.replace(/[^A-Za-z]/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
 }
 
-// 1. DPBoss ಚಾರ್ಟ್ ಇತಿಹಾಸದಿಂದ ಟ್ರೆಂಡಿಂಗ್ ಅಂಕಿಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದು
+// 1. DPBoss ಹಳೆಯ ಚಾರ್ಟ್ ಹಿಸ್ಟರಿಯಿಂದ ಟ್ರೆಂಡ್ ಅಂಕಿಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದು
 async function fetchChartTrendDigits(normalizedMarket) {
   try {
     const slug = normalizedMarket.toLowerCase().replace(/\s+/g, '-');
     const chartUrl = `https://dpboss.net/${slug}-panel-chart.php`;
-    const html = await fetchUrl(chartUrl);
+    const html = await fetchUrl(chartUrl, 5000);
 
     const jodiMatches = html.match(/\b\d{2}\b/g) || [];
     if (jodiMatches.length === 0) return [];
@@ -78,37 +89,50 @@ async function fetchChartTrendDigits(normalizedMarket) {
   }
 }
 
-// 2. SattaMatka.mobi ನಿಂದ ನೇರ ಗೆಸ್ಸಿಂಗ್ ತರುವುದು
+// 2. DPBoss ವೆಬ್‌ಸೈಟ್‌ಗಳಿಂದ ಲೈವ್ ಗೆಸ್ಸಿಂಗ್ ಡೇಟಾ ತರುವುದು
 async function fetchWebsiteData() {
   const webData = {};
-  try {
-    const html = await fetchUrl("https://sattamatka.mobi/");
-    const text = cleanText(html);
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    
-    lines.forEach(line => {
-      const match = line.match(/([A-Z\s]{3,20}?)\s*(?:OTC|FIX|DTC)?\s*[:\-]?\s*([0-9\s,\-–]{3,25})/i);
-      if (match) {
-        const mKey = normalizeMarketName(match[1]);
-        const nums = match[2].replace(/[^0-9]/g, ' ').split(/\s+/).filter(Boolean);
-        const digits = nums.filter(n => n.length === 1);
-        const panas = nums.filter(n => n.length === 3);
-        if (mKey.length >= 3 && digits.length > 0) {
-          webData[mKey] = { digits, panas };
+  const urls = [
+    "https://dpboss.net/",
+    "https://sattamatkadpboss.org/"
+  ];
+
+  for (const targetUrl of urls) {
+    try {
+      console.log(`Checking Web Source: ${targetUrl}...`);
+      const html = await fetchUrl(targetUrl, 6000);
+      const text = cleanText(html);
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      
+      lines.forEach(line => {
+        const match = line.match(/([A-Z\s]{3,20}?)\s*(?:OTC|FIX|DTC)?\s*[:\-]?\s*([0-9\s,\-–]{3,25})/i);
+        if (match) {
+          const mKey = normalizeMarketName(match[1]);
+          const nums = match[2].replace(/[^0-9]/g, ' ').split(/\s+/).filter(Boolean);
+          const digits = nums.filter(n => n.length === 1);
+          const panas = nums.filter(n => n.length === 3);
+          if (mKey.length >= 3 && digits.length > 0) {
+            webData[mKey] = { digits, panas };
+          }
         }
+      });
+
+      if (Object.keys(webData).length > 0) {
+        console.log(`Successfully fetched ${Object.keys(webData).length} markets from ${targetUrl}`);
+        break;
       }
-    });
-  } catch (e) {
-    console.log("Website Fetch Log:", e.message);
+    } catch (e) {
+      console.log(`Failed ${targetUrl}: ${e.message}`);
+    }
   }
   return webData;
 }
 
-// 3. ಇಂದಿನ ದಿನಾಂಕದ ಗೇಮ್‌ಗಳನ್ನು ಮಾತ್ರ ಚೆಕ್ ಮಾಡುವುದು
+// 3. ಇಂದಿನ ದಿನಾಂಕದ ಗೇಮ್‌ಗಳು ಈಗಾಗಲೇ ಪೋಸ್ಟ್ ಆಗಿವೆಯೇ ಎಂದು ಪರಿಶೀಲನೆ
 async function getExistingGamesToday() {
   try {
     const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
-    const res = await fetchUrl(url);
+    const res = await fetchUrl(url, 6000);
     const data = JSON.parse(res);
     if (!data.documents) return [];
 
@@ -157,12 +181,12 @@ async function postGameToFirebase(game) {
   });
 }
 
-// 5. ಮುಖ್ಯ ಎಂಜಿನ್: Telegram + Website + DPBoss Chart ಪಕ್ಕಾ ಕಂಬೈನ್
+// 5. ಮುಖ್ಯ ಎಂಜಿನ್: Telegram + Web + Chart ಕಂಬೈನ್
 async function runEngine() {
   try {
-    console.log("🚀 Starting 3-Way Fusion Scanner (Telegram + Web + DPBoss)...");
+    console.log("🚀 Starting 3-Way Combined Scanner...");
     const [tgHtml, webData] = await Promise.all([
-      fetchUrl(`https://t.me/s/${TELEGRAM_CHANNEL}`),
+      fetchUrl(`https://t.me/s/${TELEGRAM_CHANNEL}`, 8000),
       fetchWebsiteData()
     ]);
 
@@ -175,7 +199,7 @@ async function runEngine() {
     }
 
     if (messages.length === 0) {
-      console.log("No Telegram posts found.");
+      console.log("No Telegram messages found.");
       return;
     }
 
@@ -194,7 +218,6 @@ async function runEngine() {
         continue;
       }
 
-      // ಟೆಲಿಗ್ರಾಂ ಡೇಟಾ ಪ್ರತ್ಯೇಕಿಸುವಿಕೆ
       const lines = msg.split('\n').map(l => l.trim()).filter(Boolean);
       let tgDigits = [];
       let tgJodis = [];
@@ -213,7 +236,7 @@ async function runEngine() {
 
       if (tgDigits.length === 0 && tgJodis.length === 0) continue;
 
-      // 1. ವೆಬ್‌ಸೈಟ್‌ನೊಂದಿಗೆ ಮ್ಯಾಚಿಂಗ್ (Fuzzy Match)
+      // ವೆಬ್‌ಸೈಟ್ ಮ್ಯಾಚಿಂಗ್
       let webDigits = [];
       let webPanas = [];
       for (let wMarket in webData) {
@@ -224,30 +247,24 @@ async function runEngine() {
         }
       }
 
-      // 2. DPBoss ಚಾರ್ಟ್ ಟ್ರೆಂಡ್ ಪಡೆಯುವುದು
+      // DPBoss ಹಳೆಯ ಚಾರ್ಟ್ ಟ್ರೆಂಡ್ ಅಂಕಿಗಳು
       const chartDigits = await fetchChartTrendDigits(cleanMarket);
 
-      // *** ಕಡ್ಡಾಯ 3-ವೇ ಕಂಬೈನ್ ಲಾಜಿಕ್ (TRIPLE COMBINATION) ***
-      // ಮೂರೂ ಮೂಲಗಳಲ್ಲಿ ಬಂದ ಅಂಕಿಗಳನ್ನು ಆದ್ಯತೆಯ ಪ್ರಕಾರ ವಿಂಗಡಿಸುವುದು:
-      // A. ಟೆಲಿಗ್ರಾಂ ಮತ್ತು ವೆಬ್‌ಸೈಟ್ ಎರಡರಲ್ಲೂ ಇರುವ ಕಾಮನ್ ಅಂಕಿಗಳು
+      // *** 3-ವೇ ಕಂಬೈನ್ ಲಾಜಿಕ್ ***
+      // ಟೆಲಿಗ್ರಾಂ + ವೆಬ್ + ಚಾರ್ಟ್ ಮೂರರಲ್ಲೂ ಇರುವ ಕಾಮನ್ ಅಂಕಿಗಳಿಗೆ ಮೊದಲ ಆದ್ಯತೆ
       let matchedDigits = tgDigits.filter(d => webDigits.includes(d) || chartDigits.includes(d));
-
-      // B. ಅಂತಿಮ ಓಪನ್ ಅಂಕಿಗಳು (ಕಂಬೈನ್ ಆದ ಅಂಕಿಗಳಿಗೆ ಮೊದಲ ಸ್ಥಾನ)
       let finalOpen = [...new Set([...matchedDigits, ...tgDigits, ...webDigits])].slice(0, 3);
 
-      // C. ಅಂತಿಮ ಕ್ಲೋಸ್ ಅಂಕಿಗಳು (ಟೆಲಿಗ್ರಾಂ ಜೋಡಿ ಅಂಕಿಗಳು + DPBoss ಚಾರ್ಟ್ ಅಂಕಿಗಳು + ವೆಬ್‌ಸೈಟ್ ಅಂಕಿಗಳು)
       let derivedClose = tgJodis.map(j => j[1]);
       let finalClose = [...new Set([...derivedClose, ...chartDigits, ...webDigits])].slice(0, 4);
       if (finalClose.length === 0) {
         finalClose = finalOpen.map(d => ((parseInt(d) + 5) % 10).toString());
       }
 
-      // D. ಅಂತಿಮ ಜೋಡಿಗಳು (ಬಲವಾದ ಓಪನ್ ಅಂಕಿಗೆ ತಕ್ಕಂತೆ ಜೋಡಣೆ)
       let filteredJodis = tgJodis.filter(j => finalOpen.includes(j[0]));
       if (filteredJodis.length < 4) filteredJodis = tgJodis.slice(0, 6);
       else filteredJodis = filteredJodis.slice(0, 6);
 
-      // E. ಅಂತಿಮ ಪ್ಯಾನಾಗಳು (ಟೆಲಿಗ್ರಾಂ + ವೆಬ್‌ಸೈಟ್ + ಮಾಸ್ಟರ್ ಪ್ಯಾನಾ ಕಂಬೈನ್)
       let finalOpenPanas = [...tgPanas];
       if (finalOpenPanas.length < 3) {
         finalOpen.forEach(d => {
@@ -262,7 +279,7 @@ async function runEngine() {
       });
       finalClosePanas = [...new Set(finalClosePanas)].slice(0, 3);
 
-      // VIP ಅಥವಾ FREE ವರ್ಗೀಕರಣ (ಕೇವಲ ಮುಖ್ಯ ಆಟಗಳು ಮಾತ್ರ VIP)
+      // VIP ಅಥವಾ FREE ವಿಭಾಗ
       const isMainGame = VIP_MARKETS.some(m => {
         if (m === "KALYAN" && cleanMarket.includes("GOLD")) return false;
         return cleanMarket.includes(m);
@@ -280,11 +297,11 @@ async function runEngine() {
         gameType: finalGameType
       };
 
-      console.log(`✅ [COMBINED SUCCESS] ${payload.gameType} for ${cleanMarket}:`, payload);
+      console.log(`✅ [3-WAY COMBINED SUCCESS] ${payload.gameType} for ${cleanMarket}:`, payload);
       await postGameToFirebase(payload);
     }
 
-    console.log("3-Way Scan Completed.");
+    console.log("3-Way Scan Completed Successfully.");
 
   } catch (err) {
     console.error("Fusion engine error:", err);
