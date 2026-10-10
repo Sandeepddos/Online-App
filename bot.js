@@ -1,13 +1,21 @@
 const https = require('https');
 
-// ಫೈರ್‌ಬೇಸ್ ಕಾನ್ಫಿಗ್
 const FIREBASE_PROJECT_ID = "live--update";
 const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
 const ONESIGNAL_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
 
 function fetchUrl(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    }, (res) => {
+      // Redirect handle ಮಾಡುವುದು
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchUrl(res.headers.location));
+      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
@@ -37,33 +45,62 @@ function postPush(title, message) {
   req.end();
 }
 
+function parseResultsFromHTML(html) {
+  // HTML ಟ್ಯಾಗ್‌ಗಳನ್ನು ತೆಗೆದು ಶುದ್ಧ ಟೆಕ್ಸ್ಟ್ ಮಾಡುವುದು
+  const cleanText = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+                        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+                        .replace(/<[^>]+>/g, ' ')
+                        .replace(/&nbsp;/gi, ' ')
+                        .replace(/\s+/g, ' ');
+
+  const results = {};
+  // ರಿಸಲ್ಟ್ ಪ್ಯಾಟರ್ನ್ ಹುಡುಕುವುದು (ಉದಾ: MILAN MORNING 246-21-128 ಅಥವಾ 133-7)
+  const regex = /([A-Z\s]{3,25}?)\s+(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
+  let match;
+
+  while ((match = regex.exec(cleanText)) !== null) {
+    const market = match[1].replace(/[^A-Z\s]/g, '').trim();
+    const score = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
+    if (market.length >= 3 && !/HTTP|WWW|COM|DATE|TODAY|PLAY|DOWNLOAD|CALL|ADMIN/i.test(market)) {
+      results[market] = score;
+    }
+  }
+  return results;
+}
+
 async function runBot() {
   try {
     console.log("Checking DPBoss live results...");
-    const html = await fetchUrl("https://sattamatkadpboss.org/");
-    
-    // DPBoss ರಿಸಲ್ಟ್ ಎಳೆಯುವ ಲಾಜಿಕ್
-    const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
     let results = {};
-    let match;
 
-    while ((match = regex.exec(html)) !== null) {
-      const mkt = match[1].replace(/[\*\_\:\(\)]/g, '').trim().toUpperCase();
-      const score = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
-      if (mkt.length >= 3 && !/HTTP|WWW|DATE|TODAY/i.test(mkt)) {
-        results[mkt] = score;
+    // 1st Source
+    try {
+      const html1 = await fetchUrl("https://sattamatkadpboss.org/");
+      results = parseResultsFromHTML(html1);
+    } catch(e) {
+      console.log("Source 1 failed, trying source 2...");
+    }
+
+    // 2nd Source (Backup)
+    if (Object.keys(results).length === 0) {
+      try {
+        const html2 = await fetchUrl("https://dpboss.net/");
+        results = parseResultsFromHTML(html2);
+      } catch(e) {
+        console.log("Source 2 failed...");
       }
     }
 
-    console.log("Found Results:", results);
+    console.log("Found Results count:", Object.keys(results).length);
+    console.log("Found Results Sample:", Object.entries(results).slice(0, 10));
 
-    // Firebase ನಿಂದ ಆಕ್ಟಿವ್ ಗೇಮ್‌ಗಳನ್ನು ತರುವುದು
+    // Firebase ಗೇಮ್‌ಗಳನ್ನು ತರುವುದು
     const firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
     const fbRes = await fetchUrl(firebaseUrl);
     const fbData = JSON.parse(fbRes);
 
-    if (!fbData.documents) {
-      console.log("No games in database.");
+    if (!fbData.documents || fbData.documents.length === 0) {
+      console.log("No games found in Firebase database.");
       return;
     }
 
@@ -72,7 +109,7 @@ async function runBot() {
       if (fields.isPassed && fields.isPassed.booleanValue === true) continue;
 
       const market = (fields.market ? fields.market.stringValue : "").trim().toUpperCase();
-      const docName = doc.name; // Full doc path
+      const docName = doc.name;
 
       let liveScore = null;
       for (let m in results) {
@@ -82,9 +119,12 @@ async function runBot() {
         }
       }
 
-      if (!liveScore) continue;
+      if (!liveScore) {
+        console.log(`No live result on DPBoss yet for: ${market}`);
+        continue;
+      }
 
-      console.log(`Matching game ${market} with result ${liveScore}`);
+      console.log(`Checking match for ${market} with result ${liveScore}`);
 
       const parts = liveScore.split('-');
       let matched = false;
@@ -111,8 +151,7 @@ async function runBot() {
       });
 
       if (matched) {
-        console.log(`Market ${market} PASSED! Updating Firebase...`);
-        // Firebase ಅಪ್‌ಡೇಟ್ ಮಾಡುವುದು
+        console.log(`🎉 Market ${market} PASSED! Updating Firebase...`);
         const updatePayload = JSON.stringify({
           fields: {
             ...fields,
@@ -129,7 +168,6 @@ async function runBot() {
         patchReq.write(updatePayload);
         patchReq.end();
 
-        // ಪುಶ್ ನೋಟಿಫಿಕೇಶನ್
         postPush(`🏆 ${market} BLAST RESULT!`, `DPBoss Result: [${liveScore}] Passed: ${matchedNumbers.join(', ')}`);
       }
     }
