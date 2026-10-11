@@ -8,9 +8,13 @@ function fetchUrl(url, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
     }, res => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchUrl(res.headers.location, timeoutMs));
+      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
@@ -24,7 +28,15 @@ function cleanMarketName(str) {
   return str.replace(/[^A-Za-z]/g, '').toUpperCase();
 }
 
-// 2 ಮೂಲಗಳಿಂದ ಏಕಕಾಲದಲ್ಲಿ ರಿಸಲ್ಟ್ ತರುವುದು (Multi-Source Live Fetch)
+function stripHtml(html) {
+  return html.replace(/<br\s*\/?>/gi, '\n')
+             .replace(/<\/(p|div|h1|h2|h3|h4|h5|h6|li|tr|td)>/gi, '\n')
+             .replace(/<[^>]+>/g, ' ')
+             .replace(/&nbsp;/gi, ' ')
+             .replace(/\r/g, '');
+}
+
+// 2 ಸೋರ್ಸ್‌ಗಳಿಂದ ಲೈವ್ ರಿಸಲ್ಟ್‌ಗಳನ್ನು ನಿಖರವಾಗಿ ಪಾರ್ಸ್ ಮಾಡುವ ಸುಧಾರಿತ ಎಂಜಿನ್
 async function fetchAllLiveResults() {
   const results = {};
   const urls = [
@@ -35,38 +47,86 @@ async function fetchAllLiveResults() {
   for (const url of urls) {
     try {
       const html = await fetchUrl(url, 6000);
-      const regex = /([A-Za-z\s]{3,25})\s*[:\-]?\s*([0-9]{3})\s*-\s*([0-9]{2})\s*-\s*([0-9]{3})/gi;
-      let m;
-      while ((m = regex.exec(html)) !== null) {
-        const cleanName = cleanMarketName(m[1]);
-        if (!results[cleanName]) {
-          results[cleanName] = {
-            rawName: m[1].trim(),
-            openPana: m[2],
-            openDigit: m[3][0],
-            closeDigit: m[3][1],
-            closePana: m[4],
-            jodi: m[3]
-          };
+      const text = stripHtml(html);
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // 1. ಒಂದೇ ಸಾಲಿನಲ್ಲಿ ಇರುವ ರಿಸಲ್ಟ್: KALYAN 123-45-678 ಅಥವಾ KALYAN : 123-45-678
+        const fullMatch = line.match(/^([A-Za-z\s]{3,25}?)\s*[:\-]?\s*(\d{3})\s*-\s*(\d{2})\s*-\s*(\d{3})/i);
+        if (fullMatch) {
+          const cleanName = cleanMarketName(fullMatch[1]);
+          if (cleanName.length >= 3 && !results[cleanName]) {
+            results[cleanName] = {
+              rawName: fullMatch[1].trim(),
+              openPana: fullMatch[2],
+              openDigit: fullMatch[3][0],
+              closeDigit: fullMatch[3][1],
+              closePana: fullMatch[4],
+              jodi: fullMatch[3]
+            };
+          }
+          continue;
+        }
+
+        // 2. ಹಾಫ್ ರಿಸಲ್ಟ್ (Open ಮಾತ್ರ): KALYAN 123-4
+        const halfMatch = line.match(/^([A-Za-z\s]{3,25}?)\s*[:\-]?\s*(\d{3})\s*-\s*(\d{1})(?:[*\-]?)/i);
+        if (halfMatch) {
+          const cleanName = cleanMarketName(halfMatch[1]);
+          if (cleanName.length >= 3 && !results[cleanName]) {
+            results[cleanName] = {
+              rawName: halfMatch[1].trim(),
+              openPana: halfMatch[2],
+              openDigit: halfMatch[3],
+              closeDigit: null,
+              closePana: null,
+              jodi: null
+            };
+          }
+          continue;
+        }
+
+        // 3. ಮಲ್ಟಿ-ಲೈನ್ ರಿಸಲ್ಟ್ (ಹೆಸರು ಮೇಲಿನ ಸಾಲು, ನಂಬರ್ ಕೆಳಗಿನ ಸಾಲು)
+        const numOnlyFull = line.match(/^(\d{3})\s*-\s*(\d{2})\s*-\s*(\d{3})$/);
+        if (numOnlyFull && i > 0) {
+          const prevLine = lines[i - 1];
+          if (/^[A-Za-z\s]{3,25}$/.test(prevLine)) {
+            const cleanName = cleanMarketName(prevLine);
+            if (cleanName.length >= 3 && !results[cleanName]) {
+              results[cleanName] = {
+                rawName: prevLine.trim(),
+                openPana: numOnlyFull[1],
+                openDigit: numOnlyFull[2][0],
+                closeDigit: numOnlyFull[2][1],
+                closePana: numOnlyFull[3],
+                jodi: numOnlyFull[2]
+              };
+            }
+          }
+          continue;
+        }
+
+        const numOnlyHalf = line.match(/^(\d{3})\s*-\s*(\d{1})[*\-]?$/);
+        if (numOnlyHalf && i > 0) {
+          const prevLine = lines[i - 1];
+          if (/^[A-Za-z\s]{3,25}$/.test(prevLine)) {
+            const cleanName = cleanMarketName(prevLine);
+            if (cleanName.length >= 3 && !results[cleanName]) {
+              results[cleanName] = {
+                rawName: prevLine.trim(),
+                openPana: numOnlyHalf[1],
+                openDigit: numOnlyHalf[2],
+                closeDigit: null,
+                closePana: null,
+                jodi: null
+              };
+            }
+          }
         }
       }
 
-      // ಹಾಫ್ ರಿಸಲ್ಟ್ (Open ಮಾತ್ರ ಬಂದಾಗ: 123-4 or 123-4*)
-      const halfRegex = /([A-Za-z\s]{3,25})\s*[:\-]?\s*([0-9]{3})\s*-\s*([0-9]{1})\s*[-*]/gi;
-      let hm;
-      while ((hm = halfRegex.exec(html)) !== null) {
-        const cleanName = cleanMarketName(hm[1]);
-        if (!results[cleanName]) {
-          results[cleanName] = {
-            rawName: hm[1].trim(),
-            openPana: hm[2],
-            openDigit: hm[3],
-            closeDigit: null,
-            closePana: null,
-            jodi: null
-          };
-        }
-      }
+      if (Object.keys(results).length > 5) break;
     } catch (e) {}
   }
   return results;
@@ -153,15 +213,18 @@ async function checkResultsEngine() {
     getFirebaseGames()
   ]);
 
-  console.log(`Found ${Object.keys(liveResults).length} live results in markets.`);
+  const count = Object.keys(liveResults).length;
+  console.log(`Found ${count} live results in markets.`);
+  if (count > 0) {
+    console.log("Sample Markets:", Object.keys(liveResults).slice(0, 5).join(", "));
+  }
 
   for (const game of games) {
-    if (game.isPassed) continue; // ಈಗಾಗಲೇ ಪಾಸ್ ಆಗಿದ್ದರೆ ಬಿಡುವುದು
+    if (game.isPassed) continue;
 
     const targetClean = cleanMarketName(game.market);
     let matchedResult = null;
 
-    // ಸುಲಭವಾಗಿ ಹೆಸರು ಮ್ಯಾಚ್ ಮಾಡುವ ಲಾಜಿಕ್
     for (const key in liveResults) {
       if (key.includes(targetClean) || targetClean.includes(key)) {
         matchedResult = liveResults[key];
@@ -171,11 +234,11 @@ async function checkResultsEngine() {
 
     if (!matchedResult) continue;
 
-    const userOpens = game.open.split(/\s+/);
-    const userCloses = game.close.split(/\s+/);
-    const userJodis = game.jodi.split(/\s+/);
-    const userOpenPanas = game.openPana.split(/\s+/);
-    const userClosePanas = game.closePana.split(/\s+/);
+    const userOpens = (game.open || "").split(/\s+/).filter(Boolean);
+    const userCloses = (game.close || "").split(/\s+/).filter(Boolean);
+    const userJodis = (game.jodi || "").split(/\s+/).filter(Boolean);
+    const userOpenPanas = (game.openPana || "").split(/\s+/).filter(Boolean);
+    const userClosePanas = (game.closePana || "").split(/\s+/).filter(Boolean);
 
     let passType = "";
 
