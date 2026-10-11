@@ -532,6 +532,35 @@
       box-shadow: 0 4px 15px rgba(91, 77, 150, 0.15);
     }
 
+    /* REFERRAL CARD STYLING */
+    .refer-box-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 20px rgba(99, 88, 159, 0.08);
+    }
+    .refer-stat-badge {
+      background: #f7f6fc;
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 14px;
+      text-align: center;
+      flex: 1;
+    }
+    .refer-stat-badge span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .refer-stat-badge b {
+      font-size: 1.4rem;
+      color: var(--primary-dark);
+    }
+
     /* ADMIN DASHBOARD */
     .admin-subnav {
       display: flex;
@@ -660,12 +689,12 @@
       flex: 1;
       text-align: center;
       color: #cdc7ec;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       cursor: pointer;
       transition: all 0.2s;
     }
     .nav-btn.active { color: #ffffff; font-weight: 900; transform: translateY(-4px); }
-    .nav-btn span { display: block; font-size: 1.35rem; margin-bottom: 2px; }
+    .nav-btn span { display: block; font-size: 1.3rem; margin-bottom: 2px; }
   </style>
 </head>
 <body>
@@ -685,8 +714,8 @@
         </div>
 
         <div class="auth-input-line-group">
-          <span class="icon">👤</span>
-          <input type="tel" id="userPhone" placeholder="User name / Mobile">
+          <span class="icon">📱</span>
+          <input type="tel" id="userPhone" placeholder="Mobile Number">
         </div>
 
         <div class="auth-input-line-group">
@@ -735,6 +764,18 @@
       <div class="user-detail-row" style="background: #f4f2fb; padding: 8px 12px; border-radius: 10px; margin: 5px 0;">
         <span class="user-detail-lbl" style="color: var(--primary-dark); font-weight:bold;">Account Password:</span>
         <span class="user-detail-val" id="mdlPassword" style="color: #63589f; font-size:1.15rem; font-family: monospace;">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Total Referrals:</span>
+        <span class="user-detail-val" id="mdlRefers" style="color:#10b981;">0</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Referral Points:</span>
+        <span class="user-detail-val" id="mdlPoints" style="color:#f59e0b;">0 pts</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Referred By:</span>
+        <span class="user-detail-val" id="mdlReferredBy">None</span>
       </div>
       <div class="user-detail-row">
         <span class="user-detail-lbl">Live Status:</span>
@@ -804,7 +845,7 @@
           <b>1 DAY PASS</b>
           <div id="txtP1Sub" style="font-size:0.75rem; color:#7b7597;">Today's games unlock</div>
         </div>
-        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice1">₹99</b>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice1">₹150</b>
       </div>
 
       <div class="plan-card" id="p7Card" onclick="selectPlan(7)">
@@ -839,7 +880,67 @@
     </div>
   </div>
 
-  <!-- TAB 4: PROFILE -->
+  <!-- TAB 4: REFER & EARN -->
+  <div id="tabRefer" class="tab-view">
+    <div class="refer-box-card" style="border: 2px solid #fbbf24;">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <span style="font-size: 2.2rem;">🎁</span>
+        <h2 id="txtReferHeading" style="color: var(--primary-dark); font-weight: 900; margin-top: 4px;">Refer & Earn Free VIP</h2>
+        <p id="txtReferSub" style="font-size: 0.85rem; color: #7b7597; margin-top: 4px;">
+          Share your link with friends. 5 Friends = 150 Points = 1 Day VIP Free!
+        </p>
+      </div>
+
+      <!-- STATS BOX -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <div class="refer-stat-badge">
+          <span id="txtRefersCountLbl">Total Friends</span>
+          <b id="userReferCountDisplay">0</b>
+        </div>
+        <div class="refer-stat-badge" style="border-color: #fbbf24; background: #fffcf0;">
+          <span id="txtPointsCountLbl">Your Points</span>
+          <b id="userPointsDisplay" style="color: #d97706;">0</b>
+        </div>
+      </div>
+
+      <!-- REDEEM VIP BUTTON -->
+      <div style="background: #fdfaf0; border: 1.5px dashed #f59e0b; padding: 14px; border-radius: 14px; margin-bottom: 18px; text-align: center;">
+        <div style="font-size: 0.82rem; color: #92400e; font-weight: 800; margin-bottom: 8px;" id="txtRedeemDesc">
+          ⚡ 150 Points = ₹150 Value (1 Day VIP Pass)
+        </div>
+        <button id="btnRedeemVip" class="btn" style="background: var(--gold-gradient); color: #000; font-weight: 900; margin-top: 0;" onclick="redeemPointsForVip()">
+          👑 Redeem 150 Points (Unlock 1 Day VIP)
+        </button>
+      </div>
+
+      <!-- SHARE SECTION -->
+      <div style="margin-top: 15px;">
+        <label id="txtYourLinkLbl" style="font-size: 0.8rem; color: var(--text-sub); font-weight: bold; display: block; margin-bottom: 6px;">
+          Your Exclusive Referral Link:
+        </label>
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <input type="text" id="userReferralLinkInput" readonly style="font-size: 0.85rem; background: #f8f7fc;" />
+          <button class="btn" style="width: auto; padding: 8px 16px; margin-top: 0; font-size: 0.82rem;" onclick="copyReferralLink()">
+            Copy
+          </button>
+        </div>
+
+        <button class="btn" style="background: #25D366; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; margin-top: 6px;" onclick="shareReferralWhatsApp()">
+          <span style="font-size: 1.2rem;">📲</span> WhatsApp Share
+        </button>
+      </div>
+
+      <!-- RULES -->
+      <div style="background: #f8f7fc; padding: 12px 14px; border-radius: 12px; margin-top: 18px; font-size: 0.78rem; color: #645c85; line-height: 1.5;">
+        <b style="color: var(--primary-dark); display: block; margin-bottom: 4px;" id="txtHowItWorks">How it works:</b>
+        <p>1. Send your link to friends on WhatsApp.<br>
+        2. When they register using your link, you get <b>+30 Points</b>.<br>
+        3. Once you reach <b>150 Points (5 Friends)</b>, click Redeem to get 1 Day VIP unlocked instantly!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: PROFILE -->
   <div id="tabProfile" class="tab-view">
     <div id="profileCardBox" class="rich-vip-card">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
@@ -892,7 +993,7 @@
     <div class="admin-subnav">
       <button class="admin-subnav-btn active" onclick="switchAdminTab('admSecGames', this)">🎯 Games</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecDpboss', this)">⚡ DPBoss Auto Result</button>
-      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Passwords</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Referrals</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice & Alert</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecApprovals', this)">🔔 Approvals</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
@@ -900,8 +1001,6 @@
 
     <!-- 1. ADMIN GAMES SECTION -->
     <div id="admSecGames" class="admin-section active">
-      
-      <!-- MAGIC AUTO-FILL -->
       <div class="game-card" style="border: 2px dashed var(--primary); background: #fdfcff;">
         <h4 style="color: var(--primary-dark); margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
           <span>🪄</span> Paste Full Copied Game (Auto-Clean & Filter)
@@ -966,10 +1065,10 @@
       </div>
     </div>
 
-    <!-- 3. ADMIN USERS SECTION -->
+    <!-- 3. ADMIN USERS & REFERRALS SECTION -->
     <div id="admSecUsers" class="admin-section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-        <h4 style="color: var(--primary-dark);">Registered Users & Passwords</h4>
+        <h4 style="color: var(--primary-dark);">Registered Users & Referrals</h4>
         <span id="onlineCountBadge" style="font-size:0.78rem; color:#10b981; font-weight:bold;">Online: 0</span>
       </div>
       <div id="admUsersList"><p style="color:#7b7597;">Loading users...</p></div>
@@ -1014,11 +1113,12 @@
     </div>
   </div>
 
-  <!-- CURVED BOTTOM NAVIGATION -->
+  <!-- CURVED BOTTOM NAVIGATION (WITH REFER TAB) -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
     <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
     <div class="nav-btn" onclick="navigate('tabVip', this)"><span id="navIcon3">⭐</span><div id="navLbl3">VIP</div></div>
+    <div class="nav-btn" onclick="navigate('tabRefer', this)"><span id="navIconRefer">🎁</span><div id="navLblRefer">Refer</div></div>
     <div class="nav-btn" onclick="navigate('tabProfile', this)"><span id="navIcon4">👤</span><div id="navLbl4">Profile</div></div>
   </div>
 
@@ -1053,12 +1153,17 @@
     let usersCache = [];
     let dpbossCache = {};
 
+    // Get referral code from URL parameter (?ref=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const incomingReferrer = urlParams.get('ref');
+
     const translations = {
       en: {
         appTitle: "MATKA KING",
         gamesTab: "Games",
         historyTab: "History",
         vipTab: "VIP",
+        referTab: "Refer",
         profileTab: "Profile",
         historyHeader: "🏆 All-Time Success History",
         vipHeader: "🌟 VIP Membership",
@@ -1075,13 +1180,21 @@
         saveNameBtn: "Update Name",
         payHistoryTitle: "Your VIP Payment Requests",
         logoutBtn: "Logout Account",
-        openUnlock: "🔒 Unlock VIP"
+        referHeading: "Refer & Earn Free VIP",
+        referSub: "Share your link with friends. 5 Friends = 150 Points = 1 Day VIP Free!",
+        refersCountLbl: "Total Friends",
+        pointsCountLbl: "Your Points",
+        redeemDesc: "⚡ 150 Points = ₹150 Value (1 Day VIP Pass)",
+        btnRedeem: "👑 Redeem 150 Points (Unlock 1 Day VIP)",
+        yourLinkLbl: "Your Exclusive Referral Link:",
+        howItWorks: "How it works:"
       },
       kn: {
         appTitle: "ಮಟ್ಕಾ ಕಿಂಗ್",
         gamesTab: "ಗೇಮ್ಸ್",
         historyTab: "ಹಿಸ್ಟರಿ",
         vipTab: "ವಿಐಪಿ",
+        referTab: "ರೆಫರ್",
         profileTab: "ಪ್ರೊಫೈಲ್",
         historyHeader: "🏆 ಶಾಶ್ವತ ಸಕ್ಸಸ್ ಹಿಸ್ಟರಿ",
         vipHeader: "🌟 VIP ಪ್ರೀಮಿಯಂ ಸದಸ್ಯತ್ವ",
@@ -1098,7 +1211,14 @@
         saveNameBtn: "ಹೆಸರು ಅಪ್‌‌ಡೇಟ್ ಮಾಡಿ",
         payHistoryTitle: "ನಿಮ್ಮ VIP ಪಾವತಿ ಸ್ಟೇಟಸ್",
         logoutBtn: "ಖಾತೆಯಿಂದ ಲಾಗ್‌ಔಟ್",
-        openUnlock: "🔒 VIP ಅನ್‌ಲಾಕ್"
+        referHeading: "ಸ್ನೇಹಿತರಿಗೆ ರೆಫರ್ ಮಾಡಿ ಉಚಿತ VIP ಪಡೆಯಿರಿ",
+        referSub: "5 ಜನ ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಿ = 150 Points = 1 ದಿನದ VIP (₹150 ಮೌಲ್ಯ) ಉಚಿತ!",
+        refersCountLbl: "ಒಟ್ಟು ಸ್ನೇಹಿತರು",
+        pointsCountLbl: "ನಿಮ್ಮ ಪಾಯಿಂಟ್ಸ್",
+        redeemDesc: "⚡ 150 Points = ₹150 ಮೌಲ್ಯ (1 ದಿನದ VIP ಪಾಸ್)",
+        btnRedeem: "👑 150 Points ರಿಡೀಮ್ ಮಾಡಿ (1 ದಿನ VIP ಅನ್‌ಲಾಕ್)",
+        yourLinkLbl: "ನಿಮ್ಮ ರೆಫರಲ್ ಲಿಂಕ್:",
+        howItWorks: "ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ:"
       }
     };
 
@@ -1112,10 +1232,15 @@
         document.getElementById("authOverlay").style.display = "none";
         listenRealtimeGames();
         listenUserPayments();
+        renderReferralUI();
         startPresenceTracking(currentUser.phone);
+      } else {
+        if (incomingReferrer) {
+          isRegister = false;
+          toggleAuth();
+        }
       }
 
-      // Start DPBoss Auto-Fetch Engine (Every 60 seconds)
       startDPBossAutoEngine();
     };
 
@@ -1127,255 +1252,12 @@
       }
     }
 
-    // 🌐 100% FREE DPBOSS AUTO ENGINE WITH CORS PROXY
-    function startDPBossAutoEngine() {
-      fetchDPBossLiveResults();
-      clearInterval(autoSyncInterval);
-      autoSyncInterval = setInterval(fetchDPBossLiveResults, 60000); // Check every 1 minute
-    }
-
-    function manualSyncDPBoss() {
-      const feed = document.getElementById("dpbossLiveFeed");
-      feed.innerHTML = "Fetching latest live results from DPBoss...";
-      fetchDPBossLiveResults(true);
-    }
-
-    async function fetchDPBossLiveResults(isManual = false) {
-      const feed = document.getElementById("dpbossLiveFeed");
-      // Use AllOrigins open free CORS proxy to fetch DPBoss live results
-      const targetUrl = "https://sattamatkadpboss.org/";
-      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl) + "&timestamp=" + Date.now();
-
-      try {
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error("Network error");
-        const data = await response.json();
-        const html = data.contents;
-
-        if (!html) throw new Error("Empty content");
-
-        // Parse HTML to extract market results
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-
-        let extracted = {};
-        let textContent = doc.body.innerText || "";
-
-        // Regex matches pattern like: "KALYAN MORNING\n378-89-270" or "MILAN MORNING\n133-7"
-        const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
-        let match;
-
-        while ((match = regex.exec(textContent)) !== null) {
-          const rawMkt = match[1].replace(/[\*\_\:\(\)]/g, '').trim().toUpperCase();
-          const rawScore = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
-          if (rawMkt.length >= 3 && !/HTTP|WWW|DATE|TODAY|LUCKY|JODI|PANEL/i.test(rawMkt)) {
-            extracted[rawMkt] = rawScore;
-          }
-        }
-
-        dpbossCache = extracted;
-
-        if (feed) {
-          let feedHtml = "<b>Live Detected Markets:</b><br>";
-          for (let m in extracted) {
-            feedHtml += `<div style="padding:4px 0; border-bottom:1px solid #e2e0f0;"><b>${m}</b>: <span style="color:#0284c7; font-family:monospace; font-weight:bold;">${extracted[m]}</span></div>`;
-          }
-          feed.innerHTML = Object.keys(extracted).length ? feedHtml : "No active results found at this minute. Retrying in 60s...";
-        }
-
-        // AUTO-MATCH ACTIVE DATABASE GAMES AGAINST DPBOSS
-        autoEvaluateAgainstDPBoss(extracted);
-
-        if (isManual) alert("DPBoss Live Sync Complete!");
-
-      } catch (err) {
-        console.error("DPBoss Auto-Fetch Error:", err);
-        if (feed) feed.innerHTML = "<span style='color:#ef4444;'>Failed to auto-fetch DPBoss. Retrying in 60s...</span>";
-      }
-    }
-
-    // ⚡ AUTOMATICALLY MARKS PASSES WITHOUT USER INTERVENTION
-    function autoEvaluateAgainstDPBoss(dpbossData) {
-      db.collection("games").where("isPassed", "==", false).get().then(snapshot => {
-        if (snapshot.empty) return;
-
-        snapshot.forEach(docSnap => {
-          const g = docSnap.data();
-          const docId = docSnap.id;
-          const gameMarket = (g.market || "").trim().toUpperCase();
-
-          // Check if DPBoss has result for this market
-          let matchingResult = null;
-          for (let mkt in dpbossData) {
-            if (mkt.includes(gameMarket) || gameMarket.includes(mkt)) {
-              matchingResult = dpbossData[mkt];
-              break;
-            }
-          }
-
-          if (!matchingResult) return;
-
-          // Parse digits out of result (e.g. 133-7 or 378-89-270)
-          const parts = matchingResult.split(/[-–\s]+/).filter(Boolean);
-          const openPanaList = splitNumbers(g.openPana);
-          const openDigitList = splitNumbers(g.open);
-          const jodiList = splitNumbers(g.jodi);
-          const closeDigitList = splitNumbers(g.close);
-          const closePanaList = splitNumbers(g.closePana);
-
-          let passes = getGamePasses(g);
-          let matchFound = false;
-
-          parts.forEach(part => {
-            // Pana match
-            if (/^\d{3}$/.test(part)) {
-              if (openPanaList.includes(part) && !passes.some(p => p.type === "OPEN_PANA" && p.number === part)) {
-                passes.push({ type: "OPEN_PANA", number: part });
-                matchFound = true;
-              }
-              if (closePanaList.includes(part) && !passes.some(p => p.type === "CLOSE_PANA" && p.number === part)) {
-                passes.push({ type: "CLOSE_PANA", number: part });
-                matchFound = true;
-              }
-            }
-            // Jodi & single digit match
-            else if (/^\d{2}$/.test(part)) {
-              if (jodiList.includes(part) && !passes.some(p => p.type === "JODI" && p.number === part)) {
-                passes.push({ type: "JODI", number: part });
-                matchFound = true;
-              }
-              const d1 = part[0], d2 = part[1];
-              if (openDigitList.includes(d1) && !passes.some(p => p.type === "OPEN" && p.number === d1)) {
-                passes.push({ type: "OPEN", number: d1 });
-                matchFound = true;
-              }
-              if (closeDigitList.includes(d2) && !passes.some(p => p.type === "CLOSE" && p.number === d2)) {
-                passes.push({ type: "CLOSE", number: d2 });
-                matchFound = true;
-              }
-            }
-            // Single OTC match
-            else if (/^\d{1}$/.test(part)) {
-              if (openDigitList.includes(part) && !passes.some(p => p.type === "OPEN" && p.number === part)) {
-                passes.push({ type: "OPEN", number: part });
-                matchFound = true;
-              }
-              if (closeDigitList.includes(part) && !passes.some(p => p.type === "CLOSE" && p.number === part)) {
-                passes.push({ type: "CLOSE", number: part });
-                matchFound = true;
-              }
-            }
-          });
-
-          // Automatically mark as PASSED in Firebase!
-          if (matchFound) {
-            db.collection("games").doc(docId).update({
-              isPassed: true,
-              passes: passes,
-              autoDeclaredResult: matchingResult
-            }).then(() => {
-              // Automatically send celebration push notification
-              sendPushNotification(`🏆 ${g.market} BLAST RESULT!`, `DPBoss Result: [${matchingResult}] PASSED! Check App Now!`);
-            });
-          }
-        });
-      });
-    }
-
-    // 🪄 ROBUST MAGIC PARSER (CLEANS ALL BRACKETS, STARS, EMOJIS, SYMBOLS)
-    function magicParseAndFill() {
-      const rawText = document.getElementById("admRawInput").value;
-      if (!rawText || rawText.trim() === "") {
-        alert("ದಯವಿಟ್ಟು ಕಾಪಿ ಮಾಡಿದ ಗೇಮ್ ಟೆಕ್ಸ್ಟ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ!");
-        return;
-      }
-
-      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-
-      let marketName = "";
-      let openDigits = new Set();
-      let jodiList = new Set();
-      let panaList = new Set();
-
-      for (let l of lines) {
-        let cleanL = l.replace(/[^\w\s]/gi, ' ').replace(/\s+/g, ' ').trim();
-        if (/http|play|google|download|luck|good|dosto|date|\bdt\b/i.test(cleanL)) continue;
-        if (/^\d+$/.test(cleanL)) continue;
-
-        cleanL = cleanL.replace(/\botc\b/gi, '').trim();
-
-        if (/[A-Za-z]{3,}/.test(cleanL)) {
-          marketName = cleanL.toUpperCase();
-          break;
-        }
-      }
-
-      for (let line of lines) {
-        if (/http|\.com|play\.google|download|dosto|good\s*luck/i.test(line)) continue;
-        if (/^\s*\*?\s*(date|\bdt\b)/i.test(line)) continue;
-
-        let cleanedLine = line.replace(/[^\d\s]/g, ' ');
-        let tokens = cleanedLine.split(/\s+/).filter(Boolean);
-
-        for (let tok of tokens) {
-          if (tok.length === 4 && (tok.startsWith("202") || tok.startsWith("199"))) continue;
-
-          if (/^\d{3}$/.test(tok)) {
-            panaList.add(tok);
-          } else if (/^\d{2}$/.test(tok)) {
-            jodiList.add(tok);
-          } else if (/^\d{1}$/.test(tok)) {
-            openDigits.add(tok);
-          }
-        }
-      }
-
-      if (marketName) {
-        document.getElementById("admMarket").value = marketName;
-      }
-      if (openDigits.size > 0) {
-        document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
-      }
-      if (jodiList.size > 0) {
-        document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
-      }
-      if (panaList.size > 0) {
-        document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
-      }
-
-      alert("🎉 ಗೇಮ್ ಶುದ್ಧವಾಗಿ Auto-Fill ಆಗಿದೆ! (ಯಾವುದೇ ಸಿಂಬಲ್ ಇಲ್ಲದೆ ಬಾಕ್ಸ್‌ಗಳಲ್ಲಿ ಸೆಟ್ ಆಗಿದೆ)");
-    }
-
-    function togglePassVisibility(inputId) {
-      const field = document.getElementById(inputId);
-      field.type = field.type === "password" ? "text" : "password";
-    }
-
-    function sendPushNotification(title, message) {
-      fetch("https://onesignal.com/api/v1/notifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Authorization": "Key " + ONESIGNAL_REST_KEY
-        },
-        body: JSON.stringify({
-          app_id: ONESIGNAL_APP_ID,
-          included_segments: ["Total Subscriptions", "Subscribed Users"],
-          headings: { "en": title },
-          contents: { "en": message },
-          url: "https://sandeeppkdos.github.io/Online-App/"
-        })
-      })
-      .then(res => res.json())
-      .then(data => console.log("Push status:", data))
-      .catch(err => console.error("Push error:", err));
-    }
-
     function toggleLang() {
       currentLang = currentLang === "en" ? "kn" : "en";
       localStorage.setItem("app_lang", currentLang);
       applyLanguage(currentLang);
       renderProfile();
+      renderReferralUI();
       listenRealtimeGames();
     }
 
@@ -1386,6 +1268,7 @@
       document.getElementById("navLbl1").innerText = t.gamesTab;
       document.getElementById("navLbl2").innerText = t.historyTab;
       document.getElementById("navLbl3").innerText = t.vipTab;
+      document.getElementById("navLblRefer").innerText = t.referTab;
       document.getElementById("navLbl4").innerText = t.profileTab;
       document.getElementById("txtHistoryHeader").innerText = t.historyHeader;
       document.getElementById("txtVipHeader").innerText = t.vipHeader;
@@ -1402,67 +1285,99 @@
       document.getElementById("btnSaveName").innerText = t.saveNameBtn;
       document.getElementById("txtPayHistoryTitle").innerText = t.payHistoryTitle;
       document.getElementById("btnLogout").innerText = t.logoutBtn;
+
+      document.getElementById("txtReferHeading").innerText = t.referHeading;
+      document.getElementById("txtReferSub").innerText = t.referSub;
+      document.getElementById("txtRefersCountLbl").innerText = t.refersCountLbl;
+      document.getElementById("txtPointsCountLbl").innerText = t.pointsCountLbl;
+      document.getElementById("txtRedeemDesc").innerText = t.redeemDesc;
+      document.getElementById("btnRedeemVip").innerText = t.btnRedeem;
+      document.getElementById("txtYourLinkLbl").innerText = t.yourLinkLbl;
+      document.getElementById("txtHowItWorks").innerText = t.howItWorks;
     }
 
-    function startPresenceTracking(phone) {
-      if (!phone) return;
+    // 🎁 FIXED REFERRAL & POINTS LOGIC (DIRECT HTTPS LIVE LINK)
+    function renderReferralUI() {
+      if (!currentUser) return;
 
-      function setOnline() {
-        if (!currentUser) return;
-        db.collection("users").doc(phone).update({
-          isOnline: true,
-          lastSeen: Date.now()
-        }).catch(() => {});
+      const points = currentUser.points || 0;
+      const refCount = currentUser.referralCount || 0;
+
+      document.getElementById("userReferCountDisplay").innerText = refCount;
+      document.getElementById("userPointsDisplay").innerText = points;
+
+      // FIXED: Uses full live HTTPS URL so WhatsApp turns it into a clickable blue link
+      const baseAppUrl = "https://sandeeppkdos.github.io/Online-App/";
+      const myRefLink = `${baseAppUrl}?ref=${currentUser.phone}`;
+      
+      document.getElementById("userReferralLinkInput").value = myRefLink;
+
+      const redeemBtn = document.getElementById("btnRedeemVip");
+      if (points >= 150) {
+        redeemBtn.style.opacity = "1";
+        redeemBtn.style.pointerEvents = "auto";
+      } else {
+        redeemBtn.style.opacity = "0.7";
+      }
+    }
+
+    function copyReferralLink() {
+      const linkInput = document.getElementById("userReferralLinkInput");
+      linkInput.select();
+      navigator.clipboard.writeText(linkInput.value);
+      alert(currentLang === "kn" ? "ರೆಫರಲ್ ಲಿಂಕ್ ಕಾಪಿ ಆಗಿದೆ!" : "Referral link copied!");
+    }
+
+    function shareReferralWhatsApp() {
+      const link = document.getElementById("userReferralLinkInput").value;
+      const msg = currentLang === "kn" 
+        ? `🔥 ಮಟ್ಕಾ ಕಿಂಗ್ ಆ್ಯಪ್ 100% ಪಕ್ಕಾ ರಿಸಲ್ಟ್!\n\nಈ ಕೆಳಗಿನ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿ ರಿಜಿಸ್ಟರ್ ಆಗಿ:\n${link}`
+        : `🔥 Join Matka King Pro Official app for fast and accurate guessing results!\n\nClick link to register:\n${link}`;
+      
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    function redeemPointsForVip() {
+      if (!currentUser) return;
+      const currentPoints = currentUser.points || 0;
+
+      if (currentPoints < 150) {
+        alert(currentLang === "kn" 
+          ? `ನಿಮ್ಮ ಬಳಿ ಕೇವಲ ${currentPoints} ಪಾಯಿಂಟ್ಸ್ ಇದೆ. 1 ದಿನದ VIP ಅನ್‌ಲಾಕ್ ಮಾಡಲು 150 ಪಾಯಿಂಟ್ಸ್ ಬೇಕು (ಇನ್ನೂ ${Math.ceil((150 - currentPoints)/30)} ಸ್ನೇಹಿತರನ್ನು ರೆಫರ್ ಮಾಡಿ).`
+          : `You have ${currentPoints} points. You need at least 150 points to unlock 1 Day VIP (Refer ${Math.ceil((150 - currentPoints)/30)} more friends).`);
+        return;
       }
 
-      function setOffline() {
-        if (!currentUser) return;
-        db.collection("users").doc(phone).update({
-          isOnline: false,
-          lastSeen: Date.now()
-        }).catch(() => {});
+      if (!confirm(currentLang === "kn" ? "150 ಪಾಯಿಂಟ್ಸ್ ಬಳಸಿ 1 ದಿನದ VIP ಅನ್‌ಲಾಕ್ ಮಾಡಬೇಕೆ?" : "Redeem 150 points for 1 Day VIP Pass?")) return;
+
+      const now = new Date();
+      let baseTime = now.getTime();
+      if (currentUser.isVip && currentUser.vipExpiry && new Date(currentUser.vipExpiry) > now) {
+        baseTime = new Date(currentUser.vipExpiry).getTime();
       }
 
-      setOnline();
-      clearInterval(presenceInterval);
-      presenceInterval = setInterval(setOnline, 30000);
+      const newExpiry = new Date(baseTime + (24 * 60 * 60 * 1000));
 
-      window.addEventListener("beforeunload", setOffline);
-    }
+      db.collection("users").doc(currentUser.phone).update({
+        points: firebase.firestore.FieldValue.increment(-150),
+        isVip: true,
+        vipExpiry: newExpiry.toISOString()
+      }).then(() => {
+        currentUser.points = (currentUser.points || 150) - 150;
+        currentUser.isVip = true;
+        currentUser.vipExpiry = newExpiry.toISOString();
+        localStorage.setItem("app_current_user", JSON.stringify(currentUser));
 
-    function syncUserData(phone) {
-      db.collection("users").doc(phone).onSnapshot(doc => {
-        if (doc.exists && currentUser) {
-          currentUser = doc.data();
-          localStorage.setItem("app_current_user", JSON.stringify(currentUser));
-          renderProfile();
-          listenRealtimeGames();
-        }
-      });
-    }
+        renderReferralUI();
+        renderProfile();
+        listenRealtimeGames();
 
-    function listenBroadcastAndNotices() {
-      db.collection("settings").doc("notice").onSnapshot(doc => {
-        const banner = document.getElementById("topNoticeBanner");
-        if (doc.exists) {
-          const data = doc.data();
-          if (data && data.text && data.show === true) {
-            banner.innerText = "📢 " + data.text;
-            banner.style.display = "block";
-            return;
-          }
-        }
-        banner.style.display = "none";
-      });
-
-      db.collection("settings").doc("instant_alert").onSnapshot(doc => {
-        if (doc.exists) {
-          const alertData = doc.data();
-          if (alertData && alertData.id && alertData.id !== lastHandledNoticeId) {
-            lastHandledNoticeId = alertData.id;
-            localStorage.setItem("last_alert_id", alertData.id);
-          }
-        }
+        alert(currentLang === "kn" 
+          ? "🎉 ಅಭಿನಂದನೆಗಳು! 1 ದಿನದ VIP ಯಶಸ್ವಿಯಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗಿದೆ!" 
+          : "🎉 Congratulations! 1 Day VIP Pass unlocked successfully!");
+      }).catch(err => {
+        alert("Error redeeming points: " + err.message);
       });
     }
 
@@ -1499,9 +1414,24 @@
               vipExpiry: null,
               isOnline: true,
               lastSeen: Date.now(),
-              createdTime: Date.now()
+              createdTime: Date.now(),
+              points: 0,
+              referralCount: 0,
+              referredBy: incomingReferrer || null
             };
+
             db.collection("users").doc(phone).set(newUser).then(() => {
+              if (incomingReferrer && incomingReferrer !== phone) {
+                db.collection("users").doc(incomingReferrer).get().then(refDoc => {
+                  if (refDoc.exists) {
+                    db.collection("users").doc(incomingReferrer).update({
+                      referralCount: firebase.firestore.FieldValue.increment(1),
+                      points: firebase.firestore.FieldValue.increment(30)
+                    }).catch(e => console.error("Refer reward error:", e));
+                  }
+                });
+              }
+
               alert("Account created successfully!");
               finishAuth(newUser);
             });
@@ -1531,9 +1461,38 @@
       syncUserData(user.phone);
       startPresenceTracking(user.phone);
       renderProfile();
+      renderReferralUI();
       listenRealtimeGames();
       listenUserPayments();
       requestNotificationPermission();
+    }
+
+    function syncUserData(phone) {
+      db.collection("users").doc(phone).onSnapshot(doc => {
+        if (doc.exists && currentUser) {
+          currentUser = doc.data();
+          localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+          renderProfile();
+          renderReferralUI();
+          listenRealtimeGames();
+        }
+      });
+    }
+
+    function navigate(tabId, btn) {
+      document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      if (btn) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      if (tabId === 'tabGames') listenRealtimeGames();
+      if (tabId === 'tabHistory') loadAllHistory();
+      if (tabId === 'tabVip') fetchVipConfig();
+      if (tabId === 'tabRefer') renderReferralUI();
+      if (tabId === 'tabProfile') renderProfile();
     }
 
     function isVipActive() {
@@ -1704,21 +1663,6 @@
             `;
           });
         });
-    }
-
-    function navigate(tabId, btn) {
-      document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-
-      if (btn) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
-
-      if (tabId === 'tabGames') listenRealtimeGames();
-      if (tabId === 'tabHistory') loadAllHistory();
-      if (tabId === 'tabVip') fetchVipConfig();
-      if (tabId === 'tabProfile') renderProfile();
     }
 
     function selectPlan(days) {
@@ -2004,7 +1948,7 @@
       db.collection("settings").doc("vip").get().then(doc => {
         if (doc.exists) {
           const cfg = doc.data();
-          document.getElementById("vPrice1").innerText = "₹" + (cfg.plan1 || "99");
+          document.getElementById("vPrice1").innerText = "₹" + (cfg.plan1 || "150");
           document.getElementById("vPrice7").innerText = "₹" + (cfg.plan7 || "499");
           document.getElementById("vPrice30").innerText = "₹" + (cfg.plan30 || "1499");
           document.getElementById("vipUpiText").innerText = cfg.upi || "mkmatka@upi";
@@ -2026,7 +1970,7 @@
       if (!u) { alert("Please enter UPI ID!"); return; }
 
       db.collection("settings").doc("vip").set({
-        plan1: p1 || "99",
+        plan1: p1 || "150",
         plan7: p7 || "499",
         plan30: p30 || "1499",
         upi: u
@@ -2329,6 +2273,8 @@
           const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
           const expText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : 'N/A';
           const userPass = u.password || 'No Pass Set';
+          const totalRefers = u.referralCount || 0;
+          const currentPts = u.points || 0;
 
           box.innerHTML += `
             <div class="admin-user-card">
@@ -2350,12 +2296,18 @@
                 </div>
               </div>
 
+              <!-- REFERRAL & POINTS STATS IN ADMIN -->
+              <div style="display:flex; gap:8px; background:#f7f6fc; padding:8px 12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border); font-size:0.8rem;">
+                <div style="flex:1;">👥 Refers: <b style="color:var(--primary); font-size:0.95rem;">${totalRefers}</b></div>
+                <div style="flex:1;">🪙 Points: <b style="color:#d97706; font-size:0.95rem;">${currentPts} pts</b></div>
+              </div>
+
               <div style="font-size:0.75rem; color:#7b7597; margin-bottom:10px;">
                 Expiry: <b style="color:${isVip ? 'var(--vip)' : '#4a4269'};">${expText}</b>
               </div>
 
               <div style="margin-bottom:8px;">
-                <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Password</button>
+                <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Referral Stats</button>
               </div>
 
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -2380,6 +2332,9 @@
       document.getElementById("mdlName").innerText = u.name || "N/A";
       document.getElementById("mdlPhone").innerText = "+91 " + u.phone;
       document.getElementById("mdlPassword").innerText = u.password || "N/A";
+      document.getElementById("mdlRefers").innerText = (u.referralCount || 0) + " Friends";
+      document.getElementById("mdlPoints").innerText = (u.points || 0) + " pts";
+      document.getElementById("mdlReferredBy").innerText = u.referredBy ? ("+91 " + u.referredBy) : "None (Direct)";
       document.getElementById("mdlStatus").innerHTML = u.activeOnline ? "<span style='color:#10b981;'>● ONLINE LIVE</span>" : "<span style='color:#94a3b8;'>○ Offline</span>";
       document.getElementById("mdlVip").innerHTML = isVip ? "<span style='color:#f59e0b;'>★ ACTIVE VIP</span>" : "FREE USER";
       document.getElementById("mdlExpiry").innerText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : "None";
@@ -2524,6 +2479,283 @@
           alert("Request marked as rejected.");
         });
       }
+    }
+
+    function startPresenceTracking(phone) {
+      if (!phone) return;
+
+      function setOnline() {
+        if (!currentUser) return;
+        db.collection("users").doc(phone).update({
+          isOnline: true,
+          lastSeen: Date.now()
+        }).catch(() => {});
+      }
+
+      function setOffline() {
+        if (!currentUser) return;
+        db.collection("users").doc(phone).update({
+          isOnline: false,
+          lastSeen: Date.now()
+        }).catch(() => {});
+      }
+
+      setOnline();
+      clearInterval(presenceInterval);
+      presenceInterval = setInterval(setOnline, 30000);
+
+      window.addEventListener("beforeunload", setOffline);
+    }
+
+    function listenBroadcastAndNotices() {
+      db.collection("settings").doc("notice").onSnapshot(doc => {
+        const banner = document.getElementById("topNoticeBanner");
+        if (doc.exists) {
+          const data = doc.data();
+          if (data && data.text && data.show === true) {
+            banner.innerText = "📢 " + data.text;
+            banner.style.display = "block";
+            return;
+          }
+        }
+        banner.style.display = "none";
+      });
+
+      db.collection("settings").doc("instant_alert").onSnapshot(doc => {
+        if (doc.exists) {
+          const alertData = doc.data();
+          if (alertData && alertData.id && alertData.id !== lastHandledNoticeId) {
+            lastHandledNoticeId = alertData.id;
+            localStorage.setItem("last_alert_id", alertData.id);
+          }
+        }
+      });
+    }
+
+    function startDPBossAutoEngine() {
+      fetchDPBossLiveResults();
+      clearInterval(autoSyncInterval);
+      autoSyncInterval = setInterval(fetchDPBossLiveResults, 60000);
+    }
+
+    function manualSyncDPBoss() {
+      const feed = document.getElementById("dpbossLiveFeed");
+      feed.innerHTML = "Fetching latest live results from DPBoss...";
+      fetchDPBossLiveResults(true);
+    }
+
+    async function fetchDPBossLiveResults(isManual = false) {
+      const feed = document.getElementById("dpbossLiveFeed");
+      const targetUrl = "https://sattamatkadpboss.org/";
+      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl) + "&timestamp=" + Date.now();
+
+      try {
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error("Network error");
+        const data = await response.json();
+        const html = data.contents;
+
+        if (!html) throw new Error("Empty content");
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        let extracted = {};
+        let textContent = doc.body.innerText || "";
+
+        const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
+        let match;
+
+        while ((match = regex.exec(textContent)) !== null) {
+          const rawMkt = match[1].replace(/[\*\_\:\(\)]/g, '').trim().toUpperCase();
+          const rawScore = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
+          if (rawMkt.length >= 3 && !/HTTP|WWW|DATE|TODAY|LUCKY|JODI|PANEL/i.test(rawMkt)) {
+            extracted[rawMkt] = rawScore;
+          }
+        }
+
+        dpbossCache = extracted;
+
+        if (feed) {
+          let feedHtml = "<b>Live Detected Markets:</b><br>";
+          for (let m in extracted) {
+            feedHtml += `<div style="padding:4px 0; border-bottom:1px solid #e2e0f0;"><b>${m}</b>: <span style="color:#0284c7; font-family:monospace; font-weight:bold;">${extracted[m]}</span></div>`;
+          }
+          feed.innerHTML = Object.keys(extracted).length ? feedHtml : "No active results found at this minute. Retrying in 60s...";
+        }
+
+        autoEvaluateAgainstDPBoss(extracted);
+
+        if (isManual) alert("DPBoss Live Sync Complete!");
+
+      } catch (err) {
+        console.error("DPBoss Auto-Fetch Error:", err);
+        if (feed) feed.innerHTML = "<span style='color:#ef4444;'>Failed to auto-fetch DPBoss. Retrying in 60s...</span>";
+      }
+    }
+
+    function autoEvaluateAgainstDPBoss(dpbossData) {
+      db.collection("games").where("isPassed", "==", false).get().then(snapshot => {
+        if (snapshot.empty) return;
+
+        snapshot.forEach(docSnap => {
+          const g = docSnap.data();
+          const docId = docSnap.id;
+          const gameMarket = (g.market || "").trim().toUpperCase();
+
+          let matchingResult = null;
+          for (let mkt in dpbossData) {
+            if (mkt.includes(gameMarket) || gameMarket.includes(mkt)) {
+              matchingResult = dpbossData[mkt];
+              break;
+            }
+          }
+
+          if (!matchingResult) return;
+
+          const parts = matchingResult.split(/[-–\s]+/).filter(Boolean);
+          const openPanaList = splitNumbers(g.openPana);
+          const openDigitList = splitNumbers(g.open);
+          const jodiList = splitNumbers(g.jodi);
+          const closeDigitList = splitNumbers(g.close);
+          const closePanaList = splitNumbers(g.closePana);
+
+          let passes = getGamePasses(g);
+          let matchFound = false;
+
+          parts.forEach(part => {
+            if (/^\d{3}$/.test(part)) {
+              if (openPanaList.includes(part) && !passes.some(p => p.type === "OPEN_PANA" && p.number === part)) {
+                passes.push({ type: "OPEN_PANA", number: part });
+                matchFound = true;
+              }
+              if (closePanaList.includes(part) && !passes.some(p => p.type === "CLOSE_PANA" && p.number === part)) {
+                passes.push({ type: "CLOSE_PANA", number: part });
+                matchFound = true;
+              }
+            } else if (/^\d{2}$/.test(part)) {
+              if (jodiList.includes(part) && !passes.some(p => p.type === "JODI" && p.number === part)) {
+                passes.push({ type: "JODI", number: part });
+                matchFound = true;
+              }
+              const d1 = part[0], d2 = part[1];
+              if (openDigitList.includes(d1) && !passes.some(p => p.type === "OPEN" && p.number === d1)) {
+                passes.push({ type: "OPEN", number: d1 });
+                matchFound = true;
+              }
+              if (closeDigitList.includes(d2) && !passes.some(p => p.type === "CLOSE" && p.number === d2)) {
+                passes.push({ type: "CLOSE", number: d2 });
+                matchFound = true;
+              }
+            } else if (/^\d{1}$/.test(part)) {
+              if (openDigitList.includes(part) && !passes.some(p => p.type === "OPEN" && p.number === part)) {
+                passes.push({ type: "OPEN", number: part });
+                matchFound = true;
+              }
+              if (closeDigitList.includes(part) && !passes.some(p => p.type === "CLOSE" && p.number === part)) {
+                passes.push({ type: "CLOSE", number: part });
+                matchFound = true;
+              }
+            }
+          });
+
+          if (matchFound) {
+            db.collection("games").doc(docId).update({
+              isPassed: true,
+              passes: passes,
+              autoDeclaredResult: matchingResult
+            }).then(() => {
+              sendPushNotification(`🏆 ${g.market} BLAST RESULT!`, `DPBoss Result: [${matchingResult}] PASSED! Check App Now!`);
+            });
+          }
+        });
+      });
+    }
+
+    function magicParseAndFill() {
+      const rawText = document.getElementById("admRawInput").value;
+      if (!rawText || rawText.trim() === "") {
+        alert("ದಯವಿಟ್ಟು ಕಾಪಿ ಮಾಡಿದ ಗೇಮ್ ಟೆಕ್ಸ್ಟ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ!");
+        return;
+      }
+
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      let marketName = "";
+      let openDigits = new Set();
+      let jodiList = new Set();
+      let panaList = new Set();
+
+      for (let l of lines) {
+        let cleanL = l.replace(/[^\w\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+        if (/http|play|google|download|luck|good|dosto|date|\bdt\b/i.test(cleanL)) continue;
+        if (/^\d+$/.test(cleanL)) continue;
+
+        cleanL = cleanL.replace(/\botc\b/gi, '').trim();
+
+        if (/[A-Za-z]{3,}/.test(cleanL)) {
+          marketName = cleanL.toUpperCase();
+          break;
+        }
+      }
+
+      for (let line of lines) {
+        if (/http|\.com|play\.google|download|dosto|good\s*luck/i.test(line)) continue;
+        if (/^\s*\*?\s*(date|\bdt\b)/i.test(line)) continue;
+
+        let cleanedLine = line.replace(/[^\d\s]/g, ' ');
+        let tokens = cleanedLine.split(/\s+/).filter(Boolean);
+
+        for (let tok of tokens) {
+          if (tok.length === 4 && (tok.startsWith("202") || tok.startsWith("199"))) continue;
+
+          if (/^\d{3}$/.test(tok)) {
+            panaList.add(tok);
+          } else if (/^\d{2}$/.test(tok)) {             jodiList.add(tok);           } else if (/^\d{1}$/.test(tok)) {
+            openDigits.add(tok);
+          }
+        }
+      }
+
+      if (marketName) {
+        document.getElementById("admMarket").value = marketName;
+      }
+      if (openDigits.size > 0) {
+        document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
+      }
+      if (jodiList.size > 0) {
+        document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
+      }
+      if (panaList.size > 0) {
+        document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
+      }
+
+      alert("🎉 ಗೇಮ್ ಶುದ್ಧವಾಗಿ Auto-Fill ಆಗಿದೆ! (ಯಾವುದೇ ಸಿಂಬಲ್ ಇಲ್ಲದೆ ಬಾಕ್ಸ್‌ಗಳಲ್ಲಿ ಸೆಟ್ ಆಗಿದೆ)");
+    }
+
+    function togglePassVisibility(inputId) {
+      const field = document.getElementById(inputId);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+
+    function sendPushNotification(title, message) {
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Authorization": "Key " + ONESIGNAL_REST_KEY
+        },
+        body: JSON.stringify({
+          app_id: ONESIGNAL_APP_ID,
+          included_segments: ["Total Subscriptions", "Subscribed Users"],
+          headings: { "en": title },
+          contents: { "en": message },
+          url: "https://sandeeppkdos.github.io/Online-App/"
+        })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Push status:", data))
+      .catch(err => console.error("Push error:", err));
     }
   </script>
 </body>
