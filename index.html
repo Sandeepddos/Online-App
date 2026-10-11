@@ -1,659 +1,2530 @@
 <!DOCTYPE html>
-<html lang="kn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MK MATKA VIP & LIVE BLAST</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- OneSignal SDK -->
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>MATKA KING PRO</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- OneSignal Push Notification SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
         appId: "39ffebaf-3ca2-445a-b1e9-04a9732357d9",
+        allowLocalhostAsSecureOrigin: true,
+        notifyButton: { enable: false }
       });
+      await OneSignal.Slidedown.promptPush();
     });
   </script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans select-none selection:bg-amber-500 selection:text-black">
 
-  <!-- TOP HEADER -->
-  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-xl">
-    <div class="flex items-center gap-2.5">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
-        M
+  <style>
+    /* PURPLE / LAVENDER & WHITE CLEAN THEME */
+    :root {
+      --primary: #63589f;
+      --primary-dark: #4d4285;
+      --primary-light: #8579c4;
+      --accent: #7868c7;
+      --bg: #f4f3fa;
+      --surface: #ffffff;
+      --card-border: #e2e0f0;
+      --text-main: #2d264d;
+      --text-sub: #7b7597;
+      --success: #10b981;
+      --vip: #f59e0b;
+      --danger: #ef4444;
+      --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      --purple-gradient: linear-gradient(135deg, #7464b8 0%, #52448f 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding-bottom: 90px;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: #ffffff;
+      padding: 12px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1.5px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(99, 88, 159, 0.08);
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .matka-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--purple-gradient);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(99, 88, 159, 0.35);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s ease;
+    }
+    .matka-logo:active { transform: scale(0.92); }
+    .matka-logo span.crown { font-size: 1.1rem; line-height: 1; }
+    .matka-logo span.text { font-size: 0.52rem; font-weight: 900; color: #fff; letter-spacing: 0.6px; line-height: 1; margin-top: 2px; }
+    
+    .brand-title { display: flex; flex-direction: column; }
+    .brand-title h1 { font-size: 1.25rem; color: var(--primary-dark); font-weight: 900; letter-spacing: 0.5px; line-height: 1.1; }
+    .brand-title span { font-size: 0.65rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+
+    .bell-btn {
+      background: #f0eef9;
+      border: 1.5px solid var(--card-border);
+      color: var(--primary-dark);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .bell-btn:hover { background: var(--primary); color: #fff; }
+
+    .lang-round-btn {
+      background: #f0eef9;
+      border: 1.5px solid var(--card-border);
+      color: var(--primary-dark);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .lang-round-btn:hover { background: var(--primary); color: #fff; }
+
+    #topNoticeBanner {
+      background: var(--purple-gradient);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: none;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(99, 88, 159, 0.25);
+    }
+
+    /* AUTH SCREEN */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: #b1a7d6;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .auth-phone-mockup {
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      max-height: 750px;
+      background: linear-gradient(145deg, #5b4d96 0%, #7666b3 40%, #51428c 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(45, 38, 77, 0.4);
+    }
+    @media (min-width: 480px) {
+      .auth-phone-mockup { border-radius: 36px; border: 8px solid #ffffff; height: 92vh; }
+    }
+
+    .auth-curved-white-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 88%;
+      height: 78%;
+      background: #ffffff;
+      border-bottom-right-radius: 200px 220px;
+      z-index: 1;
+      padding: 70px 28px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .auth-input-line-group {
+      display: flex;
+      align-items: center;
+      border-bottom: 1.5px solid #d4cfe6;
+      margin-bottom: 24px;
+      padding-bottom: 6px;
+      position: relative;
+    }
+    .auth-input-line-group span.icon {
+      font-size: 1.15rem;
+      color: #928aa8;
+      margin-right: 12px;
+    }
+    .auth-input-line-group input {
+      border: none !important;
+      background: transparent !important;
+      padding: 6px 0 !important;
+      font-size: 0.95rem;
+      color: #332b53 !important;
+      outline: none;
+      width: 100%;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .auth-input-line-group input::placeholder {
+      color: #aaa4be;
+      font-weight: 500;
+    }
+
+    .btn-login-now {
+      margin-top: 25px;
+      background: #ffffff;
+      border: 2px solid #5b4d96;
+      color: #5b4d96;
+      padding: 13px 24px;
+      border-radius: 30px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 0.6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(91, 77, 150, 0.2);
+      transition: all 0.2s ease;
+    }
+    .btn-login-now:active { transform: scale(0.97); }
+
+    .auth-switch-text {
+      font-size: 0.8rem;
+      color: #5b4d96;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .auth-bottom-social {
+      position: absolute;
+      bottom: 28px;
+      right: 28px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      color: #ffffff;
+    }
+    .auth-bottom-social span.lbl {
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    .auth-social-icons {
+      display: flex;
+      gap: 14px;
+      font-size: 1.25rem;
+      color: #ffffff;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      color: var(--text-main);
+      border-radius: 12px;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(99, 88, 159, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--purple-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.96rem;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 15px rgba(99, 88, 159, 0.35);
+      transition: transform 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-secondary {
+      background: #e7e5f3;
+      color: var(--primary-dark);
+      margin-top: 10px;
+      box-shadow: none;
+      border: 1px solid var(--card-border);
+    }
+    .btn-danger {
+      background: #f43f5e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .btn-info {
+      background: #5b4d96;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: bold;
+    }
+    
+    .tab-view { display: none; padding: 16px; max-width: 650px; margin: 0 auto; }
+    .tab-view.active { display: block; }
+
+    /* CARD STYLING */
+    .game-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      position: relative;
+      box-shadow: 0 6px 20px rgba(99, 88, 159, 0.08);
+    }
+    .game-card.passed-card {
+      border: 2px solid var(--success);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .badge-free { background: #5b4d96; color: white; }
+    .badge-vip { background: var(--gold-gradient); color: #000; font-weight: 900; }
+    .badge-pass { background: var(--success); color: white; float: right; font-weight: 900; margin-left: 4px; margin-bottom: 4px; }
+
+    .game-title { font-size: 1.3rem; font-weight: 900; margin-top: 8px; color: var(--primary-dark); }
+    .game-date-time { font-size: 0.78rem; color: var(--accent); margin-bottom: 12px; font-weight: 600; }
+
+    .matka-grid-custom {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      background: #f7f6fc;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      margin-top: 10px;
+    }
+    .grid-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 8px;
+    }
+    .grid-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .matka-cell {
+      background: #ffffff;
+      padding: 10px 4px;
+      border-radius: 12px;
+      border: 1.5px solid var(--card-border);
+      position: relative;
+      text-align: center;
+    }
+    .matka-cell.jodi-cell {
+      border: 1.5px solid var(--primary);
+      background: #f0eef9;
+    }
+    .matka-cell.pana-cell {
+      border: 1.5px dashed var(--accent);
+      background: #fbfaff;
+    }
+
+    .matka-cell span.cell-lbl {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .digits-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .digit-box {
+      display: inline-block;
+      padding: 4px 9px;
+      background: #eef0f8;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #2b254a;
+      font-weight: 800;
+      border: 1px solid #d9d6ea;
+      transition: all 0.2s ease;
+    }
+    .jodi-cell .digit-box {
+      color: var(--primary);
+      font-size: 1.05rem;
+      background: #ffffff;
+      border-color: #baaee6;
+    }
+
+    .digit-box.passed {
+      background: var(--success) !important;
+      color: #fff !important;
+      border: 1.5px solid #059669 !important;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.8) !important;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1.05); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1.05); }
+    }
+
+    .cell-passed {
+      background: #ecfdf5 !important;
+      border: 1.5px solid var(--success) !important;
+    }
+
+    .passed-tag {
+      position: absolute;
+      top: -8px;
+      right: 6px;
+      background: var(--success);
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .blur-mask { filter: blur(8px); user-select: none; pointer-events: none; }
+    .vip-lock-btn {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--purple-gradient);
+      color: #fff;
+      padding: 11px 24px;
+      border-radius: 30px;
+      font-weight: 900;
+      font-size: 0.92rem;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 8px 25px rgba(91, 77, 150, 0.4);
+    }
+
+    /* VIP CARD & PROFILE */
+    .rich-vip-card {
+      background: var(--purple-gradient);
+      color: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(91, 77, 150, 0.3);
+    }
+    .rich-vip-card.active-vip {
+      background: linear-gradient(135deg, #4d3a8e 0%, #2f235a 100%);
+      border: 2px solid #fbbf24;
+    }
+    .vip-badge-pill {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+    .vip-pill-gold { background: var(--gold-gradient); color: #000; }
+    .vip-pill-free { background: rgba(255,255,255,0.2); color: #fff; }
+
+    .timer-box {
+      margin-top: 15px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px dashed #fbbf24;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .timer-text {
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    .plan-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 15px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .plan-card.selected {
+      border-color: var(--primary);
+      background: #f6f4fd;
+      box-shadow: 0 4px 15px rgba(91, 77, 150, 0.15);
+    }
+
+    /* ADMIN DASHBOARD */
+    .admin-subnav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      padding: 6px;
+      border-radius: 14px;
+      border: 1.5px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .admin-subnav-btn {
+      flex: 1;
+      padding: 10px 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .admin-subnav-btn.active {
+      background: var(--purple-gradient);
+      color: #fff;
+    }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+
+    .admin-user-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .admin-pass-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #10b981;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: bold;
+      margin: 3px 4px 3px 0;
+    }
+    .admin-pass-tag button {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      cursor: pointer;
+    }
+
+    #userDetailModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 38, 77, 0.7);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+    .detail-card {
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 24px;
+      padding: 26px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    .user-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0eef9;
+      font-size: 0.88rem;
+    }
+    .user-detail-row:last-child { border-bottom: none; }
+    .user-detail-lbl { color: var(--text-sub); font-weight: 600; }
+    .user-detail-val { color: var(--text-main); font-weight: 800; text-align: right; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .status-online { background: #10b981; color: #fff; }
+    .status-offline { background: #94a3b8; color: #fff; }
+    .status-pending { background: #f59e0b; color: #000; }
+    .status-approved { background: #10b981; color: #fff; }
+    .status-rejected { background: #ef4444; color: #fff; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 68px;
+      background: var(--purple-gradient);
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 -5px 25px rgba(91, 77, 150, 0.35);
+    }
+    .nav-btn {
+      flex: 1;
+      text-align: center;
+      color: #cdc7ec;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn.active { color: #ffffff; font-weight: 900; transform: translateY(-4px); }
+    .nav-btn span { display: block; font-size: 1.35rem; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HIGHLIGHT NOTICE BANNER -->
+  <div id="topNoticeBanner"></div>
+
+  <!-- AUTH SCREEN -->
+  <div id="authOverlay">
+    <div class="auth-phone-mockup">
+      <div class="auth-curved-white-bg">
+        <h2 id="authHeading" style="color: #4d4285; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px;">Login</h2>
+        
+        <div id="nameInputWrap" class="auth-input-line-group" style="display: none;">
+          <span class="icon">👤</span>
+          <input type="text" id="userName" placeholder="Full Name">
+        </div>
+
+        <div class="auth-input-line-group">
+          <span class="icon">👤</span>
+          <input type="tel" id="userPhone" placeholder="User name / Mobile">
+        </div>
+
+        <div class="auth-input-line-group">
+          <span class="icon">🔒</span>
+          <input type="password" id="userPass" placeholder="Password">
+          <span style="cursor:pointer; color:#928aa8; font-size:0.9rem;" onclick="togglePassVisibility('userPass')">👁️</span>
+        </div>
+
+        <button class="btn-login-now" id="authSubmitBtn" onclick="handleAuthSubmit()">
+          <span id="authSubmitText">LOGIN NOW</span>
+          <span style="font-size: 1.2rem; font-weight: bold;">❯</span>
+        </button>
+
+        <div class="auth-switch-text" id="authSwitchBtn" onclick="toggleAuth()">
+          Don't have an account? Register
+        </div>
       </div>
-      <div>
-        <h1 class="text-base font-black tracking-wider bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">MK MATKA LIVE</h1>
-        <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 24/7 AUTO RESULT CHECKER
-        </p>
+
+      <div class="auth-bottom-social">
+        <span class="lbl">login via</span>
+        <div class="auth-social-icons">
+          <span>📷</span>
+          <span>🌐</span>
+          <span>🐦</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER DETAIL POPUP MODAL (ADMIN ONLY) -->
+  <div id="userDetailModal">
+    <div class="detail-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:2px solid #f0eef9; padding-bottom:10px;">
+        <h3 style="color:var(--primary-dark); font-size:1.2rem; font-weight:900;">👤 User Full Details</h3>
+        <button onclick="closeUserDetailModal()" style="background:none; border:none; color:var(--text-sub); font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">User Name:</span>
+        <span class="user-detail-val" id="mdlName">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Mobile Number:</span>
+        <span class="user-detail-val" id="mdlPhone">-</span>
+      </div>
+      <div class="user-detail-row" style="background: #f4f2fb; padding: 8px 12px; border-radius: 10px; margin: 5px 0;">
+        <span class="user-detail-lbl" style="color: var(--primary-dark); font-weight:bold;">Account Password:</span>
+        <span class="user-detail-val" id="mdlPassword" style="color: #63589f; font-size:1.15rem; font-family: monospace;">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Live Status:</span>
+        <span class="user-detail-val" id="mdlStatus">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Membership:</span>
+        <span class="user-detail-val" id="mdlVip">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">VIP Expiry:</span>
+        <span class="user-detail-val" id="mdlExpiry">-</span>
+      </div>
+      <div class="user-detail-row">
+        <span class="user-detail-lbl">Account Created:</span>
+        <span class="user-detail-val" id="mdlCreated">-</span>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-secondary" style="width:100%; margin-top:0;" onclick="closeUserDetailModal()">Close Window</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-brand">
+      <div class="matka-logo" id="logoAdminTrigger" title="5 Taps for Admin">
+        <span class="crown">👑</span>
+        <span class="text">MATKA</span>
+      </div>
+      <div class="brand-title">
+        <h1 id="txtAppTitle">MATKA KING</h1>
+        <span>OFFICIAL GUESSING</span>
       </div>
     </div>
     
-    <!-- User Quick Coin Pill -->
-    <div onclick="switchTab('refer')" class="flex items-center gap-1.5 bg-slate-800/90 hover:bg-slate-800 border border-amber-500/40 px-2.5 py-1 rounded-full cursor-pointer shadow">
-      <span class="text-sm">🪙</span>
-      <span class="text-xs font-black text-amber-300" id="headerCoinCount">0</span>
+    <div class="header-actions">
+      <button class="bell-btn" onclick="requestNotificationPermission()" title="Enable Notification">
+        🔔
+      </button>
+      <div class="lang-round-btn" id="langToggleBtn" onclick="toggleLang()" title="Switch Language">
+        EN
+      </div>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
-  <main class="max-w-md mx-auto px-4 pt-4">
+  <!-- TAB 1: GAMES -->
+  <div id="tabGames" class="tab-view active">
+    <div id="gamesContainer"><p style="text-align:center; color:#94a3b8; margin-top:20px;">Loading games...</p></div>
+  </div>
 
-    <!-- ==================== 1. HOME TAB (GAMES & BLAST) ==================== -->
-    <div id="tab-home" class="space-y-4">
-      <!-- VIP Active Alert Banner -->
-      <div id="homeVipActiveBanner" class="hidden bg-gradient-to-r from-emerald-950 to-slate-900 border border-emerald-500/50 rounded-2xl p-3 text-emerald-300 flex items-center justify-between text-xs font-bold shadow-lg">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-crown text-amber-400 text-sm"></i>
-          <span>VIP ACCESS UNLOCKED!</span>
+  <!-- TAB 2: PERMANENT HISTORY -->
+  <div id="tabHistory" class="tab-view">
+    <h3 id="txtHistoryHeader" style="color: var(--success); margin-bottom: 15px; font-weight:900;">🏆 All-Time Success History</h3>
+    <div id="historyContainer"><p style="text-align:center; color:#94a3b8; margin-top:20px;">Loading history...</p></div>
+  </div>
+
+  <!-- TAB 3: VIP -->
+  <div id="tabVip" class="tab-view">
+    <div class="game-card" style="border-color: #fbbf24; padding: 22px;">
+      <h2 id="txtVipHeader" style="color: var(--primary-dark); margin-bottom: 4px; text-align: center; font-weight:900;">🌟 VIP Membership</h2>
+      <p id="txtVipSub" style="font-size: 0.82rem; color: #7b7597; margin-bottom: 16px; text-align: center;">Select a plan and pay to unlock VIP games</p>
+      
+      <div class="plan-card selected" id="p1Card" onclick="selectPlan(1)">
+        <div>
+          <b>1 DAY PASS</b>
+          <div id="txtP1Sub" style="font-size:0.75rem; color:#7b7597;">Today's games unlock</div>
         </div>
-        <span id="homeVipHours" class="text-[10px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-200 font-mono">ACTIVE</span>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice1">₹99</b>
       </div>
 
-      <!-- Quick Refer Banner on Home -->
-      <div onclick="switchTab('refer')" class="bg-gradient-to-r from-amber-600/30 to-yellow-600/20 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between cursor-pointer hover:border-amber-400 transition">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-base">
-            <i class="fa-solid fa-gift"></i>
-          </div>
-          <div>
-            <div class="text-xs font-black text-amber-300">ಉಚಿತ VIP ಬೇಕೇ?</div>
-            <div class="text-[10px] text-slate-400">5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ 1 Day VIP ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ</div>
-          </div>
+      <div class="plan-card" id="p7Card" onclick="selectPlan(7)">
+        <div>
+          <b>7 DAYS VIP (1 Week)</b>
+          <div id="txtP7Sub" style="font-size:0.75rem; color:#7b7597;">Full week access</div>
         </div>
-        <i class="fa-solid fa-chevron-right text-xs text-amber-400"></i>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice7">₹499</b>
       </div>
 
-      <!-- Markets Header -->
-      <div class="flex items-center justify-between pt-1">
-        <h2 class="text-xs font-extrabold text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
-          <i class="fa-solid fa-dice text-amber-400"></i> ಇಂದಿನ ಮಾರುಕಟ್ಟೆಗಳು
-        </h2>
-        <button onclick="loadGamesFromFirestore()" class="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1">
-          <i class="fa-solid fa-rotate-right"></i> ರಿಫ್ರೆಶ್
+      <div class="plan-card" id="p30Card" onclick="selectPlan(30)">
+        <div>
+          <b>30 DAYS VIP (1 Month)</b>
+          <div id="txtP30Sub" style="font-size:0.75rem; color:#7b7597;">Full month blast games</div>
+        </div>
+        <b style="color:var(--primary); font-size:1.25rem;" id="vPrice30">₹1499</b>
+      </div>
+
+      <div style="background: #f7f6fc; padding: 18px; border-radius: 18px; margin-top: 15px; border: 1.5px solid var(--card-border);">
+        <span id="txtUpiNotice" style="font-size:0.8rem; color:#7b7597; display:block; margin-bottom: 6px;">Pay to Official UPI ID:</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; padding:12px 14px; border-radius:12px; border: 1.5px solid var(--card-border);">
+          <b id="vipUpiText" style="color:var(--primary); font-size:0.95rem;">mkmatka@upi</b>
+          <button style="background:var(--purple-gradient); color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:0.75rem; font-weight:900; cursor:pointer;" onclick="copyUpi()">COPY</button>
+        </div>
+
+        <div style="margin-top: 15px;">
+          <label id="txtTrxLabel" style="font-size:0.8rem; color:#4a4269; display:block; margin-bottom:6px;">Enter Transaction ID / UTR:</label>
+          <input type="text" id="userTrxId" placeholder="Enter 12-digit UTR number">
+          <button id="btnSubmitTrx" class="btn" onclick="submitPaymentRequest()">Submit for Approval</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: PROFILE -->
+  <div id="tabProfile" class="tab-view">
+    <div id="profileCardBox" class="rich-vip-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div>
+          <span style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; font-weight:700;">MK Guessing Member</span>
+          <h2 id="richName" style="color: #fff; font-size: 1.5rem; margin-top: 4px; font-weight:900;">User</h2>
+          <p id="richPhone" style="font-size: 0.88rem; opacity: 0.85;">+91 0000000000</p>
+        </div>
+        <span id="richPill" class="vip-badge-pill vip-pill-free">FREE USER</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 14px;">
+        <div>
+          <span id="txtMemStatusLbl" style="font-size: 0.7rem; opacity: 0.8; display: block; font-weight:700;">MEMBERSHIP STATUS</span>
+          <b id="richStatusText" style="font-size: 0.95rem; color: #fff;">Free Account</b>
+        </div>
+        <div style="text-align: right;">
+          <span id="txtExpLbl" style="font-size: 0.7rem; opacity: 0.8; display: block; font-weight:700;">VIP EXPIRY DATE</span>
+          <b id="richExpiryText" style="font-size: 0.95rem; color: #fbbf24;">None</b>
+        </div>
+      </div>
+
+      <div id="vipCountdownBox" class="timer-box" style="display: none;">
+        <span style="font-size: 0.75rem; color: #ffffff; font-weight:bold;">⏳ VIP Time Left:</span>
+        <span id="vipCountdownTimer" class="timer-text">00:00:00</span>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <h4 id="txtEditProfTitle" style="margin-bottom: 10px; color:var(--primary-dark);">Edit Profile</h4>
+      <input type="text" id="editUserName" placeholder="Enter Correct Name">
+      <button id="btnSaveName" class="btn" style="padding:11px; margin-top:6px;" onclick="updateProfileName()">Update Name</button>
+    </div>
+
+    <div class="game-card">
+      <h4 id="txtPayHistoryTitle" style="margin-bottom: 10px; color:var(--primary);">Your VIP Payment Requests</h4>
+      <div id="userPaymentHistoryList"><p style="color:#7b7597; font-size:0.85rem;">Loading status...</p></div>
+    </div>
+
+    <button id="btnLogout" class="btn btn-secondary" onclick="logOut()" style="background:#e7e5f3; color:#ef4444; font-weight:bold; cursor:pointer;">Logout Account</button>
+  </div>
+
+  <!-- HIDDEN ADMIN VIEW -->
+  <div id="tabAdmin" class="tab-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h2 style="color: var(--primary-dark); font-size: 1.3rem; font-weight:900;">⚙️ Admin Dashboard</h2>
+      <button onclick="exitAdmin()" style="background: var(--danger); border: none; color: white; padding: 6px 14px; border-radius: 8px; font-weight: bold; cursor:pointer;">Exit</button>
+    </div>
+
+    <div class="admin-subnav">
+      <button class="admin-subnav-btn active" onclick="switchAdminTab('admSecGames', this)">🎯 Games</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecDpboss', this)">⚡ DPBoss Auto Result</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Passwords</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice & Alert</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecApprovals', this)">🔔 Approvals</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
+    </div>
+
+    <!-- 1. ADMIN GAMES SECTION -->
+    <div id="admSecGames" class="admin-section active">
+      
+      <!-- MAGIC AUTO-FILL -->
+      <div class="game-card" style="border: 2px dashed var(--primary); background: #fdfcff;">
+        <h4 style="color: var(--primary-dark); margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
+          <span>🪄</span> Paste Full Copied Game (Auto-Clean & Filter)
+        </h4>
+        <p style="font-size: 0.76rem; color: var(--text-sub); margin-bottom: 8px;">
+          ಯಾವುದೇ ಸಿಂಬಲ್, ಸ್ಟಾರ್ (*), ಬ್ರಾಕೆಟ್ ([ ], ( )) ಇದ್ದರೂ ಪರವಾಗಿಲ್ಲ, ನೇರವಾಗಿ ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ:
+        </p>
+        <textarea id="admRawInput" rows="5" placeholder="*MILAN MORNING (OTC)*&#10;(( *2 - 6 - 8 - 9* ))&#10;[[ *21 - 60 - 83 - 91* ]]&#10;[[ *246 - 178 - 350* ]]"></textarea>
+        <button class="btn" style="background: var(--purple-gradient); padding: 11px; font-size: 0.88rem;" onclick="magicParseAndFill()">
+          ⚡ Auto-Clean & Fill Game (ಶುದ್ಧವಾಗಿ ಸೆಟ್ ಮಾಡಿ)
         </button>
       </div>
 
-      <!-- Games List -->
-      <div id="gamesListContainer" class="space-y-3.5">
-        <div class="bg-slate-900 rounded-2xl p-6 border border-slate-800 text-center text-slate-500 text-xs animate-pulse">
-          ಗೇಮ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...
-        </div>
+      <div class="game-card">
+        <h4 style="margin-bottom: 10px; color:var(--primary-dark);">Post Numbers (Multiple Digits & Pana Supported)</h4>
+        <input type="text" id="admMarket" placeholder="Game Name (e.g. MILAN MORNING)">
+        <select id="admType">
+          <option value="FREE">Free Game (FREE)</option>
+          <option value="VIP">Premium Game (VIP)</option>
+        </select>
+        
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma):</label>
+        <input type="text" id="admOpenPana" placeholder="e.g. 246, 178, 350, 126">
+
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits / OTC (Space/Comma):</label>
+        <input type="text" id="admOpen" placeholder="e.g. 2, 6, 8, 9">
+
+        <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers (Space/Comma):</label>
+        <input type="text" id="admJodi" placeholder="e.g. 21, 60, 83, 91, 26, 65">
+
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits (Space/Comma):</label>
+        <input type="text" id="admClose" placeholder="e.g. 1, 0, 3">
+
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Close Pana (Space/Comma):</label>
+        <input type="text" id="admClosePana" placeholder="e.g. 570, 367">
+
+        <button class="btn" onclick="saveGame()">Publish & Send Background Push Notification</button>
       </div>
+
+      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games (Mark Open, Close, Jodi Passes)</h4>
+      <div id="admGamesList"></div>
     </div>
 
-    <!-- ==================== 2. VIP PLANS TAB ==================== -->
-    <div id="tab-vip" class="space-y-4 hidden">
-      <div class="text-center py-2">
-        <span class="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30">
-          PREMIUM ACCESS
-        </span>
-        <h2 class="text-lg font-black text-white mt-2">VIP ಗೇಮ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ</h2>
-        <p class="text-xs text-slate-400 mt-1">ಖಚಿತವಾದ ಬ್ಲಾಸ್ಟ್ ಜೋಡಿ ಮತ್ತು ಪಾನಾ ಪಡೆಯಲು ಪ್ಲ್ಯಾನ್ ಆಯ್ಕೆಮಾಡಿ</p>
-      </div>
-
-      <!-- Plans Grid -->
-      <div class="space-y-3">
-        <!-- 1 Day Pass -->
-        <div onclick="selectPlan('1 DAY PASS', 150)" class="bg-slate-900 hover:border-amber-500/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-lg">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400 text-lg font-black">
-              1D
-            </div>
-            <div>
-              <div class="text-sm font-black text-white">1 DAY PASS</div>
-              <div class="text-xs text-slate-400">Today's games unlock</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-amber-400">₹150</div>
-            <span class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-bold">ಇಂದಿಗೆ ಮಾತ್ರ</span>
-          </div>
-        </div>
-
-        <!-- 7 Days VIP (Popular) -->
-        <div onclick="selectPlan('7 DAYS VIP (1 Week)', 309)" class="relative bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-2 border-amber-500/70 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-xl shadow-amber-500/10">
-          <div class="absolute -top-2.5 right-4 bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-            MOST POPULAR
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 text-lg font-black">
-              7D
-            </div>
-            <div>
-              <div class="text-sm font-black text-white">7 DAYS VIP (1 Week)</div>
-              <div class="text-xs text-slate-400">Full week access</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-amber-400">₹309</div>
-            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">1 ವಾರ ಪೂರ್ತಿ</span>
-          </div>
-        </div>
-
-        <!-- 30 Days VIP -->
-        <div onclick="selectPlan('30 DAYS VIP (1 Month)', 499)" class="bg-slate-900 hover:border-amber-500/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-lg">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400 text-lg font-black">
-              30D
-            </div>
-            <div>
-              <div class="text-sm font-black text-white">30 DAYS VIP (1 Month)</div>
-              <div class="text-xs text-slate-400">Full month blast games</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-amber-400">₹499</div>
-            <span class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-bold">1 ತಿಂಗಳು</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Free Alternative Banner -->
-      <div onclick="switchTab('refer')" class="bg-slate-900/60 border border-dashed border-yellow-500/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-slate-900 transition">
-        <p class="text-xs text-yellow-300 font-bold mb-1">ಹಣ ಪಾವತಿಸಲು ಇಷ್ಟವಿಲ್ಲವೇ?</p>
-        <p class="text-[11px] text-slate-400">ಸ್ನೇಹಿತರಿಗೆ ಶೇರ್ ಮಾಡಿ 100 ಕಾಯಿನ್ ಗಳಿಸಿ ₹150 ಪಾಸ್ ಅನ್ನು ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ!</p>
-      </div>
-    </div>
-
-    <!-- ==================== 3. REFER & EARN TAB ==================== -->
-    <div id="tab-refer" class="space-y-4 hidden">
-      <!-- Main Wallet Card -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-yellow-600 to-amber-700 p-5 text-white shadow-2xl border border-yellow-400/50">
-        <div class="flex justify-between items-start mb-3">
+    <!-- 2. DPBOSS AUTO-RESULT MATCHER SECTION -->
+    <div id="admSecDpboss" class="admin-section">
+      <div class="game-card" style="border: 2px solid var(--primary); background: #fdfcff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
-            <span class="inline-block text-[10px] font-black uppercase tracking-wider bg-black/40 px-2.5 py-1 rounded-full text-yellow-200">
-              🪙 COIN REWARD WALLET
-            </span>
-            <h2 class="text-lg font-black mt-2">ರೆಫರ್ ಮಾಡಿ - ಉಚಿತ VIP ಗೆಲ್ಲಿರಿ!</h2>
+            <h3 style="color: var(--primary-dark); font-size:1.15rem; font-weight:900;">🌐 DPBoss Live Auto-Sync</h3>
+            <span style="font-size: 0.75rem; color: #10b981; font-weight:bold;">● Auto-Sync Running Every 60s</span>
           </div>
-          <div class="text-right bg-black/30 backdrop-blur px-3 py-2 rounded-2xl border border-white/10">
-            <div class="text-[10px] text-yellow-200 uppercase font-bold">ಬ್ಯಾಲೆನ್ಸ್</div>
-            <div class="text-3xl font-black text-yellow-300 leading-none mt-0.5" id="tabCoinBalance">0</div>
-          </div>
+          <button class="btn" style="width:auto; padding:6px 14px; font-size:0.8rem; margin:0;" onclick="manualSyncDPBoss()">
+            ⚡ Sync Now
+          </button>
         </div>
-
-        <p class="text-xs text-yellow-100/95 leading-relaxed mb-4">
-          ಪ್ರತಿ ಸ್ನೇಹಿತ ಆ್ಯಪ್ ಓಪನ್ ಮಾಡಿದಾಗ ನಿಮಗೆ <b>20 Coins</b> ಸಿಗುತ್ತದೆ. ಒಟ್ಟು <b>5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ 100 Coins ಗಳಿಸಿ</b> ₹150 ರ 1 Day VIP ಪಾಸ್ ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿಕೊಳ್ಳಿ!
+        <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 12px;">
+          DPBoss ನಿಂದ ಇತ್ತೀಚಿನ ರಿಸಲ್ಟ್‌ಗಳು ತಾನಾಗಿಯೇ ಫೆಚ್ ಆಗಿ, ನೀವು ಪೋಸ್ಟ್ ಮಾಡಿರುವ ಗೇಮ್‌ಗೆ ಮ್ಯಾಚ್ ಆಗಿದ್ದರೆ ತಾನೇ ಆಟೋಮೆಟಿಕ್ ಆಗಿ ಪಾಸ್ ಮಾರ್ಕ್ ಆಗುತ್ತದೆ.
         </p>
-
-        <!-- Progress -->
-        <div class="space-y-1.5 mb-4">
-          <div class="flex justify-between text-xs font-black text-yellow-100">
-            <span>VIP ಅನ್‌ಲಾಕ್ ಪ್ರಗತಿ</span>
-            <span id="tabCoinProgressText">0 / 100 Coins</span>
-          </div>
-          <div class="w-full bg-black/40 rounded-full h-3 p-0.5 overflow-hidden">
-            <div id="tabCoinProgressBar" class="bg-gradient-to-r from-yellow-300 via-white to-yellow-200 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="shareReferralWhatsApp()" class="py-3 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-lg flex items-center justify-center gap-1.5 transition">
-            <i class="fa-brands fa-whatsapp text-lg"></i> ವಾಟ್ಸಾಪ್ ಶೇರ್
-          </button>
-          <button id="tabRedeemBtn" onclick="redeemCoinsForVip()" disabled class="py-3 px-3 rounded-2xl bg-slate-800 text-slate-500 font-black text-xs flex items-center justify-center gap-1.5 transition cursor-not-allowed border border-white/10">
-            <i class="fa-solid fa-gift"></i> Unlock 1D VIP
-          </button>
-        </div>
-      </div>
-
-      <!-- How It Works Instructions -->
-      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
-        <h3 class="text-xs font-black text-slate-300 uppercase tracking-wider">ನಿಯಮಗಳು (How it works):</h3>
-        <div class="space-y-2 text-xs text-slate-400">
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
-            <span>ವಾಟ್ಸಾಪ್ ಶೇರ್ ಬಟನ್ ಒತ್ತಿ ನಿಮ್ಮ ಸ್ನೇಹಿತರಿಗೆ ಅಥವಾ ಗ್ರೂಪ್‌ಗಳಿಗೆ ಲಿಂಕ್ ಕಳುಹಿಸಿ.</span>
-          </div>
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">2</span>
-            <span>ಅವರು ಆ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ತಕ್ಷಣ <b>20 Coins</b> ಜಮೆಯಾಗುತ್ತದೆ.</span>
-          </div>
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">3</span>
-            <span>100 Coins ತಲುಪಿದ ತಕ್ಷಣ "Unlock 1D VIP" ಬಟನ್ ಒತ್ತಿ 24 ಗಂಟೆಗಳ ಕಾಲ ಉಚಿತ VIP ನೋಡಿ!</span>
-          </div>
+        <div id="dpbossLiveFeed" style="max-height: 260px; overflow-y: auto; background:#f7f6fc; padding:10px; border-radius:12px; border:1px solid var(--card-border); font-size:0.82rem;">
+          Loading live DPBoss results...
         </div>
       </div>
     </div>
 
-    <!-- ==================== 4. ADMIN TAB ==================== -->
-    <div id="tab-admin" class="space-y-4 hidden">
-      <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-xl space-y-4">
-        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-          <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-            <i class="fa-solid fa-user-shield"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-black text-white">ಅಡ್ಮಿನ್ ಕಂಟ್ರೋಲ್ ಪ್ಯಾನೆಲ್</h3>
-            <p class="text-[10px] text-slate-400">ಹೊಸ ಗೇಮ್‌ಗಳನ್ನು ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ</p>
-          </div>
+    <!-- 3. ADMIN USERS SECTION -->
+    <div id="admSecUsers" class="admin-section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h4 style="color: var(--primary-dark);">Registered Users & Passwords</h4>
+        <span id="onlineCountBadge" style="font-size:0.78rem; color:#10b981; font-weight:bold;">Online: 0</span>
+      </div>
+      <div id="admUsersList"><p style="color:#7b7597;">Loading users...</p></div>
+    </div>
+
+    <!-- 4. ADMIN NOTICE & BROADCAST -->
+    <div id="admSecBroadcast" class="admin-section">
+      <div class="game-card">
+        <h4 style="color:var(--primary-dark); margin-bottom:8px;">📢 App Top Highlight Notice Banner</h4>
+        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">This text will show permanently at the top of user screens.</p>
+        <input type="text" id="admTopNoticeText" placeholder="Enter breaking notice or update text">
+        <div style="display:flex; gap:8px;">
+          <button class="btn" style="flex:2;" onclick="saveTopNotice()">Show Banner</button>
+          <button class="btn-danger" style="flex:1;" onclick="clearTopNotice()">Hide Banner</button>
         </div>
+      </div>
 
-        <!-- Password Auth Section -->
-        <div id="adminAuthBox" class="space-y-3">
-          <label class="text-xs text-slate-400 font-bold block">ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ:</label>
-          <input type="password" id="adminPinInput" placeholder="Password (Default: 1234)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-          <button onclick="loginAdmin()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition">
-            ಅನ್‌ಲಾಕ್ ಮಾಡಿ
-          </button>
-        </div>
-
-        <!-- Add Game Form -->
-        <form id="adminPostForm" onsubmit="saveGameToFirestore(event)" class="space-y-3 hidden">
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">ಮಾರ್ಕೆಟ್ ಹೆಸರು (ಉದಾ: KALYAN, MAIN BAZAR):</label>
-            <input type="text" id="mName" required placeholder="KALYAN" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase focus:border-amber-500">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN (4 Digits):</label>
-              <input type="text" id="mOpen" placeholder="1 2 3 4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE (4 Digits):</label>
-              <input type="text" id="mClose" placeholder="5 6 7 8" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">JODI (Pairs):</label>
-            <input type="text" id="mJodi" placeholder="15 16 27 28 35 48" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN PANA:</label>
-              <input type="text" id="mOpenPana" placeholder="128 137 236" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE PANA:</label>
-              <input type="text" id="mClosePana" placeholder="230 249 357" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">GAME TYPE:</label>
-            <select id="mType" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-              <option value="VIP">VIP (ಲಾಕ್ ಆಗಿರುತ್ತದೆ)</option>
-              <option value="FREE">FREE (ಎಲ್ಲರಿಗೂ ಉಚಿತ)</option>
-            </select>
-          </div>
-
-          <button type="submit" id="postGameBtn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-lg transition">
-            ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ (Post Game)
-          </button>
-        </form>
+      <div class="game-card">
+        <h4 style="color:var(--primary); margin-bottom:8px;">🔔 Send Instant Alert Notification</h4>
+        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">Sends instant alert popup & OneSignal Mobile Push Notification.</p>
+        <input type="text" id="admAlertMsg" placeholder="Alert message (e.g. Kalyan Result Blast!)">
+        <button class="btn" style="background:#5b4d96;" onclick="sendInstantBroadcast()">Send Push Alert Now</button>
       </div>
     </div>
 
-  </main>
-
-  <!-- ==================== BOTTOM NAVIGATION BAR ==================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-4 py-2">
-    <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
-      
-      <!-- Home Button -->
-      <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item flex flex-col items-center justify-center py-1 text-amber-400 transition">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="text-[10px] font-black mt-1">Home</span>
-      </button>
-
-      <!-- VIP Plans Button -->
-      <button onclick="switchTab('vip')" id="nav-btn-vip" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition">
-        <i class="fa-solid fa-crown text-lg"></i>
-        <span class="text-[10px] font-black mt-1">VIP Plans</span>
-      </button>
-
-      <!-- Refer & Earn Button -->
-      <button onclick="switchTab('refer')" id="nav-btn-refer" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition relative">
-        <span class="absolute -top-1 right-5 flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-        </span>
-        <i class="fa-solid fa-gift text-lg"></i>
-        <span class="text-[10px] font-black mt-1">Refer & 🪙</span>
-      </button>
-
-      <!-- Admin Button -->
-      <button onclick="switchTab('admin')" id="nav-btn-admin" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition">
-        <i class="fa-solid fa-lock text-lg"></i>
-        <span class="text-[10px] font-black mt-1">Admin</span>
-      </button>
-
+    <!-- 5. ADMIN APPROVALS SECTION -->
+    <div id="admSecApprovals" class="admin-section">
+      <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Payment Requests (Approve / Reject)</h4>
+      <div id="adminApprovalsList">Loading...</div>
     </div>
-  </nav>
 
-  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <!-- 6. ADMIN SETTINGS SECTION -->
+    <div id="admSecSettings" class="admin-section">
+      <div class="game-card">
+        <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Prices & UPI Setup</h4>
+        <input type="number" id="admP1" placeholder="1 Day Price">
+        <input type="number" id="admP7" placeholder="7 Days Price">
+        <input type="number" id="admP30" placeholder="30 Days Price">
+        <input type="text" id="admUpi" placeholder="UPI ID">
+        <button class="btn" onclick="updateVipConfig()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURVED BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
+    <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
+    <div class="nav-btn" onclick="navigate('tabVip', this)"><span id="navIcon3">⭐</span><div id="navLbl3">VIP</div></div>
+    <div class="nav-btn" onclick="navigate('tabProfile', this)"><span id="navIcon4">👤</span><div id="navLbl4">Profile</div></div>
+  </div>
+
   <script>
-    const FIREBASE_PROJECT_ID = "live--update";
-    const ADMIN_PIN = "1234"; // ನಿಮ್ಮ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್
+    const firebaseConfig = {
+      apiKey: "AIzaSyBr47Pc-j_IWkDBn7LIruxGsPTTgrV1LR4",
+      authDomain: "live--update.firebaseapp.com",
+      databaseURL: "https://live--update-default-rtdb.firebaseio.com",
+      projectId: "live--update",
+      storageBucket: "live--update.firebasestorage.app",
+      messagingSenderId: "870310390365",
+      appId: "1:870310390365:web:4312203fc5b9947451fbb4",
+      measurementId: "G-6ZRXKLGJJX"
+    };
 
-    let isVipActive = false;
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
 
-    // 1. ಬಳಕೆದಾರರ ಯೂನಿಕ್ ID ರಚನೆ
-    let currentUserId = localStorage.getItem("mk_user_id");
-    if (!currentUserId) {
-      currentUserId = "USER_" + Math.random().toString(36).substring(2, 9).toUpperCase();
-      localStorage.setItem("mk_user_id", currentUserId);
+    const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
+    const ONESIGNAL_REST_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
+
+    let currentUser = JSON.parse(localStorage.getItem("app_current_user") || "null");
+    let currentLang = localStorage.getItem("app_lang") || "en";
+    let isRegister = false;
+    let selectedPlanDays = 1;
+    let timerInterval = null;
+    let presenceInterval = null;
+    let autoSyncInterval = null;
+    let lastHandledNoticeId = localStorage.getItem("last_alert_id") || "";
+    let usersCache = [];
+    let dpbossCache = {};
+
+    const translations = {
+      en: {
+        appTitle: "MATKA KING",
+        gamesTab: "Games",
+        historyTab: "History",
+        vipTab: "VIP",
+        profileTab: "Profile",
+        historyHeader: "🏆 All-Time Success History",
+        vipHeader: "🌟 VIP Membership",
+        vipSub: "Select a plan and pay to unlock VIP games",
+        p1Sub: "Today's games unlock",
+        p7Sub: "Full week access",
+        p30Sub: "Full month blast games",
+        upiNotice: "Pay to Official UPI ID:",
+        trxLabel: "Enter Transaction ID / UTR:",
+        submitTrxBtn: "Submit for Approval",
+        memStatusLbl: "MEMBERSHIP STATUS",
+        expLbl: "VIP EXPIRY DATE",
+        editProfTitle: "Edit Profile",
+        saveNameBtn: "Update Name",
+        payHistoryTitle: "Your VIP Payment Requests",
+        logoutBtn: "Logout Account",
+        openUnlock: "🔒 Unlock VIP"
+      },
+      kn: {
+        appTitle: "ಮಟ್ಕಾ ಕಿಂಗ್",
+        gamesTab: "ಗೇಮ್ಸ್",
+        historyTab: "ಹಿಸ್ಟರಿ",
+        vipTab: "ವಿಐಪಿ",
+        profileTab: "ಪ್ರೊಫೈಲ್",
+        historyHeader: "🏆 ಶಾಶ್ವತ ಸಕ್ಸಸ್ ಹಿಸ್ಟರಿ",
+        vipHeader: "🌟 VIP ಪ್ರೀಮಿಯಂ ಸದಸ್ಯತ್ವ",
+        vipSub: "ಯಾವುದಾದರೂ ಒಂದು ಪ್ಲಾನ್ ಆಯ್ಕೆ ಮಾಡಿ ಹಣ ಪಾವತಿಸಿ",
+        p1Sub: "ಇವತ್ತಿನ ಆಟಗಳು ಅನ್‌ಲಾಕ್",
+        p7Sub: "ವಾರ ಪೂರ್ತಿ ಕಂಟಿನ್ಯೂ ಗೇಮ್ಸ್",
+        p30Sub: "ತಿಂಗಳು ಪೂರ್ತಿ ಧಮಾಕ ಆಟಗಳು",
+        upiNotice: "ಅಧಿಕೃತ UPI ID ಗೆ ಹಣ ಪಾವತಿಸಿ:",
+        trxLabel: "ಪಾವತಿಸಿದ Transaction ID / UTR ನಂಬರ್ ಹಾಕಿ:",
+        submitTrxBtn: "ಅಪ್ರೂವಲ್‌ಗಾಗಿ ಸಬ್ಮಿಟ್ ಮಾಡಿ",
+        memStatusLbl: "ಸದಸ್ಯತ್ವ ಸ್ಟೇಟಸ್",
+        expLbl: "VIP ಮುಕ್ತಾಯ ದಿನಾಂಕ",
+        editProfTitle: "ಪ್ರೊಫೈಲ್ ಎಡಿಟ್ ಮಾಡಿ",
+        saveNameBtn: "ಹೆಸರು ಅಪ್‌‌ಡೇಟ್ ಮಾಡಿ",
+        payHistoryTitle: "ನಿಮ್ಮ VIP ಪಾವತಿ ಸ್ಟೇಟಸ್",
+        logoutBtn: "ಖಾತೆಯಿಂದ ಲಾಗ್‌ಔಟ್",
+        openUnlock: "🔒 VIP ಅನ್‌ಲಾಕ್"
+      }
+    };
+
+    window.onload = function() {
+      applyLanguage(currentLang);
+      fetchVipConfig();
+      listenBroadcastAndNotices();
+
+      if (currentUser) {
+        syncUserData(currentUser.phone);
+        document.getElementById("authOverlay").style.display = "none";
+        listenRealtimeGames();
+        listenUserPayments();
+        startPresenceTracking(currentUser.phone);
+      }
+
+      // Start DPBoss Auto-Fetch Engine (Every 60 seconds)
+      startDPBossAutoEngine();
+    };
+
+    function requestNotificationPermission() {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          await OneSignal.Slidedown.promptPush();
+        });
+      }
     }
 
-    // 2. ಟ್ಯಾಬ್ ಬದಲಾವಣೆ (Tab Switching)
-    function switchTab(tabName) {
-      const tabs = ['home', 'vip', 'refer', 'admin'];
-      tabs.forEach(t => {
-        const tabEl = document.getElementById(`tab-${t}`);
-        const navBtn = document.getElementById(`nav-btn-${t}`);
-        if (t === tabName) {
-          tabEl.classList.remove('hidden');
-          navBtn.classList.remove('text-slate-400');
-          navBtn.classList.add('text-amber-400');
-        } else {
-          tabEl.classList.add('hidden');
-          navBtn.classList.remove('text-amber-400');
-          navBtn.classList.add('text-slate-400');
+    // 🌐 100% FREE DPBOSS AUTO ENGINE WITH CORS PROXY
+    function startDPBossAutoEngine() {
+      fetchDPBossLiveResults();
+      clearInterval(autoSyncInterval);
+      autoSyncInterval = setInterval(fetchDPBossLiveResults, 60000); // Check every 1 minute
+    }
+
+    function manualSyncDPBoss() {
+      const feed = document.getElementById("dpbossLiveFeed");
+      feed.innerHTML = "Fetching latest live results from DPBoss...";
+      fetchDPBossLiveResults(true);
+    }
+
+    async function fetchDPBossLiveResults(isManual = false) {
+      const feed = document.getElementById("dpbossLiveFeed");
+      // Use AllOrigins open free CORS proxy to fetch DPBoss live results
+      const targetUrl = "https://sattamatkadpboss.org/";
+      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl) + "&timestamp=" + Date.now();
+
+      try {
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error("Network error");
+        const data = await response.json();
+        const html = data.contents;
+
+        if (!html) throw new Error("Empty content");
+
+        // Parse HTML to extract market results
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        let extracted = {};
+        let textContent = doc.body.innerText || "";
+
+        // Regex matches pattern like: "KALYAN MORNING\n378-89-270" or "MILAN MORNING\n133-7"
+        const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
+        let match;
+
+        while ((match = regex.exec(textContent)) !== null) {
+          const rawMkt = match[1].replace(/[\*\_\:\(\)]/g, '').trim().toUpperCase();
+          const rawScore = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
+          if (rawMkt.length >= 3 && !/HTTP|WWW|DATE|TODAY|LUCKY|JODI|PANEL/i.test(rawMkt)) {
+            extracted[rawMkt] = rawScore;
+          }
         }
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        dpbossCache = extracted;
+
+        if (feed) {
+          let feedHtml = "<b>Live Detected Markets:</b><br>";
+          for (let m in extracted) {
+            feedHtml += `<div style="padding:4px 0; border-bottom:1px solid #e2e0f0;"><b>${m}</b>: <span style="color:#0284c7; font-family:monospace; font-weight:bold;">${extracted[m]}</span></div>`;
+          }
+          feed.innerHTML = Object.keys(extracted).length ? feedHtml : "No active results found at this minute. Retrying in 60s...";
+        }
+
+        // AUTO-MATCH ACTIVE DATABASE GAMES AGAINST DPBOSS
+        autoEvaluateAgainstDPBoss(extracted);
+
+        if (isManual) alert("DPBoss Live Sync Complete!");
+
+      } catch (err) {
+        console.error("DPBoss Auto-Fetch Error:", err);
+        if (feed) feed.innerHTML = "<span style='color:#ef4444;'>Failed to auto-fetch DPBoss. Retrying in 60s...</span>";
+      }
     }
 
-    // 3. ರೆಫರಲ್ ಬೋನಸ್ ನಿರ್ವಹಣೆ
-    async function checkReferralReward() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const referrerId = urlParams.get('ref');
-      const alreadyClaimed = localStorage.getItem("mk_referral_done");
+    // ⚡ AUTOMATICALLY MARKS PASSES WITHOUT USER INTERVENTION
+    function autoEvaluateAgainstDPBoss(dpbossData) {
+      db.collection("games").where("isPassed", "==", false).get().then(snapshot => {
+        if (snapshot.empty) return;
 
-      if (referrerId && referrerId !== currentUserId && !alreadyClaimed) {
-        try {
-          const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${referrerId}`;
-          const res = await fetch(userDocUrl);
-          let currentCoins = 0;
-          if (res.ok) {
-            const data = await res.json();
-            currentCoins = data.fields && data.fields.coins ? parseInt(data.fields.coins.integerValue || 0) : 0;
+        snapshot.forEach(docSnap => {
+          const g = docSnap.data();
+          const docId = docSnap.id;
+          const gameMarket = (g.market || "").trim().toUpperCase();
+
+          // Check if DPBoss has result for this market
+          let matchingResult = null;
+          for (let mkt in dpbossData) {
+            if (mkt.includes(gameMarket) || gameMarket.includes(mkt)) {
+              matchingResult = dpbossData[mkt];
+              break;
+            }
           }
 
-          const newCoins = currentCoins + 20; // 1 ರೆಫರ್‌ಗೆ 20 Coins
-          await fetch(`${userDocUrl}?updateMask.fieldPaths=coins`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fields: { coins: { integerValue: newCoins } } })
-          });
+          if (!matchingResult) return;
 
-          localStorage.setItem("mk_referral_done", "true");
-        } catch (e) {
-          console.error("Referral process error:", e);
-        }
-      }
-    }
+          // Parse digits out of result (e.g. 133-7 or 378-89-270)
+          const parts = matchingResult.split(/[-–\s]+/).filter(Boolean);
+          const openPanaList = splitNumbers(g.openPana);
+          const openDigitList = splitNumbers(g.open);
+          const jodiList = splitNumbers(g.jodi);
+          const closeDigitList = splitNumbers(g.close);
+          const closePanaList = splitNumbers(g.closePana);
 
-    // 4. ಯೂಸರ್ ಕಾಯಿನ್ ಮತ್ತು ವಿಐಪಿ ಸ್ಥಿತಿ ಚೆಕ್
-    async function fetchUserStatus() {
-      try {
-        const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${currentUserId}`;
-        const res = await fetch(userDocUrl);
-        let coins = 0;
-        let vipExpiry = 0;
+          let passes = getGamePasses(g);
+          let matchFound = false;
 
-        if (res.ok) {
-          const data = await res.json();
-          coins = data.fields && data.fields.coins ? parseInt(data.fields.coins.integerValue || 0) : 0;
-          vipExpiry = data.fields && data.fields.vipExpiry ? parseInt(data.fields.vipExpiry.integerValue || 0) : 0;
-        }
-
-        // ಕಾಯಿನ್ ಅಪ್‌ಡೇಟ್
-        document.getElementById("headerCoinCount").innerText = coins;
-        document.getElementById("tabCoinBalance").innerText = coins;
-        document.getElementById("tabCoinProgressText").innerText = `${coins} / 100 Coins`;
-        const percentage = Math.min((coins / 100) * 100, 100);
-        document.getElementById("tabCoinProgressBar").style.width = percentage + "%";
-
-        // ಅನ್‌ಲಾಕ್ ಬಟನ್
-        const redeemBtn = document.getElementById("tabRedeemBtn");
-        if (coins >= 100) {
-          redeemBtn.disabled = false;
-          redeemBtn.className = "py-3 px-3 rounded-2xl bg-amber-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow-lg flex items-center justify-center gap-1.5 transition cursor-pointer";
-        }
-
-        // ವಿಐಪಿ ಪರಿಶೀಲನೆ
-        const now = Date.now();
-        if (vipExpiry > now) {
-          isVipActive = true;
-          document.getElementById("homeVipActiveBanner").classList.remove("hidden");
-          const hoursLeft = Math.round((vipExpiry - now) / (1000 * 60 * 60));
-          document.getElementById("homeVipHours").innerText = `${hoursLeft}h ಉಳಿದಿದೆ`;
-        }
-      } catch (e) {
-        console.error("User status fetch error:", e);
-      }
-    }
-
-    // 5. WhatsApp ಶೇರ್
-    function shareReferralWhatsApp() {
-      const shareUrl = window.location.origin + window.location.pathname + `?ref=${currentUserId}`;
-      const msg = `🔥 *MK MATKA VIP GUESSING FREE!* 🔥\n\nಇಂದಿನ ಕಲ್ಯಾಣ್ ಮತ್ತು ಮೇನ್ ಬಜಾರ್ VIP ಗೇಮ್‌ಗಳನ್ನು ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಈ ಕೆಳಗಿನ ಲಿಂಕ್ ಒತ್ತಿ ಆ್ಯಪ್ ಓಪನ್ ಮಾಡಿ:\n👉 ${shareUrl}\n\n(ನೀವೂ 5 ಜನರಿಗೆ ಶೇರ್ ಮಾಡಿ ₹150 ಮೌಲ್ಯದ 1 Day VIP ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ!)`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // 6. 100 ಕಾಯಿನ್‌ಗೆ VIP ಅನ್‌ಲಾಕ್
-    async function redeemCoinsForVip() {
-      if (!confirm("100 ಕಾಯಿನ್ ಬಳಸಿ 24 ಗಂಟೆಗಳ ಕಾಲ VIP PASS ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಬಯಸುವಿರಾ?")) return;
-
-      try {
-        const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${currentUserId}`;
-        const res = await fetch(userDocUrl);
-        if (!res.ok) return;
-
-        const data = await res.json();
-        let coins = data.fields && data.fields.coins ? parseInt(data.fields.coins.integerValue || 0) : 0;
-
-        if (coins >= 100) {
-          const remainingCoins = coins - 100;
-          const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 ಗಂಟೆಗಳು
-
-          await fetch(`${userDocUrl}?updateMask.fieldPaths=coins&updateMask.fieldPaths=vipExpiry`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fields: {
-                coins: { integerValue: remainingCoins },
-                vipExpiry: { integerValue: expiryTime }
+          parts.forEach(part => {
+            // Pana match
+            if (/^\d{3}$/.test(part)) {
+              if (openPanaList.includes(part) && !passes.some(p => p.type === "OPEN_PANA" && p.number === part)) {
+                passes.push({ type: "OPEN_PANA", number: part });
+                matchFound = true;
               }
-            })
+              if (closePanaList.includes(part) && !passes.some(p => p.type === "CLOSE_PANA" && p.number === part)) {
+                passes.push({ type: "CLOSE_PANA", number: part });
+                matchFound = true;
+              }
+            }
+            // Jodi & single digit match
+            else if (/^\d{2}$/.test(part)) {
+              if (jodiList.includes(part) && !passes.some(p => p.type === "JODI" && p.number === part)) {
+                passes.push({ type: "JODI", number: part });
+                matchFound = true;
+              }
+              const d1 = part[0], d2 = part[1];
+              if (openDigitList.includes(d1) && !passes.some(p => p.type === "OPEN" && p.number === d1)) {
+                passes.push({ type: "OPEN", number: d1 });
+                matchFound = true;
+              }
+              if (closeDigitList.includes(d2) && !passes.some(p => p.type === "CLOSE" && p.number === d2)) {
+                passes.push({ type: "CLOSE", number: d2 });
+                matchFound = true;
+              }
+            }
+            // Single OTC match
+            else if (/^\d{1}$/.test(part)) {
+              if (openDigitList.includes(part) && !passes.some(p => p.type === "OPEN" && p.number === part)) {
+                passes.push({ type: "OPEN", number: part });
+                matchFound = true;
+              }
+              if (closeDigitList.includes(part) && !passes.some(p => p.type === "CLOSE" && p.number === part)) {
+                passes.push({ type: "CLOSE", number: part });
+                matchFound = true;
+              }
+            }
           });
 
-          alert("🎉 ಅಭಿನಂದನೆಗಳು! 1 Day VIP PASS ಯಶಸ್ವಿಯಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗಿದೆ!");
-          window.location.reload();
+          // Automatically mark as PASSED in Firebase!
+          if (matchFound) {
+            db.collection("games").doc(docId).update({
+              isPassed: true,
+              passes: passes,
+              autoDeclaredResult: matchingResult
+            }).then(() => {
+              // Automatically send celebration push notification
+              sendPushNotification(`🏆 ${g.market} BLAST RESULT!`, `DPBoss Result: [${matchingResult}] PASSED! Check App Now!`);
+            });
+          }
+        });
+      });
+    }
+
+    // 🪄 ROBUST MAGIC PARSER (CLEANS ALL BRACKETS, STARS, EMOJIS, SYMBOLS)
+    function magicParseAndFill() {
+      const rawText = document.getElementById("admRawInput").value;
+      if (!rawText || rawText.trim() === "") {
+        alert("ದಯವಿಟ್ಟು ಕಾಪಿ ಮಾಡಿದ ಗೇಮ್ ಟೆಕ್ಸ್ಟ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ!");
+        return;
+      }
+
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      let marketName = "";
+      let openDigits = new Set();
+      let jodiList = new Set();
+      let panaList = new Set();
+
+      for (let l of lines) {
+        let cleanL = l.replace(/[^\w\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+        if (/http|play|google|download|luck|good|dosto|date|\bdt\b/i.test(cleanL)) continue;
+        if (/^\d+$/.test(cleanL)) continue;
+
+        cleanL = cleanL.replace(/\botc\b/gi, '').trim();
+
+        if (/[A-Za-z]{3,}/.test(cleanL)) {
+          marketName = cleanL.toUpperCase();
+          break;
         }
-      } catch (e) {
-        alert("ದೋಷ ಉಂಟಾಗಿದೆ, ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.");
+      }
+
+      for (let line of lines) {
+        if (/http|\.com|play\.google|download|dosto|good\s*luck/i.test(line)) continue;
+        if (/^\s*\*?\s*(date|\bdt\b)/i.test(line)) continue;
+
+        let cleanedLine = line.replace(/[^\d\s]/g, ' ');
+        let tokens = cleanedLine.split(/\s+/).filter(Boolean);
+
+        for (let tok of tokens) {
+          if (tok.length === 4 && (tok.startsWith("202") || tok.startsWith("199"))) continue;
+
+          if (/^\d{3}$/.test(tok)) {
+            panaList.add(tok);
+          } else if (/^\d{2}$/.test(tok)) {
+            jodiList.add(tok);
+          } else if (/^\d{1}$/.test(tok)) {
+            openDigits.add(tok);
+          }
+        }
+      }
+
+      if (marketName) {
+        document.getElementById("admMarket").value = marketName;
+      }
+      if (openDigits.size > 0) {
+        document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
+      }
+      if (jodiList.size > 0) {
+        document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
+      }
+      if (panaList.size > 0) {
+        document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
+      }
+
+      alert("🎉 ಗೇಮ್ ಶುದ್ಧವಾಗಿ Auto-Fill ಆಗಿದೆ! (ಯಾವುದೇ ಸಿಂಬಲ್ ಇಲ್ಲದೆ ಬಾಕ್ಸ್‌ಗಳಲ್ಲಿ ಸೆಟ್ ಆಗಿದೆ)");
+    }
+
+    function togglePassVisibility(inputId) {
+      const field = document.getElementById(inputId);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+
+    function sendPushNotification(title, message) {
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Authorization": "Key " + ONESIGNAL_REST_KEY
+        },
+        body: JSON.stringify({
+          app_id: ONESIGNAL_APP_ID,
+          included_segments: ["Total Subscriptions", "Subscribed Users"],
+          headings: { "en": title },
+          contents: { "en": message },
+          url: "https://sandeeppkdos.github.io/Online-App/"
+        })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Push status:", data))
+      .catch(err => console.error("Push error:", err));
+    }
+
+    function toggleLang() {
+      currentLang = currentLang === "en" ? "kn" : "en";
+      localStorage.setItem("app_lang", currentLang);
+      applyLanguage(currentLang);
+      renderProfile();
+      listenRealtimeGames();
+    }
+
+    function applyLanguage(lang) {
+      const t = translations[lang] || translations.en;
+      document.getElementById("langToggleBtn").innerText = lang.toUpperCase();
+      document.getElementById("txtAppTitle").innerText = t.appTitle;
+      document.getElementById("navLbl1").innerText = t.gamesTab;
+      document.getElementById("navLbl2").innerText = t.historyTab;
+      document.getElementById("navLbl3").innerText = t.vipTab;
+      document.getElementById("navLbl4").innerText = t.profileTab;
+      document.getElementById("txtHistoryHeader").innerText = t.historyHeader;
+      document.getElementById("txtVipHeader").innerText = t.vipHeader;
+      document.getElementById("txtVipSub").innerText = t.vipSub;
+      document.getElementById("txtP1Sub").innerText = t.p1Sub;
+      document.getElementById("txtP7Sub").innerText = t.p7Sub;
+      document.getElementById("txtP30Sub").innerText = t.p30Sub;
+      document.getElementById("txtUpiNotice").innerText = t.upiNotice;
+      document.getElementById("txtTrxLabel").innerText = t.trxLabel;
+      document.getElementById("btnSubmitTrx").innerText = t.submitTrxBtn;
+      document.getElementById("txtMemStatusLbl").innerText = t.memStatusLbl;
+      document.getElementById("txtExpLbl").innerText = t.expLbl;
+      document.getElementById("txtEditProfTitle").innerText = t.editProfTitle;
+      document.getElementById("btnSaveName").innerText = t.saveNameBtn;
+      document.getElementById("txtPayHistoryTitle").innerText = t.payHistoryTitle;
+      document.getElementById("btnLogout").innerText = t.logoutBtn;
+    }
+
+    function startPresenceTracking(phone) {
+      if (!phone) return;
+
+      function setOnline() {
+        if (!currentUser) return;
+        db.collection("users").doc(phone).update({
+          isOnline: true,
+          lastSeen: Date.now()
+        }).catch(() => {});
+      }
+
+      function setOffline() {
+        if (!currentUser) return;
+        db.collection("users").doc(phone).update({
+          isOnline: false,
+          lastSeen: Date.now()
+        }).catch(() => {});
+      }
+
+      setOnline();
+      clearInterval(presenceInterval);
+      presenceInterval = setInterval(setOnline, 30000);
+
+      window.addEventListener("beforeunload", setOffline);
+    }
+
+    function syncUserData(phone) {
+      db.collection("users").doc(phone).onSnapshot(doc => {
+        if (doc.exists && currentUser) {
+          currentUser = doc.data();
+          localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+          renderProfile();
+          listenRealtimeGames();
+        }
+      });
+    }
+
+    function listenBroadcastAndNotices() {
+      db.collection("settings").doc("notice").onSnapshot(doc => {
+        const banner = document.getElementById("topNoticeBanner");
+        if (doc.exists) {
+          const data = doc.data();
+          if (data && data.text && data.show === true) {
+            banner.innerText = "📢 " + data.text;
+            banner.style.display = "block";
+            return;
+          }
+        }
+        banner.style.display = "none";
+      });
+
+      db.collection("settings").doc("instant_alert").onSnapshot(doc => {
+        if (doc.exists) {
+          const alertData = doc.data();
+          if (alertData && alertData.id && alertData.id !== lastHandledNoticeId) {
+            lastHandledNoticeId = alertData.id;
+            localStorage.setItem("last_alert_id", alertData.id);
+          }
+        }
+      });
+    }
+
+    function toggleAuth() {
+      isRegister = !isRegister;
+      document.getElementById("authHeading").innerText = isRegister ? "Register" : "Login";
+      document.getElementById("nameInputWrap").style.display = isRegister ? "flex" : "none";
+      document.getElementById("authSubmitText").innerText = isRegister ? "REGISTER NOW" : "LOGIN NOW";
+      document.getElementById("authSwitchBtn").innerText = isRegister ? "Already registered? Login" : "Don't have an account? Register";
+    }
+
+    function handleAuthSubmit() {
+      const phone = document.getElementById("userPhone").value.trim();
+      const pass = document.getElementById("userPass").value.trim();
+
+      if (!phone || !pass) {
+        alert("Please enter mobile number and password!");
+        return;
+      }
+
+      if (isRegister) {
+        const name = document.getElementById("userName").value.trim();
+        if (!name) { alert("Please enter your name!"); return; }
+
+        db.collection("users").doc(phone).get().then(doc => {
+          if (doc.exists) {
+            alert("This mobile number is already registered! Please login.");
+          } else {
+            const newUser = {
+              name: name,
+              phone: phone,
+              password: pass,
+              isVip: false,
+              vipExpiry: null,
+              isOnline: true,
+              lastSeen: Date.now(),
+              createdTime: Date.now()
+            };
+            db.collection("users").doc(phone).set(newUser).then(() => {
+              alert("Account created successfully!");
+              finishAuth(newUser);
+            });
+          }
+        });
+      } else {
+        db.collection("users").doc(phone).get().then(doc => {
+          if (!doc.exists) {
+            alert("Account not found! Please create a new account.");
+          } else {
+            const data = doc.data();
+            if (data.password !== pass) {
+              alert("Wrong password! Please check again.");
+            } else {
+              alert("Login successful!");
+              finishAuth(data);
+            }
+          }
+        });
       }
     }
 
-    // 7. ಪ್ಲ್ಯಾನ್ ಆಯ್ಕೆಮಾಡುವ ಸಂದೇಶ
-    function selectPlan(planName, price) {
-      alert(`ನೀವು ${planName} (₹${price}) ಆಯ್ಕೆ ಮಾಡಿದ್ದೀರಿ.\n\nPhonePe/GPay ಮೂಲಕ ಹಣ ಪಾವತಿಸಿ VIP ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಅಡ್ಮಿನ್ ಸಂಪರ್ಕಿಸಿ ಅಥವಾ WhatsApp ಮಾಡಿ.`);
+    function finishAuth(user) {
+      currentUser = user;
+      localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+      document.getElementById("authOverlay").style.display = "none";
+      syncUserData(user.phone);
+      startPresenceTracking(user.phone);
+      renderProfile();
+      listenRealtimeGames();
+      listenUserPayments();
+      requestNotificationPermission();
     }
 
-    // 8. ಲೈವ್ ಗೇಮ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡುವುದು
-    async function loadGamesFromFirestore() {
-      const container = document.getElementById("gamesListContainer");
-      try {
-        const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
-        const res = await fetch(url);
-        const data = await res.json();
+    function isVipActive() {
+      if (!currentUser || currentUser.isVip !== true) return false;
+      if (!currentUser.vipExpiry) return false;
+      
+      const now = Date.now();
+      const expiry = new Date(currentUser.vipExpiry).getTime();
 
-        if (!data.documents || data.documents.length === 0) {
-          container.innerHTML = `<div class="bg-slate-900 rounded-2xl p-6 text-center text-slate-500 text-xs border border-slate-800">ಯಾವುದೇ ಗೇಮ್‌ಗಳು ಲಭ್ಯವಿಲ್ಲ.</div>`;
+      if (now >= expiry) {
+        autoExpireUserVip(currentUser.phone);
+        return false;
+      }
+      return true;
+    }
+
+    function autoExpireUserVip(phone) {
+      db.collection("users").doc(phone).update({
+        isVip: false,
+        vipExpiry: null
+      }).then(() => {
+        currentUser.isVip = false;
+        currentUser.vipExpiry = null;
+        localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+        renderProfile();
+        listenRealtimeGames();
+      });
+    }
+
+    function startVipCountdown(expiryTimestamp) {
+      clearInterval(timerInterval);
+      const timerElement = document.getElementById("vipCountdownTimer");
+
+      function updateTimer() {
+        const now = Date.now();
+        const diff = expiryTimestamp - now;
+
+        if (diff <= 0) {
+          clearInterval(timerInterval);
+          timerElement.innerText = "00:00:00";
+          autoExpireUserVip(currentUser.phone);
           return;
         }
 
-        container.innerHTML = "";
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        data.documents.forEach(doc => {
-          const f = doc.fields;
-          const market = f.market ? f.market.stringValue : "UNKNOWN";
-          const open = f.open ? f.open.stringValue : "--";
-          const close = f.close ? f.close.stringValue : "--";
-          const jodi = f.jodi ? f.jodi.stringValue : "--";
-          const openPana = f.openPana ? f.openPana.stringValue : "--";
-          const closePana = f.closePana ? f.closePana.stringValue : "--";
-          const gameType = f.gameType ? f.gameType.stringValue : "FREE";
-          const isPassed = f.isPassed ? f.isPassed.booleanValue : false;
-          const passMessage = f.passMessage ? f.passMessage.stringValue : "";
-
-          const isLocked = (gameType === "VIP" && !isVipActive);
-
-          const card = document.createElement("div");
-          card.className = `relative overflow-hidden rounded-2xl p-4 transition shadow-lg ${
-            isPassed 
-              ? 'bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900/40 border-2 border-emerald-500 shadow-emerald-500/20' 
-              : 'bg-slate-900 border border-slate-800'
-          }`;
-
-          card.innerHTML = `
-            ${isPassed ? `
-              <div class="mb-3 py-1.5 px-3 bg-emerald-500 text-slate-950 font-black text-xs rounded-xl text-center shadow-md animate-pulse">
-                ${passMessage || "✔ BLAST PASSED"}
-              </div>
-            ` : ''}
-
-            <div class="flex justify-between items-center mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-base font-black text-white tracking-wide">${market}</span>
-                <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${gameType === 'VIP' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-400'}">
-                  ${gameType}
-                </span>
-              </div>
-              ${isPassed ? '<span class="text-xs font-black text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> LIVE PASS</span>' : ''}
-            </div>
-
-            ${isLocked ? `
-              <div class="bg-slate-950/90 rounded-xl p-5 text-center border border-amber-500/20">
-                <i class="fa-solid fa-lock text-amber-400 text-2xl mb-2"></i>
-                <div class="text-xs font-black text-amber-300 uppercase">VIP GAME LOCKED</div>
-                <p class="text-[10px] text-slate-400 mt-1">5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ ಅಥವಾ VIP ಪಾಸ್ ಖರೀದಿಸಿ</p>
-                <button onclick="switchTab('refer')" class="mt-3 px-4 py-1.5 bg-amber-500 text-slate-950 rounded-lg text-xs font-black">
-                  ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿ
-                </button>
-              </div>
-            ` : `
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-                  <span class="text-[10px] font-bold text-slate-400 block mb-0.5">OPEN DIGITS</span>
-                  <span class="font-black text-amber-400 text-sm tracking-wider">${open}</span>
-                </div>
-                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-                  <span class="text-[10px] font-bold text-slate-400 block mb-0.5">CLOSE DIGITS</span>
-                  <span class="font-black text-yellow-300 text-sm tracking-wider">${close}</span>
-                </div>
-              </div>
-
-              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 mt-2">
-                <span class="text-[10px] font-bold text-slate-400 block mb-0.5">JODI NUMBERS</span>
-                <span class="font-black text-emerald-400 text-xs tracking-wider">${jodi}</span>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 text-xs mt-2">
-                <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                  <span class="text-[9px] font-bold text-slate-400 block">OPEN PANA</span>
-                  <span class="font-bold text-slate-300 text-xs">${openPana}</span>
-                </div>
-                <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                  <span class="text-[9px] font-bold text-slate-400 block">CLOSE PANA</span>
-                  <span class="font-bold text-slate-300 text-xs">${closePana}</span>
-                </div>
-              </div>
-            `}
-          `;
-
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="bg-rose-950/50 p-4 rounded-xl text-center text-xs text-rose-300">ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.</div>`;
-      }
-    }
-
-    // 9. ಅಡ್ಮಿನ್ ಲಾಗಿನ್ & ಗೇಮ್ ಸೇವ್
-    function loginAdmin() {
-      const pin = document.getElementById("adminPinInput").value;
-      if (pin === ADMIN_PIN) {
-        document.getElementById("adminAuthBox").classList.add("hidden");
-        document.getElementById("adminPostForm").classList.remove("hidden");
-      } else {
-        alert("ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್!");
-      }
-    }
-
-    async function saveGameToFirestore(e) {
-      e.preventDefault();
-      const btn = document.getElementById("postGameBtn");
-      btn.disabled = true;
-      btn.innerText = "ಸೇವ್ ಮಾಡಲಾಗುತ್ತಿದೆ...";
-
-      const market = document.getElementById("mName").value.trim().toUpperCase();
-      const open = document.getElementById("mOpen").value.trim();
-      const close = document.getElementById("mClose").value.trim();
-      const jodi = document.getElementById("mJodi").value.trim();
-      const openPana = document.getElementById("mOpenPana").value.trim();
-      const closePana = document.getElementById("mClosePana").value.trim();
-      const gameType = document.getElementById("mType").value;
-
-      try {
-        const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/games`;
-        const payload = {
-          fields: {
-            market: { stringValue: market },
-            open: { stringValue: open },
-            close: { stringValue: close },
-            jodi: { stringValue: jodi },
-            openPana: { stringValue: openPana },
-            closePana: { stringValue: closePana },
-            gameType: { stringValue: gameType },
-            isPassed: { booleanValue: false },
-            passMessage: { stringValue: "" },
-            createdAt: { timestampValue: new Date().toISOString() }
-          }
-        };
-
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-          alert(`✅ ${market} ಗೇಮ್ ಯಶಸ್ವಿಯಾಗಿ ಲೈವ್ ಪೋಸ್ಟ್ ಆಗಿದೆ!`);
-          document.getElementById("adminPostForm").reset();
-          switchTab('home');
-          loadGamesFromFirestore();
+        if (days > 0) {
+          timerElement.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         } else {
-          alert("ಸೇವ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ!");
+          timerElement.innerText = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
         }
-      } catch (err) {
-        alert("ಎರರ್: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ (Post Game)";
+      }
+
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function renderProfile() {
+      if (!currentUser) return;
+      document.getElementById("richName").innerText = currentUser.name || "User";
+      document.getElementById("richPhone").innerText = "+91 " + currentUser.phone;
+      document.getElementById("editUserName").value = currentUser.name || "";
+
+      const active = isVipActive();
+      const card = document.getElementById("profileCardBox");
+      const pill = document.getElementById("richPill");
+      const countdownBox = document.getElementById("vipCountdownBox");
+
+      if (active) {
+        card.classList.add("active-vip");
+        pill.className = "vip-badge-pill vip-pill-gold";
+        pill.innerText = "★ GOLD VIP MEMBER";
+        document.getElementById("richStatusText").innerText = currentLang === "kn" ? "ಪ್ರೀಮಿಯಂ VIP ಆಕ್ಟಿವ್ ಆಗಿದೆ" : "Active VIP Member";
+        
+        const expiryDateObj = new Date(currentUser.vipExpiry);
+        document.getElementById("richExpiryText").innerText = expiryDateObj.toLocaleString();
+        
+        countdownBox.style.display = "flex";
+        startVipCountdown(expiryDateObj.getTime());
+      } else {
+        clearInterval(timerInterval);
+        card.classList.remove("active-vip");
+        pill.className = "vip-badge-pill vip-pill-free";
+        pill.innerText = "FREE USER";
+        document.getElementById("richStatusText").innerText = currentLang === "kn" ? "ನಾರ್ಮಲ್ ಉಚಿತ ಖಾತೆ" : "Normal Free Account";
+        document.getElementById("richExpiryText").innerText = currentLang === "kn" ? "ಇಲ್ಲ" : "None";
+        countdownBox.style.display = "none";
       }
     }
 
-    // ಆ್ಯಪ್ ಲೋಡ್ ಆರಂಭ
-    window.addEventListener("DOMContentLoaded", async () => {
-      await checkReferralReward();
-      await fetchUserStatus();
-      await loadGamesFromFirestore();
+    function updateProfileName() {
+      const newName = document.getElementById("editUserName").value.trim();
+      if (!newName) { alert("Name cannot be empty!"); return; }
+      db.collection("users").doc(currentUser.phone).update({
+        name: newName
+      }).then(() => {
+        currentUser.name = newName;
+        localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+        renderProfile();
+        alert(currentLang === "kn" ? "ಹೆಸರು ಯಶಸ್ವಿಯಾಗಿ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ!" : "Name updated successfully!");
+      }).catch(err => alert("Error: " + err.message));
+    }
+
+    function logOut() {
+      if (confirm(currentLang === "kn" ? "ಖಾತೆಯಿಂದ ಲಾಗ್‌ಔಟ್ ಮಾಡಬೇಕೆ?" : "Are you sure you want to logout?")) {
+        try {
+          clearInterval(timerInterval);
+          clearInterval(presenceInterval);
+
+          if (currentUser && currentUser.phone) {
+            db.collection("users").doc(currentUser.phone).update({
+              isOnline: false,
+              lastSeen: Date.now()
+            }).catch(() => {});
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        currentUser = null;
+        localStorage.removeItem("app_current_user");
+
+        const auth = document.getElementById("authOverlay");
+        if (auth) {
+          auth.style.display = "flex";
+        }
+        window.location.reload();
+      }
+    }
+
+    function listenUserPayments() {
+      if (!currentUser) return;
+      db.collection("vip_requests").where("userPhone", "==", currentUser.phone)
+        .onSnapshot(snapshot => {
+          const box = document.getElementById("userPaymentHistoryList");
+          box.innerHTML = "";
+
+          if (snapshot.empty) {
+            box.innerHTML = `<p style="color:#7b7597; font-size:0.85rem;">${currentLang === "kn" ? "ಯಾವುದೇ ಪಾವತಿ ರಿಕ್ವೆಸ್ಟ್‌ಗಳಿಲ್ಲ." : "No payment requests submitted yet."}</p>`;
+            return;
+          }
+
+          let requests = [];
+          snapshot.forEach(doc => requests.push({ id: doc.id, ...doc.data() }));
+          requests.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+          requests.forEach(r => {
+            let statusPill = "";
+            if (r.status === "PENDING") {
+              statusPill = `<span class="status-badge status-pending">PENDING ⏳</span>`;
+            } else if (r.status === "APPROVED") {
+              statusPill = `<span class="status-badge status-approved">APPROVED (ಸಕ್ಸಸ್) ✅</span>`;
+            } else {
+              statusPill = `<span class="status-badge status-rejected">REJECTED (ತಿರಸ್ಕೃತ) ❌</span>`;
+            }
+
+            box.innerHTML += `
+              <div style="background:#ffffff; border:1.5px solid var(--card-border); padding:10px 14px; border-radius:12px; margin-bottom:8px; font-size:0.85rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <b>${r.days} Days VIP Pass</b>
+                  ${statusPill}
+                </div>
+                <div style="color:#7b7597; font-size:0.75rem;">UTR / Trx ID: <span style="color:var(--primary); font-family:monospace; font-weight:bold;">${r.trxId}</span></div>
+              </div>
+            `;
+          });
+        });
+    }
+
+    function navigate(tabId, btn) {
+      document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      if (btn) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      if (tabId === 'tabGames') listenRealtimeGames();
+      if (tabId === 'tabHistory') loadAllHistory();
+      if (tabId === 'tabVip') fetchVipConfig();
+      if (tabId === 'tabProfile') renderProfile();
+    }
+
+    function selectPlan(days) {
+      selectedPlanDays = days;
+      document.getElementById("p1Card").classList.toggle("selected", days === 1);
+      document.getElementById("p7Card").classList.toggle("selected", days === 7);
+      document.getElementById("p30Card").classList.toggle("selected", days === 30);
+    }
+
+    function copyUpi() {
+      const upi = document.getElementById("vipUpiText").innerText;
+      navigator.clipboard.writeText(upi);
+      alert("UPI ID Copied: " + upi);
+    }
+
+    function submitPaymentRequest() {
+      const trxId = document.getElementById("userTrxId").value.trim();
+      if (!trxId) {
+        alert(currentLang === "kn" ? "ದಯವಿಟ್ಟು Transaction ID ನಮೂದಿಸಿ!" : "Please enter the Transaction ID / UTR!");
+        return;
+      }
+
+      db.collection("vip_requests").add({
+        userName: currentUser.name,
+        userPhone: currentUser.phone,
+        trxId: trxId,
+        days: selectedPlanDays,
+        status: "PENDING",
+        createdTime: Date.now()
+      }).then(() => {
+        alert(currentLang === "kn" ? "ಟ್ರಾನ್ಸಾಕ್ಷನ್ ಐಡಿ ಸಬ್ಮಿಟ್ ಆಗಿದೆ! ಅಡ್ಮಿನ್ ಅಪ್ರೂವ್ ಮಾಡಿದ ತಕ್ಷಣ VIP ಆನ್ ಆಗುತ್ತದೆ." : "Payment ID submitted! VIP will unlock as soon as Admin approves.");
+        document.getElementById("userTrxId").value = "";
+      }).catch(err => alert("Error: " + err.message));
+    }
+
+    function splitNumbers(rawInput) {
+      if (!rawInput) return [];
+      if (Array.isArray(rawInput)) return rawInput;
+      return rawInput.toString().split(/[\s,]+/).filter(x => x && x.trim() !== "");
+    }
+
+    function isNumberPassed(item, passList) {
+      if (!passList || !Array.isArray(passList)) return false;
+      return passList.some(p => p.number && p.number.toString().trim() === item.toString().trim());
+    }
+
+    function renderDynamicNumberList(rawInput, passListForType) {
+      const items = splitNumbers(rawInput);
+      if (items.length === 0) return "<span style='color:#a09cb0;'>-</span>";
+
+      return items.map(item => {
+        const isPassed = isNumberPassed(item, passListForType);
+        return `<span class="digit-box ${isPassed ? 'passed' : ''}">${item}</span>`;
+      }).join("");
+    }
+
+    function getGamePasses(g) {
+      let list = [];
+      if (Array.isArray(g.passes) && g.passes.length > 0) {
+        list = g.passes;
+      } else if (g.isPassed && g.passType && g.passedNumber) {
+        list = [{ type: g.passType, number: g.passedNumber }];
+      }
+      return list;
+    }
+
+    function listenRealtimeGames() {
+      db.collection("games")
+        .onSnapshot(snapshot => {
+          const box = document.getElementById("gamesContainer");
+          box.innerHTML = "";
+
+          if (snapshot.empty) {
+            box.innerHTML = `<p style='text-align:center; color:#7b7597; margin-top:25px;'>${currentLang === "kn" ? "ಇನ್ನೂ ಯಾವುದೇ ಆಟ ಲೈವ್ ಆಗಿಲ್ಲ." : "No games live right now."}</p>`;
+            return;
+          }
+
+          let games = [];
+          snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
+          games.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+          const lockTxt = currentLang === "kn" ? "🔒 VIP ಅನ್‌ಲಾಕ್" : "🔒 Unlock VIP";
+          const userHasVip = isVipActive();
+
+          games.forEach(g => {
+            const locked = (g.type === "VIP" && !userHasVip);
+            const allPasses = getGamePasses(g);
+            const isAnyPassed = allPasses.length > 0;
+
+            const passesOpenPana = allPasses.filter(p => p.type === "OPEN_PANA");
+            const passesOpen = allPasses.filter(p => p.type === "OPEN");
+            const passesJodi = allPasses.filter(p => p.type === "JODI");
+            const passesClose = allPasses.filter(p => p.type === "CLOSE");
+            const passesClosePana = allPasses.filter(p => p.type === "CLOSE_PANA");
+
+            const openData = g.open || [g.open1, g.open2, g.open3].filter(Boolean).join(" ");
+            const jodiData = g.jodi || [g.jodi1, g.jodi2, g.jodi3].filter(Boolean).join(" ");
+            const closeData = g.close || [g.close1, g.close2, g.close3].filter(Boolean).join(" ");
+            const openPanaData = g.openPana || "";
+            const closePanaData = g.closePana || "";
+
+            const hasPana = (openPanaData || closePanaData);
+            const postTime = g.postTime ? ` • ⏰ ${g.postTime}` : "";
+
+            let passBadgesHTML = "";
+            if (isAnyPassed) {
+              allPasses.forEach(p => {
+                passBadgesHTML += `<span class="badge badge-pass">✓ ${p.type}: ${p.number} BLAST</span>`;
+              });
+            }
+
+            box.innerHTML += `
+              <div class="game-card ${isAnyPassed ? 'passed-card' : ''}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
+                  <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
+                  <div>${passBadgesHTML}</div>
+                </div>
+                <div class="game-title">${g.market}</div>
+                <div class="game-date-time">📅 ${g.date}${postTime}</div>
+
+                <div style="position: relative;">
+                  <div class="matka-grid-custom ${locked ? 'blur-mask' : ''}">
+                    
+                    <div class="grid-row-3">
+                      <div class="matka-cell ${passesOpen.length ? 'cell-passed' : ''}">
+                        ${passesOpen.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                        <span class="cell-lbl">OPEN</span>
+                        <div class="digits-wrap">
+                          ${renderDynamicNumberList(openData, passesOpen)}
+                        </div>
+                      </div>
+
+                      <div class="matka-cell jodi-cell ${passesJodi.length ? 'cell-passed' : ''}">
+                        ${passesJodi.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                        <span class="cell-lbl">JODI</span>
+                        <div class="digits-wrap">
+                          ${renderDynamicNumberList(jodiData, passesJodi)}
+                        </div>
+                      </div>
+
+                      <div class="matka-cell ${passesClose.length ? 'cell-passed' : ''}">
+                        ${passesClose.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                        <span class="cell-lbl">CLOSE</span>
+                        <div class="digits-wrap">
+                          ${renderDynamicNumberList(closeData, passesClose)}
+                        </div>
+                      </div>
+                    </div>
+
+                    ${hasPana ? `
+                      <div class="grid-row-2">
+                        <div class="matka-cell pana-cell ${passesOpenPana.length ? 'cell-passed' : ''}">
+                          ${passesOpenPana.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                          <span class="cell-lbl">OPEN PANA</span>
+                          <div class="digits-wrap">
+                            ${renderDynamicNumberList(openPanaData, passesOpenPana)}
+                          </div>
+                        </div>
+
+                        <div class="matka-cell pana-cell ${passesClosePana.length ? 'cell-passed' : ''}">
+                          ${passesClosePana.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                          <span class="cell-lbl">CLOSE PANA</span>
+                          <div class="digits-wrap">
+                            ${renderDynamicNumberList(closePanaData, passesClosePana)}
+                          </div>
+                        </div>
+                      </div>
+                    ` : ''}
+
+                  </div>
+                  ${locked ? `<div class="vip-lock-btn" onclick="navigate('tabVip')">${lockTxt}</div>` : ''}
+                </div>
+              </div>
+            `;
+          });
+        }, error => {
+          console.error("Games listener error:", error);
+        });
+    }
+
+    function loadAllHistory() {
+      const box = document.getElementById("historyContainer");
+      box.innerHTML = "<p style='text-align:center; color:#7b7597; margin-top:20px;'>Loading history...</p>";
+
+      db.collection("games").where("isPassed", "==", true).onSnapshot(snapshot => {
+        box.innerHTML = "";
+        let passedGames = [];
+
+        snapshot.forEach(doc => passedGames.push({ id: doc.id, ...doc.data() }));
+
+        if (passedGames.length === 0) {
+          box.innerHTML = `<p style='text-align:center; color:#7b7597; margin-top:25px;'>${currentLang === "kn" ? "ಯಾವುದೇ ಪಾಸ್ ಆದ ಹಿಸ್ಟರಿ ಲಭ್ಯವಿಲ್ಲ." : "No passed history records found."}</p>`;
+          return;
+        }
+
+        passedGames.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+        passedGames.forEach(g => {
+          const allPasses = getGamePasses(g);
+          const passesOpenPana = allPasses.filter(p => p.type === "OPEN_PANA");
+          const passesOpen = allPasses.filter(p => p.type === "OPEN");
+          const passesJodi = allPasses.filter(p => p.type === "JODI");
+          const passesClose = allPasses.filter(p => p.type === "CLOSE");
+          const passesClosePana = allPasses.filter(p => p.type === "CLOSE_PANA");
+
+          const openData = g.open || [g.open1, g.open2, g.open3].filter(Boolean).join(" ");
+          const jodiData = g.jodi || [g.jodi1, g.jodi2, g.jodi3].filter(Boolean).join(" ");
+          const closeData = g.close || [g.close1, g.close2, g.close3].filter(Boolean).join(" ");
+          const openPanaData = g.openPana || "";
+          const closePanaData = g.closePana || "";
+
+          const hasPana = (openPanaData || closePanaData);
+          const postTime = g.postTime ? ` • ⏰ ${g.postTime}` : "";
+
+          let passBadgesHTML = "";
+          allPasses.forEach(p => {
+            passBadgesHTML += `<span class="badge badge-pass">✓ ${p.type}: ${p.number} BLAST</span>`;
+          });
+
+          box.innerHTML += `
+            <div class="game-card passed-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
+                <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
+                <div>${passBadgesHTML}</div>
+              </div>
+              <div class="game-title">${g.market}</div>
+              <div class="game-date-time">📅 ${g.date}${postTime}</div>
+
+              <div class="matka-grid-custom">
+                <div class="grid-row-3">
+                  <div class="matka-cell ${passesOpen.length ? 'cell-passed' : ''}">
+                    ${passesOpen.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                    <span class="cell-lbl">OPEN</span>
+                    <div class="digits-wrap">
+                      ${renderDynamicNumberList(openData, passesOpen)}
+                    </div>
+                  </div>
+
+                  <div class="matka-cell jodi-cell ${passesJodi.length ? 'cell-passed' : ''}">
+                    ${passesJodi.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                    <span class="cell-lbl">JODI</span>
+                    <div class="digits-wrap">
+                      ${renderDynamicNumberList(jodiData, passesJodi)}
+                    </div>
+                  </div>
+
+                  <div class="matka-cell ${passesClose.length ? 'cell-passed' : ''}">
+                    ${passesClose.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                    <span class="cell-lbl">CLOSE</span>
+                    <div class="digits-wrap">
+                      ${renderDynamicNumberList(closeData, passesClose)}
+                    </div>
+                  </div>
+                </div>
+
+                ${hasPana ? `
+                  <div class="grid-row-2">
+                    <div class="matka-cell pana-cell ${passesOpenPana.length ? 'cell-passed' : ''}">
+                      ${passesOpenPana.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                      <span class="cell-lbl">OPEN PANA</span>
+                      <div class="digits-wrap">
+                        ${renderDynamicNumberList(openPanaData, passesOpenPana)}
+                      </div>
+                    </div>
+
+                    <div class="matka-cell pana-cell ${passesClosePana.length ? 'cell-passed' : ''}">
+                      ${passesClosePana.length ? '<div class="passed-tag">PASSED</div>' : ''}
+                      <span class="cell-lbl">CLOSE PANA</span>
+                      <div class="digits-wrap">
+                        ${renderDynamicNumberList(closePanaData, passesClosePana)}
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function fetchVipConfig() {
+      db.collection("settings").doc("vip").get().then(doc => {
+        if (doc.exists) {
+          const cfg = doc.data();
+          document.getElementById("vPrice1").innerText = "₹" + (cfg.plan1 || "99");
+          document.getElementById("vPrice7").innerText = "₹" + (cfg.plan7 || "499");
+          document.getElementById("vPrice30").innerText = "₹" + (cfg.plan30 || "1499");
+          document.getElementById("vipUpiText").innerText = cfg.upi || "mkmatka@upi";
+
+          document.getElementById("admP1").value = cfg.plan1 || "";
+          document.getElementById("admP7").value = cfg.plan7 || "";
+          document.getElementById("admP30").value = cfg.plan30 || "";
+          document.getElementById("admUpi").value = cfg.upi || "";
+        }
+      });
+    }
+
+    function updateVipConfig() {
+      const p1 = document.getElementById("admP1").value.trim();
+      const p7 = document.getElementById("admP7").value.trim();
+      const p30 = document.getElementById("admP30").value.trim();
+      const u = document.getElementById("admUpi").value.trim();
+
+      if (!u) { alert("Please enter UPI ID!"); return; }
+
+      db.collection("settings").doc("vip").set({
+        plan1: p1 || "99",
+        plan7: p7 || "499",
+        plan30: p30 || "1499",
+        upi: u
+      }, { merge: true }).then(() => {
+        alert("VIP settings saved successfully!");
+        fetchVipConfig();
+      });
+    }
+
+    let logoTaps = 0, logoTimer = null;
+    document.getElementById("logoAdminTrigger").addEventListener("click", () => {
+      logoTaps++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoTaps = 0; }, 2000);
+
+      if (logoTaps >= 5) {
+        logoTaps = 0;
+        const pass = prompt("Enter Admin Password:");
+        if (pass === "admin123") {
+          navigate('tabAdmin');
+          renderAdminGames();
+          renderAdminUsers();
+          renderVipApprovals();
+        } else if (pass !== null) {
+          alert("Wrong password!");
+        }
+      }
     });
+
+    function exitAdmin() {
+      navigate('tabGames', document.querySelectorAll('.nav-btn')[0]);
+    }
+
+    function switchAdminTab(secId, btn) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(secId).classList.add('active');
+
+      document.querySelectorAll('.admin-subnav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function saveGame() {
+      const market = document.getElementById("admMarket").value.trim().toUpperCase();
+      const type = document.getElementById("admType").value;
+      
+      const openPana = document.getElementById("admOpenPana").value.trim();
+      const open = document.getElementById("admOpen").value.trim();
+      const jodi = document.getElementById("admJodi").value.trim();
+      const close = document.getElementById("admClose").value.trim();
+      const closePana = document.getElementById("admClosePana").value.trim();
+
+      if (!market) { alert("Please enter game name!"); return; }
+
+      const now = new Date();
+      const today = now.toLocaleDateString('en-GB');
+      const postTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+      const docId = market.replace(/\s+/g, '_') + "_" + Date.now();
+
+      db.collection("games").doc(docId).set({
+        market: market,
+        type: type,
+        openPana: openPana,
+        open: open,
+        jodi: jodi,
+        close: close,
+        closePana: closePana,
+        date: today,
+        postTime: postTime,
+        isPassed: false,
+        passes: [],
+        createdTime: Date.now()
+      }).then(() => {
+        const pushTitle = `🎯 ${market} (${type}) LIVE!`;
+        const pushBody = `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`;
+        sendPushNotification(pushTitle, pushBody);
+
+        alert("Game posted successfully! Auto-matching against DPBoss is active.");
+        document.getElementById("admMarket").value = "";
+        document.getElementById("admOpenPana").value = "";
+        document.getElementById("admOpen").value = "";
+        document.getElementById("admJodi").value = "";
+        document.getElementById("admClose").value = "";
+        document.getElementById("admClosePana").value = "";
+        document.getElementById("admRawInput").value = "";
+        renderAdminGames();
+        listenRealtimeGames();
+      }).catch(err => {
+        alert("Error saving game: " + err.message);
+      });
+    }
+
+    function renderAdminGames() {
+      const box = document.getElementById("admGamesList");
+      box.innerHTML = "<p style='color:#7b7597;'>Loading...</p>";
+
+      db.collection("games").get().then(snapshot => {
+        box.innerHTML = "";
+        if (snapshot.empty) {
+          box.innerHTML = "<p style='color:#7b7597;'>No games posted.</p>";
+          return;
+        }
+
+        let games = [];
+        snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
+        games.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+        games.forEach(g => {
+          const openNums = splitNumbers(g.open || [g.open1, g.open2, g.open3].filter(Boolean).join(" "));
+          const jodiNums = splitNumbers(g.jodi || [g.jodi1, g.jodi2, g.jodi3].filter(Boolean).join(" "));
+          const closeNums = splitNumbers(g.close || [g.close1, g.close2, g.close3].filter(Boolean).join(" "));
+          const openPanaNums = splitNumbers(g.openPana || "");
+          const closePanaNums = splitNumbers(g.closePana || "");
+
+          let dropdownOptions = "";
+          openPanaNums.forEach(num => { dropdownOptions += `<option value="OPEN_PANA:${num}">Open Pana: ${num}</option>`; });
+          openNums.forEach(num => { dropdownOptions += `<option value="OPEN:${num}">Open Digit: ${num}</option>`; });
+          jodiNums.forEach(num => { dropdownOptions += `<option value="JODI:${num}">Jodi: ${num}</option>`; });
+          closeNums.forEach(num => { dropdownOptions += `<option value="CLOSE:${num}">Close Digit: ${num}</option>`; });
+          closePanaNums.forEach(num => { dropdownOptions += `<option value="CLOSE_PANA:${num}">Close Pana: ${num}</option>`; });
+
+          const allPasses = getGamePasses(g);
+
+          let passTagsHTML = "";
+          if (allPasses.length > 0) {
+            allPasses.forEach((p, idx) => {
+              passTagsHTML += `
+                <span class="admin-pass-tag">
+                  ✓ ${p.type}: [${p.number}]
+                  <button title="Remove" onclick="removeSpecificPass('${g.id}', ${idx})">✕</button>
+                </span>
+              `;
+            });
+          } else {
+            passTagsHTML = "<span style='font-size:0.75rem; color:#94a3b8;'>No passes yet (Waiting for DPBoss / Manual).</span>";
+          }
+
+          box.innerHTML += `
+            <div class="game-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span class="badge badge-free">${g.type}</span>
+                  <b style="color:var(--primary-dark); font-size:1.1rem; margin-left:4px;">${g.market}</b> <span style="font-size:0.75rem; color:var(--primary);">(${g.date} • ${g.postTime || ''})</span>
+                </div>
+                <button class="btn-danger" onclick="deleteGame('${g.id}')">Delete</button>
+              </div>
+
+              <div style="font-size:0.82rem; margin: 10px 0; color:#4a4269; line-height: 1.5;">
+                ${openPanaNums.length ? `Open Pana: <b>[${openPanaNums.join(', ')}]</b><br>` : ''}
+                Open: <b>[${openNums.join(', ')}]</b><br>
+                Jodi: <b>[${jodiNums.join(', ')}]</b><br>
+                Close: <b>[${closeNums.join(', ')}]</b><br>
+                ${closePanaNums.length ? `Close Pana: <b>[${closePanaNums.join(', ')}]</b>` : ''}
+              </div>
+
+              <div style="margin-top:10px; background:#f7f6fc; padding:12px; border-radius:14px; border:1.5px solid var(--card-border);">
+                <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-bottom:6px;">
+                  Manual Pass (If DPBoss not updated):
+                </label>
+                <div style="display:flex; gap:6px;">
+                  <select id="selPass_${g.id}" style="margin-bottom:0; font-size:0.82rem;">
+                    ${dropdownOptions}
+                  </select>
+                  <button class="btn" style="width:auto; white-space:nowrap; padding:6px 14px; margin-top:0;" onclick="confirmAddPass('${g.id}', '${g.market}')">Add Pass</button>
+                </div>
+
+                <div style="margin-top:10px;">
+                  <div style="font-size:0.75rem; font-weight:bold; color:var(--text-sub); margin-bottom:4px;">Currently Active Passes:</div>
+                  <div style="display:flex; flex-wrap:wrap; align-items:center;">
+                    ${passTagsHTML}
+                  </div>
+                  ${allPasses.length > 0 ? `
+                    <div style="margin-top:6px;">
+                      <button style="background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:bold; text-decoration:underline; cursor:pointer;" onclick="resetAllPasses('${g.id}')">
+                        Reset All Passes
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function confirmAddPass(docId, marketName) {
+      const sel = document.getElementById("selPass_" + docId);
+      if (!sel || !sel.value) return;
+
+      const [type, number] = sel.value.split(":");
+
+      db.collection("games").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        const g = doc.data();
+        let passes = getGamePasses(g);
+
+        const exists = passes.some(p => p.type === type && p.number === number);
+        if (exists) {
+          alert(`${type} [${number}] already passed!`);
+          return;
+        }
+
+        passes.push({ type: type, number: number });
+
+        db.collection("games").doc(docId).update({
+          isPassed: true,
+          passes: passes,
+          passType: type,
+          passedNumber: number
+        }).then(() => {
+          sendPushNotification(`🏆 ${marketName} BLAST RESULT!`, `${type} Number [${number}] PASSED! Check App Now!`);
+          alert(`Successfully added ${type} [${number}] as PASSED!`);
+          renderAdminGames();
+          listenRealtimeGames();
+        });
+      });
+    }
+
+    function removeSpecificPass(docId, indexToRemove) {
+      if (!confirm("Remove this pass?")) return;
+
+      db.collection("games").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        const g = doc.data();
+        let passes = getGamePasses(g);
+
+        passes.splice(indexToRemove, 1);
+
+        const isStillPassed = passes.length > 0;
+        const lastPass = isStillPassed ? passes[passes.length - 1] : null;
+
+        db.collection("games").doc(docId).update({
+          isPassed: isStillPassed,
+          passes: passes,
+          passType: lastPass ? lastPass.type : "NONE",
+          passedNumber: lastPass ? lastPass.number : null
+        }).then(() => {
+          alert("Pass removed successfully!");
+          renderAdminGames();
+          listenRealtimeGames();
+        });
+      });
+    }
+
+    function resetAllPasses(docId) {
+      if (!confirm("Clear all passes for this game?")) return;
+
+      db.collection("games").doc(docId).update({
+        isPassed: false,
+        passes: [],
+        passType: "NONE",
+        passedNumber: null
+      }).then(() => {
+        alert("All passes cleared.");
+        renderAdminGames();
+        listenRealtimeGames();
+      });
+    }
+
+    function deleteGame(docId) {
+      if (confirm("Are you sure you want to delete this game?")) {
+        db.collection("games").doc(docId).delete().then(() => {
+          alert("Game deleted!");
+          renderAdminGames();
+          listenRealtimeGames();
+        });
+      }
+    }
+
+    function renderAdminUsers() {
+      const box = document.getElementById("admUsersList");
+      const onlineBadge = document.getElementById("onlineCountBadge");
+      box.innerHTML = "<p style='color:#7b7597;'>Loading users...</p>";
+
+      db.collection("users").onSnapshot(snapshot => {
+        box.innerHTML = "";
+        if (snapshot.empty) {
+          box.innerHTML = "<p style='color:#7b7597;'>No users registered yet.</p>";
+          onlineBadge.innerText = "Online: 0";
+          return;
+        }
+
+        usersCache = [];
+        let onlineCount = 0;
+        const now = Date.now();
+
+        snapshot.forEach(doc => {
+          const u = { id: doc.id, ...doc.data() };
+          const isUserOnline = (u.isOnline === true) && (u.lastSeen && (now - u.lastSeen < 60000));
+          if (isUserOnline) onlineCount++;
+          u.activeOnline = isUserOnline;
+          usersCache.push(u);
+        });
+
+        onlineBadge.innerText = `Online: ${onlineCount} / Total: ${usersCache.length}`;
+        usersCache.sort((a,b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+
+        usersCache.forEach(u => {
+          const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
+          const expText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : 'N/A';
+          const userPass = u.password || 'No Pass Set';
+
+          box.innerHTML += `
+            <div class="admin-user-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div>
+                  <b style="font-size:1.05rem; color:var(--primary-dark);">${u.name || 'User'}</b>
+                  <div style="font-size:0.82rem; color:#7b7597; margin-top:2px;">📱 +91 ${u.phone}</div>
+                  <div style="font-size:0.82rem; color:var(--primary); margin-top:4px;">
+                    🔑 Pass: <b style="color:#5b4d96; font-family:monospace; font-size:1rem; font-weight:900;">${userPass}</b>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <span class="status-badge ${u.activeOnline ? 'status-online' : 'status-offline'}">
+                    ${u.activeOnline ? '● ONLINE' : '○ Offline'}
+                  </span><br>
+                  <span class="badge ${isVip ? 'badge-vip' : 'badge-free'}" style="margin-top:5px;">
+                    ${isVip ? '★ VIP' : 'FREE'}
+                  </span>
+                </div>
+              </div>
+
+              <div style="font-size:0.75rem; color:#7b7597; margin-bottom:10px;">
+                Expiry: <b style="color:${isVip ? 'var(--vip)' : '#4a4269'};">${expText}</b>
+              </div>
+
+              <div style="margin-bottom:8px;">
+                <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Password</button>
+              </div>
+
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
+                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem;" onclick="removeVip('${u.phone}')">Cancel VIP</button>
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem; background:#b91c1c;" onclick="deleteUserAccount('${u.phone}')">🗑 Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function openUserDetail(phone) {
+      const u = usersCache.find(x => x.phone === phone);
+      if (!u) return;
+
+      const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
+      
+      document.getElementById("mdlName").innerText = u.name || "N/A";
+      document.getElementById("mdlPhone").innerText = "+91 " + u.phone;
+      document.getElementById("mdlPassword").innerText = u.password || "N/A";
+      document.getElementById("mdlStatus").innerHTML = u.activeOnline ? "<span style='color:#10b981;'>● ONLINE LIVE</span>" : "<span style='color:#94a3b8;'>○ Offline</span>";
+      document.getElementById("mdlVip").innerHTML = isVip ? "<span style='color:#f59e0b;'>★ ACTIVE VIP</span>" : "FREE USER";
+      document.getElementById("mdlExpiry").innerText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : "None";
+      document.getElementById("mdlCreated").innerText = u.createdTime ? new Date(u.createdTime).toLocaleString() : "Earlier Records";
+
+      document.getElementById("userDetailModal").style.display = "flex";
+    }
+
+    function closeUserDetailModal() {
+      document.getElementById("userDetailModal").style.display = "none";
+    }
+
+    function setVipDuration(phone, days) {
+      const now = new Date();
+      const expiryTimestamp = now.getTime() + (days * 24 * 60 * 60 * 1000);
+      const expDate = new Date(expiryTimestamp);
+
+      db.collection("users").doc(phone).update({
+        isVip: true,
+        vipExpiry: expDate.toISOString()
+      }).then(() => {
+        alert(days + " Days VIP Activated! Expires on: " + expDate.toLocaleString());
+      });
+    }
+
+    function removeVip(phone) {
+      if (confirm("Remove VIP status for this user?")) {
+        db.collection("users").doc(phone).update({
+          isVip: false,
+          vipExpiry: null
+        }).then(() => {
+          alert("VIP status cancelled.");
+        });
+      }
+    }
+
+    function deleteUserAccount(phone) {
+      if (confirm("Are you sure you want to permanently delete user: " + phone + "?")) {
+        db.collection("users").doc(phone).delete().then(() => {
+          alert("User deleted successfully!");
+        }).catch(err => alert("Error deleting user: " + err.message));
+      }
+    }
+
+    function saveTopNotice() {
+      const txt = document.getElementById("admTopNoticeText").value.trim();
+      if (!txt) { alert("Please enter notice text!"); return; }
+
+      db.collection("settings").doc("notice").set({
+        text: txt,
+        show: true,
+        updatedTime: Date.now()
+      }).then(() => {
+        alert("Top notice banner published to all users!");
+      });
+    }
+
+    function clearTopNotice() {
+      db.collection("settings").doc("notice").set({
+        text: "",
+        show: false
+      }).then(() => {
+        alert("Top notice banner hidden!");
+        document.getElementById("admTopNoticeText").value = "";
+      });
+    }
+
+    function sendInstantBroadcast() {
+      const msg = document.getElementById("admAlertMsg").value.trim();
+      if (!msg) { alert("Please enter message to alert!"); return; }
+
+      db.collection("settings").doc("instant_alert").set({
+        message: msg,
+        id: "alert_" + Date.now(),
+        timestamp: Date.now()
+      }).then(() => {
+        sendPushNotification("📢 IMPORTANT ALERT", msg);
+        alert("Push alert sent!");
+        document.getElementById("admAlertMsg").value = "";
+      });
+    }
+
+    function renderVipApprovals() {
+      const box = document.getElementById("adminApprovalsList");
+      box.innerHTML = "<p style='color:#7b7597;'>Searching requests...</p>";
+
+      db.collection("vip_requests").onSnapshot(snapshot => {
+        box.innerHTML = "";
+        let pending = [];
+
+        snapshot.forEach(doc => {
+          const req = doc.data();
+          if (req.status === "PENDING") {
+            pending.push({ id: doc.id, ...req });
+          }
+        });
+
+        if (pending.length === 0) {
+          box.innerHTML = "<p style='color:#7b7597; font-size:0.85rem;'>No pending payment requests.</p>";
+          return;
+        }
+
+        pending.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+        pending.forEach(req => {
+          box.innerHTML += `
+            <div style="background:#ffffff; padding:14px; border-radius:14px; margin-bottom:10px; border:1.5px solid var(--card-border);">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <b>${req.userName} (${req.userPhone})</b>
+                <b style="color:var(--primary); font-size:0.95rem;">${req.days} Days Pass</b>
+              </div>
+              <div style="font-size:0.8rem; color:#7b7597; margin-bottom:8px;">
+                Trx ID: <b style="color:var(--primary-dark);">${req.trxId}</b>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn" style="background:var(--success); color:#fff; flex:1; padding:8px; font-size:0.82rem; margin-top:0;" onclick="approveVipRequest('${req.id}', '${req.userPhone}', ${req.days})">✓ Approve (Success)</button>
+                <button class="btn-danger" style="flex:1;" onclick="rejectVipRequest('${req.id}')">✕ Reject</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function approveVipRequest(requestId, phone, days) {
+      const now = new Date();
+      const expiryTimestamp = now.getTime() + (days * 24 * 60 * 60 * 1000);
+      const expDate = new Date(expiryTimestamp);
+
+      db.collection("users").doc(phone).update({
+        isVip: true,
+        vipExpiry: expDate.toISOString()
+      }).then(() => {
+        db.collection("vip_requests").doc(requestId).update({ status: "APPROVED" });
+        alert("VIP unlocked for " + days + " days successfully!");
+      });
+    }
+
+    function rejectVipRequest(requestId) {
+      if (confirm("Reject this payment request?")) {
+        db.collection("vip_requests").doc(requestId).update({ status: "REJECTED" }).then(() => {
+          alert("Request marked as rejected.");
+        });
+      }
+    }
   </script>
 </body>
 </html>
