@@ -29,7 +29,7 @@
   </script>
 
   <style>
-    /* PURPLE / LAVENDER & WHITE CLEAN THEME */
+    /* PURPLE / LAVENDER & WHITE THEME */
     :root {
       --primary: #63589f;
       --primary-dark: #4d4285;
@@ -169,11 +169,11 @@
       top: 0;
       left: 0;
       width: 88%;
-      height: 78%;
+      height: 80%;
       background: #ffffff;
       border-bottom-right-radius: 200px 220px;
       z-index: 1;
-      padding: 70px 28px 20px 30px;
+      padding: 55px 28px 20px 30px;
       display: flex;
       flex-direction: column;
       box-shadow: 10px 10px 30px rgba(0,0,0,0.12);
@@ -183,8 +183,8 @@
       display: flex;
       align-items: center;
       border-bottom: 1.5px solid #d4cfe6;
-      margin-bottom: 24px;
-      padding-bottom: 6px;
+      margin-bottom: 16px;
+      padding-bottom: 5px;
       position: relative;
     }
     .auth-input-line-group span.icon {
@@ -209,11 +209,11 @@
     }
 
     .btn-login-now {
-      margin-top: 25px;
+      margin-top: 14px;
       background: #ffffff;
       border: 2px solid #5b4d96;
       color: #5b4d96;
-      padding: 13px 24px;
+      padding: 12px 24px;
       border-radius: 30px;
       font-weight: 900;
       font-size: 0.95rem;
@@ -232,7 +232,7 @@
       color: #5b4d96;
       font-weight: 800;
       text-align: center;
-      margin-top: 16px;
+      margin-top: 12px;
       cursor: pointer;
       text-decoration: underline;
     }
@@ -706,7 +706,7 @@
   <div id="authOverlay">
     <div class="auth-phone-mockup">
       <div class="auth-curved-white-bg">
-        <h2 id="authHeading" style="color: #4d4285; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px;">Login</h2>
+        <h2 id="authHeading" style="color: #4d4285; font-size: 1.5rem; font-weight: 900; margin-bottom: 18px;">Login</h2>
         
         <div id="nameInputWrap" class="auth-input-line-group" style="display: none;">
           <span class="icon">👤</span>
@@ -722,6 +722,12 @@
           <span class="icon">🔒</span>
           <input type="password" id="userPass" placeholder="Password">
           <span style="cursor:pointer; color:#928aa8; font-size:0.9rem;" onclick="togglePassVisibility('userPass')">👁️</span>
+        </div>
+
+        <!-- REFERRAL CODE INPUT (AUTO OR MANUAL) -->
+        <div id="referInputWrap" class="auth-input-line-group" style="display: none;">
+          <span class="icon">🎁</span>
+          <input type="tel" id="userReferCodeInput" placeholder="Referral Code / Friend Mobile (Optional)">
         </div>
 
         <button class="btn-login-now" id="authSubmitBtn" onclick="handleAuthSubmit()">
@@ -880,7 +886,7 @@
     </div>
   </div>
 
-  <!-- TAB 4: REFER & EARN -->
+  <!-- TAB 4: REFER & EARN (SEPARATE TAB) -->
   <div id="tabRefer" class="tab-view">
     <div class="refer-box-card" style="border: 2px solid #fbbf24;">
       <div style="text-align: center; margin-bottom: 16px;">
@@ -891,7 +897,6 @@
         </p>
       </div>
 
-      <!-- STATS BOX -->
       <div style="display: flex; gap: 10px; margin-bottom: 16px;">
         <div class="refer-stat-badge">
           <span id="txtRefersCountLbl">Total Friends</span>
@@ -903,7 +908,6 @@
         </div>
       </div>
 
-      <!-- REDEEM VIP BUTTON -->
       <div style="background: #fdfaf0; border: 1.5px dashed #f59e0b; padding: 14px; border-radius: 14px; margin-bottom: 18px; text-align: center;">
         <div style="font-size: 0.82rem; color: #92400e; font-weight: 800; margin-bottom: 8px;" id="txtRedeemDesc">
           ⚡ 150 Points = ₹150 Value (1 Day VIP Pass)
@@ -913,10 +917,9 @@
         </button>
       </div>
 
-      <!-- SHARE SECTION -->
       <div style="margin-top: 15px;">
         <label id="txtYourLinkLbl" style="font-size: 0.8rem; color: var(--text-sub); font-weight: bold; display: block; margin-bottom: 6px;">
-          Your Exclusive Referral Link:
+          Your Exclusive Download & Referral Link:
         </label>
         <div style="display: flex; gap: 6px; margin-bottom: 10px;">
           <input type="text" id="userReferralLinkInput" readonly style="font-size: 0.85rem; background: #f8f7fc;" />
@@ -930,11 +933,10 @@
         </button>
       </div>
 
-      <!-- RULES -->
       <div style="background: #f8f7fc; padding: 12px 14px; border-radius: 12px; margin-top: 18px; font-size: 0.78rem; color: #645c85; line-height: 1.5;">
         <b style="color: var(--primary-dark); display: block; margin-bottom: 4px;" id="txtHowItWorks">How it works:</b>
         <p>1. Send your link to friends on WhatsApp.<br>
-        2. When they register using your link, you get <b>+30 Points</b>.<br>
+        2. When they download the app and register using your Referral Code, you get <b>+30 Points</b>.<br>
         3. Once you reach <b>150 Points (5 Friends)</b>, click Redeem to get 1 Day VIP unlocked instantly!</p>
       </div>
     </div>
@@ -1005,60 +1007,54 @@
         <h4 style="color: var(--primary-dark); margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
           <span>🪄</span> Paste Full Copied Game (Auto-Clean & Filter)
         </h4>
-        <p style="font-size: 0.76rem; color: var(--text-sub); margin-bottom: 8px;">
-          ಯಾವುದೇ ಸಿಂಬಲ್, ಸ್ಟಾರ್ (*), ಬ್ರಾಕೆಟ್ ([ ], ( )) ಇದ್ದರೂ ಪರವಾಗಿಲ್ಲ, ನೇರವಾಗಿ ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ:
-        </p>
-        <textarea id="admRawInput" rows="5" placeholder="*MILAN MORNING (OTC)*&#10;(( *2 - 6 - 8 - 9* ))&#10;[[ *21 - 60 - 83 - 91* ]]&#10;[[ *246 - 178 - 350* ]]"></textarea>
+        <textarea id="admRawInput" rows="5" placeholder="Paste copied game text here"></textarea>
         <button class="btn" style="background: var(--purple-gradient); padding: 11px; font-size: 0.88rem;" onclick="magicParseAndFill()">
-          ⚡ Auto-Clean & Fill Game (ಶುದ್ಧವಾಗಿ ಸೆಟ್ ಮಾಡಿ)
+          ⚡ Auto-Clean & Fill Game
         </button>
       </div>
 
       <div class="game-card">
-        <h4 style="margin-bottom: 10px; color:var(--primary-dark);">Post Numbers (Multiple Digits & Pana Supported)</h4>
+        <h4 style="margin-bottom: 10px; color:var(--primary-dark);">Post Numbers</h4>
         <input type="text" id="admMarket" placeholder="Game Name (e.g. MILAN MORNING)">
         <select id="admType">
           <option value="FREE">Free Game (FREE)</option>
           <option value="VIP">Premium Game (VIP)</option>
         </select>
         
-        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana (Space/Comma):</label>
-        <input type="text" id="admOpenPana" placeholder="e.g. 246, 178, 350, 126">
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Open Pana:</label>
+        <input type="text" id="admOpenPana" placeholder="e.g. 246, 178">
 
-        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits / OTC (Space/Comma):</label>
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Open Digits / OTC:</label>
         <input type="text" id="admOpen" placeholder="e.g. 2, 6, 8, 9">
 
-        <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers (Space/Comma):</label>
-        <input type="text" id="admJodi" placeholder="e.g. 21, 60, 83, 91, 26, 65">
+        <label style="font-size:0.75rem; color:var(--primary-dark); font-weight:bold; display:block; margin-top:8px;">Jodi Numbers:</label>
+        <input type="text" id="admJodi" placeholder="e.g. 21, 60">
 
-        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits (Space/Comma):</label>
+        <label style="font-size:0.75rem; color:#7b7597; display:block; margin-top:4px;">Close Digits:</label>
         <input type="text" id="admClose" placeholder="e.g. 1, 0, 3">
 
-        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Close Pana (Space/Comma):</label>
+        <label style="font-size:0.75rem; color:var(--primary); font-weight:bold; display:block; margin-top:8px;">Close Pana:</label>
         <input type="text" id="admClosePana" placeholder="e.g. 570, 367">
 
-        <button class="btn" onclick="saveGame()">Publish & Send Background Push Notification</button>
+        <button class="btn" onclick="saveGame()">Publish Game</button>
       </div>
 
-      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games (Mark Open, Close, Jodi Passes)</h4>
+      <h4 style="margin: 18px 0 10px; color:var(--primary-dark);">Live Games</h4>
       <div id="admGamesList"></div>
     </div>
 
-    <!-- 2. DPBOSS AUTO-RESULT MATCHER SECTION -->
+    <!-- 2. DPBOSS AUTO RESULT SECTION -->
     <div id="admSecDpboss" class="admin-section">
       <div class="game-card" style="border: 2px solid var(--primary); background: #fdfcff;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
             <h3 style="color: var(--primary-dark); font-size:1.15rem; font-weight:900;">🌐 DPBoss Live Auto-Sync</h3>
-            <span style="font-size: 0.75rem; color: #10b981; font-weight:bold;">● Auto-Sync Running Every 60s</span>
+            <span style="font-size: 0.75rem; color: #10b981; font-weight:bold;">● Running Every 60s</span>
           </div>
           <button class="btn" style="width:auto; padding:6px 14px; font-size:0.8rem; margin:0;" onclick="manualSyncDPBoss()">
             ⚡ Sync Now
           </button>
         </div>
-        <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 12px;">
-          DPBoss ನಿಂದ ಇತ್ತೀಚಿನ ರಿಸಲ್ಟ್‌ಗಳು ತಾನಾಗಿಯೇ ಫೆಚ್ ಆಗಿ, ನೀವು ಪೋಸ್ಟ್ ಮಾಡಿರುವ ಗೇಮ್‌ಗೆ ಮ್ಯಾಚ್ ಆಗಿದ್ದರೆ ತಾನೇ ಆಟೋಮೆಟಿಕ್ ಆಗಿ ಪಾಸ್ ಮಾರ್ಕ್ ಆಗುತ್ತದೆ.
-        </p>
         <div id="dpbossLiveFeed" style="max-height: 260px; overflow-y: auto; background:#f7f6fc; padding:10px; border-radius:12px; border:1px solid var(--card-border); font-size:0.82rem;">
           Loading live DPBoss results...
         </div>
@@ -1078,8 +1074,7 @@
     <div id="admSecBroadcast" class="admin-section">
       <div class="game-card">
         <h4 style="color:var(--primary-dark); margin-bottom:8px;">📢 App Top Highlight Notice Banner</h4>
-        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">This text will show permanently at the top of user screens.</p>
-        <input type="text" id="admTopNoticeText" placeholder="Enter breaking notice or update text">
+        <input type="text" id="admTopNoticeText" placeholder="Enter notice text">
         <div style="display:flex; gap:8px;">
           <button class="btn" style="flex:2;" onclick="saveTopNotice()">Show Banner</button>
           <button class="btn-danger" style="flex:1;" onclick="clearTopNotice()">Hide Banner</button>
@@ -1087,16 +1082,15 @@
       </div>
 
       <div class="game-card">
-        <h4 style="color:var(--primary); margin-bottom:8px;">🔔 Send Instant Alert Notification</h4>
-        <p style="font-size:0.75rem; color:#7b7597; margin-bottom:8px;">Sends instant alert popup & OneSignal Mobile Push Notification.</p>
-        <input type="text" id="admAlertMsg" placeholder="Alert message (e.g. Kalyan Result Blast!)">
+        <h4 style="color:var(--primary); margin-bottom:8px;">🔔 Instant Alert Notification</h4>
+        <input type="text" id="admAlertMsg" placeholder="Alert message">
         <button class="btn" style="background:#5b4d96;" onclick="sendInstantBroadcast()">Send Push Alert Now</button>
       </div>
     </div>
 
     <!-- 5. ADMIN APPROVALS SECTION -->
     <div id="admSecApprovals" class="admin-section">
-      <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Payment Requests (Approve / Reject)</h4>
+      <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Payment Requests</h4>
       <div id="adminApprovalsList">Loading...</div>
     </div>
 
@@ -1113,7 +1107,7 @@
     </div>
   </div>
 
-  <!-- CURVED BOTTOM NAVIGATION (WITH REFER TAB) -->
+  <!-- CURVED BOTTOM NAVIGATION (5 TABS) -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
     <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
@@ -1186,7 +1180,7 @@
         pointsCountLbl: "Your Points",
         redeemDesc: "⚡ 150 Points = ₹150 Value (1 Day VIP Pass)",
         btnRedeem: "👑 Redeem 150 Points (Unlock 1 Day VIP)",
-        yourLinkLbl: "Your Exclusive Referral Link:",
+        yourLinkLbl: "Your Exclusive Download & Referral Link:",
         howItWorks: "How it works:"
       },
       kn: {
@@ -1217,7 +1211,7 @@
         pointsCountLbl: "ನಿಮ್ಮ ಪಾಯಿಂಟ್ಸ್",
         redeemDesc: "⚡ 150 Points = ₹150 ಮೌಲ್ಯ (1 ದಿನದ VIP ಪಾಸ್)",
         btnRedeem: "👑 150 Points ರಿಡೀಮ್ ಮಾಡಿ (1 ದಿನ VIP ಅನ್‌ಲಾಕ್)",
-        yourLinkLbl: "ನಿಮ್ಮ ರೆಫರಲ್ ಲಿಂಕ್:",
+        yourLinkLbl: "ನಿಮ್ಮ ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ & ರೆಫರ್ ಲಿಂಕ್:",
         howItWorks: "ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ:"
       }
     };
@@ -1296,7 +1290,7 @@
       document.getElementById("txtHowItWorks").innerText = t.howItWorks;
     }
 
-    // 🎁 FIXED REFERRAL & POINTS LOGIC (DIRECT HTTPS LIVE LINK)
+    // 🎁 REFERRAL & DOWNLOAD LINK LOGIC
     function renderReferralUI() {
       if (!currentUser) return;
 
@@ -1306,10 +1300,8 @@
       document.getElementById("userReferCountDisplay").innerText = refCount;
       document.getElementById("userPointsDisplay").innerText = points;
 
-      // FIXED: Uses full live HTTPS URL so WhatsApp turns it into a clickable blue link
-      const baseAppUrl = "https://sandeeppkdos.github.io/Online-App/";
-      const myRefLink = `${baseAppUrl}?ref=${currentUser.phone}`;
-      
+      // Link pointing to download.html which opens MediaFire download
+      const myRefLink = `https://sandeepddos.github.io/Online-App/download.html?ref=${currentUser.phone}`;
       document.getElementById("userReferralLinkInput").value = myRefLink;
 
       const redeemBtn = document.getElementById("btnRedeemVip");
@@ -1329,10 +1321,12 @@
     }
 
     function shareReferralWhatsApp() {
-      const link = document.getElementById("userReferralLinkInput").value;
+      const myPhone = currentUser ? currentUser.phone : "";
+      const downloadLink = `https://sandeepddos.github.io/Online-App/download.html?ref=${myPhone}`;
+      
       const msg = currentLang === "kn" 
-        ? `🔥 ಮಟ್ಕಾ ಕಿಂಗ್ ಆ್ಯಪ್ 100% ಪಕ್ಕಾ ರಿಸಲ್ಟ್!\n\nಈ ಕೆಳಗಿನ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿ ರಿಜಿಸ್ಟರ್ ಆಗಿ:\n${link}`
-        : `🔥 Join Matka King Pro Official app for fast and accurate guessing results!\n\nClick link to register:\n${link}`;
+        ? `🔥 *ಮಟ್ಕಾ ಕಿಂಗ್ ಪ್ರೋ (Matka King Pro)*\n100% ಪಕ್ಕಾ ರಿಸಲ್ಟ್ ಆಫೀಶಿಯಲ್ ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ!\n\n📥 ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ ಲಿಂಕ್:\n${downloadLink}\n\n🎁 ರೆಫರ್ ಕೋಡ್: *${myPhone}*\n(ಆ್ಯಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ ರಿಜಿಸ್ಟರ್ ಆಗುವಾಗ ಈ ರೆಫರ್ ಕೋಡ್ ಹಾಕಿ ಉಚಿತ VIP ಪಡೆಯಿರಿ!)`
+        : `🔥 *Matka King Pro Official App*\nDownload app for fast & accurate guessing results!\n\n📥 Download Link:\n${downloadLink}\n\n🎁 Referral Code: *${myPhone}*`;
       
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
       window.open(whatsappUrl, '_blank');
@@ -1385,8 +1379,13 @@
       isRegister = !isRegister;
       document.getElementById("authHeading").innerText = isRegister ? "Register" : "Login";
       document.getElementById("nameInputWrap").style.display = isRegister ? "flex" : "none";
+      document.getElementById("referInputWrap").style.display = isRegister ? "flex" : "none";
       document.getElementById("authSubmitText").innerText = isRegister ? "REGISTER NOW" : "LOGIN NOW";
       document.getElementById("authSwitchBtn").innerText = isRegister ? "Already registered? Login" : "Don't have an account? Register";
+
+      if (isRegister && incomingReferrer) {
+        document.getElementById("userReferCodeInput").value = incomingReferrer;
+      }
     }
 
     function handleAuthSubmit() {
@@ -1400,6 +1399,9 @@
 
       if (isRegister) {
         const name = document.getElementById("userName").value.trim();
+        const typedReferrer = document.getElementById("userReferCodeInput").value.trim();
+        const finalReferrer = typedReferrer || incomingReferrer || null;
+
         if (!name) { alert("Please enter your name!"); return; }
 
         db.collection("users").doc(phone).get().then(doc => {
@@ -1417,17 +1419,18 @@
               createdTime: Date.now(),
               points: 0,
               referralCount: 0,
-              referredBy: incomingReferrer || null
+              referredBy: (finalReferrer && finalReferrer !== phone) ? finalReferrer : null
             };
 
             db.collection("users").doc(phone).set(newUser).then(() => {
-              if (incomingReferrer && incomingReferrer !== phone) {
-                db.collection("users").doc(incomingReferrer).get().then(refDoc => {
+              // Reward referrer with +30 Points and +1 Count
+              if (finalReferrer && finalReferrer !== phone) {
+                db.collection("users").doc(finalReferrer).get().then(refDoc => {
                   if (refDoc.exists) {
-                    db.collection("users").doc(incomingReferrer).update({
+                    db.collection("users").doc(finalReferrer).update({
                       referralCount: firebase.firestore.FieldValue.increment(1),
                       points: firebase.firestore.FieldValue.increment(30)
-                    }).catch(e => console.error("Refer reward error:", e));
+                    }).catch(e => console.error("Refer bonus error:", e));
                   }
                 });
               }
@@ -2105,7 +2108,7 @@
               `;
             });
           } else {
-            passTagsHTML = "<span style='font-size:0.75rem; color:#94a3b8;'>No passes yet (Waiting for DPBoss / Manual).</span>";
+            passTagsHTML = "<span style='font-size:0.75rem; color:#94a3b8;'>No passes yet.</span>";
           }
 
           box.innerHTML += `
@@ -2296,7 +2299,7 @@
                 </div>
               </div>
 
-              <!-- REFERRAL & POINTS STATS IN ADMIN -->
+              <!-- REALTIME REFERRAL STATS IN ADMIN -->
               <div style="display:flex; gap:8px; background:#f7f6fc; padding:8px 12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border); font-size:0.8rem;">
                 <div style="flex:1;">👥 Refers: <b style="color:var(--primary); font-size:0.95rem;">${totalRefers}</b></div>
                 <div style="flex:1;">🪙 Points: <b style="color:#d97706; font-size:0.95rem;">${currentPts} pts</b></div>
@@ -2750,7 +2753,7 @@
           included_segments: ["Total Subscriptions", "Subscribed Users"],
           headings: { "en": title },
           contents: { "en": message },
-          url: "https://sandeeppkdos.github.io/Online-App/"
+          url: "https://sandeepddos.github.io/Online-App/"
         })
       })
       .then(res => res.json())
