@@ -2,7 +2,8 @@ const https = require('https');
 
 const FIREBASE_PROJECT_ID = "live--update";
 const ONESIGNAL_APP_ID = "63d76378-c0b7-4950-af4d-25eb0be82845";
-const ONESIGNAL_REST_KEY = process.env.ONESIGNAL_KEY || "";
+// ಹೆಡರ್ ಕ್ಯಾರೆಕ್ಟರ್ ಎರರ್ ಬರದಂತೆ ಸ್ಪೇಸ್ ಮತ್ತು ನ್ಯೂಲೈನ್‌ಗಳನ್ನು ಕ್ಲೀನ್ ಮಾಡುವುದು
+const ONESIGNAL_REST_KEY = (process.env.ONESIGNAL_KEY || "").replace(/[\r\n\t\s]/g, '');
 
 function fetchUrl(url, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
@@ -36,7 +37,6 @@ function stripHtml(html) {
              .replace(/\r/g, '');
 }
 
-// 2 ಸೋರ್ಸ್‌ಗಳಿಂದ ಲೈವ್ ರಿಸಲ್ಟ್‌ಗಳನ್ನು ನಿಖರವಾಗಿ ಪಾರ್ಸ್ ಮಾಡುವ ಸುಧಾರಿತ ಎಂಜಿನ್
 async function fetchAllLiveResults() {
   const results = {};
   const urls = [
@@ -53,7 +53,7 @@ async function fetchAllLiveResults() {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        // 1. ಒಂದೇ ಸಾಲಿನಲ್ಲಿ ಇರುವ ರಿಸಲ್ಟ್: KALYAN 123-45-678 ಅಥವಾ KALYAN : 123-45-678
+        // 1. KALYAN 123-45-678
         const fullMatch = line.match(/^([A-Za-z\s]{3,25}?)\s*[:\-]?\s*(\d{3})\s*-\s*(\d{2})\s*-\s*(\d{3})/i);
         if (fullMatch) {
           const cleanName = cleanMarketName(fullMatch[1]);
@@ -70,7 +70,7 @@ async function fetchAllLiveResults() {
           continue;
         }
 
-        // 2. ಹಾಫ್ ರಿಸಲ್ಟ್ (Open ಮಾತ್ರ): KALYAN 123-4
+        // 2. KALYAN 123-4
         const halfMatch = line.match(/^([A-Za-z\s]{3,25}?)\s*[:\-]?\s*(\d{3})\s*-\s*(\d{1})(?:[*\-]?)/i);
         if (halfMatch) {
           const cleanName = cleanMarketName(halfMatch[1]);
@@ -87,7 +87,7 @@ async function fetchAllLiveResults() {
           continue;
         }
 
-        // 3. ಮಲ್ಟಿ-ಲೈನ್ ರಿಸಲ್ಟ್ (ಹೆಸರು ಮೇಲಿನ ಸಾಲು, ನಂಬರ್ ಕೆಳಗಿನ ಸಾಲು)
+        // 3. ಮಲ್ಟಿ ಲೈನ್ ರಿಸಲ್ಟ್
         const numOnlyFull = line.match(/^(\d{3})\s*-\s*(\d{2})\s*-\s*(\d{3})$/);
         if (numOnlyFull && i > 0) {
           const prevLine = lines[i - 1];
@@ -126,7 +126,7 @@ async function fetchAllLiveResults() {
         }
       }
 
-      if (Object.keys(results).length > 5) break;
+      if (Object.keys(results).length > 20) break;
     } catch (e) {}
   }
   return results;
@@ -180,7 +180,11 @@ async function updateGamePassStatus(docPath, passMessage) {
 }
 
 async function sendNotification(title, message) {
-  if (!ONESIGNAL_REST_KEY) return;
+  if (!ONESIGNAL_REST_KEY || ONESIGNAL_REST_KEY.length < 10) {
+    console.log("OneSignal REST key not provided, skipping notification.");
+    return;
+  }
+
   const payload = JSON.stringify({
     app_id: ONESIGNAL_APP_ID,
     included_segments: ["All"],
@@ -189,20 +193,31 @@ async function sendNotification(title, message) {
   });
 
   return new Promise((resolve) => {
-    const req = https.request('https://onesignal.com/api/v1/notifications', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${ONESIGNAL_REST_KEY}`
-      }
-    }, res => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(data));
-    });
-    req.on('error', () => resolve(null));
-    req.write(payload);
-    req.end();
+    try {
+      const req = https.request('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${ONESIGNAL_REST_KEY}`
+        }
+      }, res => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          console.log("Notification sent response:", data.slice(0, 100));
+          resolve(data);
+        });
+      });
+      req.on('error', (err) => {
+        console.error("Notification error ignored:", err.message);
+        resolve(null);
+      });
+      req.write(payload);
+      req.end();
+    } catch (e) {
+      console.error("Notification exception caught:", e.message);
+      resolve(null);
+    }
   });
 }
 
@@ -215,9 +230,6 @@ async function checkResultsEngine() {
 
   const count = Object.keys(liveResults).length;
   console.log(`Found ${count} live results in markets.`);
-  if (count > 0) {
-    console.log("Sample Markets:", Object.keys(liveResults).slice(0, 5).join(", "));
-  }
 
   for (const game of games) {
     if (game.isPassed) continue;
