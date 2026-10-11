@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Online Matka Guessing & Live Blast</title>
+  <title>MK MATKA VIP & LIVE BLAST</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
@@ -19,240 +19,362 @@
     });
   </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-20 font-sans selection:bg-amber-500 selection:text-black">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans select-none selection:bg-amber-500 selection:text-black">
 
   <!-- TOP HEADER -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-lg">
-    <div class="flex items-center gap-2">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-md shadow-amber-500/20">
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-xl">
+    <div class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
         M
       </div>
       <div>
-        <h1 class="text-base font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">MK MATKA LIVE</h1>
-        <p class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 24/7 AUTO RESULT ACTIVE
+        <h1 class="text-base font-black tracking-wider bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">MK MATKA LIVE</h1>
+        <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 24/7 AUTO RESULT CHECKER
         </p>
       </div>
     </div>
     
-    <div class="flex items-center gap-2">
-      <!-- Admin Button -->
-      <button onclick="openAdminModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 border border-slate-700 transition">
-        <i class="fa-solid fa-lock text-amber-400 mr-1"></i> Admin
-      </button>
+    <!-- User Quick Coin Pill -->
+    <div onclick="switchTab('refer')" class="flex items-center gap-1.5 bg-slate-800/90 hover:bg-slate-800 border border-amber-500/40 px-2.5 py-1 rounded-full cursor-pointer shadow">
+      <span class="text-sm">🪙</span>
+      <span class="text-xs font-black text-amber-300" id="headerCoinCount">0</span>
     </div>
   </header>
 
-  <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-md mx-auto px-4 pt-4">
 
-    <!-- REFERRAL & COIN WALLET CARD -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-600 via-yellow-600 to-amber-700 p-4 text-white shadow-xl border border-yellow-400/40">
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <span class="inline-block text-[10px] font-black uppercase tracking-wider bg-black/40 px-2 py-0.5 rounded-full text-yellow-300">
-            🔥 ಉಚಿತ VIP ಆಫರ್
-          </span>
-          <h2 class="text-base font-black mt-1 flex items-center gap-1">
-            <span>🪙 ರೆಫರ್ ಮಾಡಿ - VIP ಪಡೆಯಿರಿ!</span>
-          </h2>
+    <!-- ==================== 1. HOME TAB (GAMES & BLAST) ==================== -->
+    <div id="tab-home" class="space-y-4">
+      <!-- VIP Active Alert Banner -->
+      <div id="homeVipActiveBanner" class="hidden bg-gradient-to-r from-emerald-950 to-slate-900 border border-emerald-500/50 rounded-2xl p-3 text-emerald-300 flex items-center justify-between text-xs font-bold shadow-lg">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-crown text-amber-400 text-sm"></i>
+          <span>VIP ACCESS UNLOCKED!</span>
         </div>
-        <div class="text-right bg-black/30 px-3 py-1.5 rounded-xl border border-white/10">
-          <div class="text-xs text-yellow-200 font-medium">ನಿಮ್ಮ Coins</div>
-          <div class="text-2xl font-black leading-none text-yellow-300" id="userCoinsDisplay">0</div>
-        </div>
+        <span id="homeVipHours" class="text-[10px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-200 font-mono">ACTIVE</span>
       </div>
 
-      <p class="text-xs text-yellow-100/90 leading-relaxed mb-3">
-        ಕೇವಲ 5 ಜನ ಸ್ನೇಹಿತರಿಗೆ ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ ಶೇರ್ ಮಾಡಿ ₹150 ಮೌಲ್ಯದ <b>1 DAY VIP PASS</b> ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿಕೊಳ್ಳಿ! (1 Refer = 20 Coins)
-      </p>
-
-      <!-- Coins Progress Bar -->
-      <div class="space-y-1 mb-3">
-        <div class="flex justify-between text-[11px] font-bold text-yellow-100">
-          <span>ಪ್ರಗತಿ (100 Coins = VIP)</span>
-          <span id="coinProgressText">0 / 100</span>
+      <!-- Quick Refer Banner on Home -->
+      <div onclick="switchTab('refer')" class="bg-gradient-to-r from-amber-600/30 to-yellow-600/20 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between cursor-pointer hover:border-amber-400 transition">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-base">
+            <i class="fa-solid fa-gift"></i>
+          </div>
+          <div>
+            <div class="text-xs font-black text-amber-300">ಉಚಿತ VIP ಬೇಕೇ?</div>
+            <div class="text-[10px] text-slate-400">5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ 1 Day VIP ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ</div>
+          </div>
         </div>
-        <div class="w-full bg-black/40 rounded-full h-2.5 p-0.5 overflow-hidden">
-          <div id="coinProgressBar" class="bg-gradient-to-r from-yellow-300 to-white h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
+        <i class="fa-solid fa-chevron-right text-xs text-amber-400"></i>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="shareReferralWhatsApp()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs shadow-md flex items-center justify-center gap-1.5 transition">
-          <i class="fa-brands fa-whatsapp text-base"></i> Share (WhatsApp)
-        </button>
-        <button id="redeemVipBtn" onclick="redeemCoinsForVip()" disabled class="w-full py-2.5 px-3 rounded-xl bg-slate-800 text-slate-500 font-extrabold text-xs flex items-center justify-center gap-1.5 transition cursor-not-allowed border border-white/10">
-          <i class="fa-solid fa-gift"></i> Unlock 1 Day VIP
+      <!-- Markets Header -->
+      <div class="flex items-center justify-between pt-1">
+        <h2 class="text-xs font-extrabold text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
+          <i class="fa-solid fa-dice text-amber-400"></i> ಇಂದಿನ ಮಾರುಕಟ್ಟೆಗಳು
+        </h2>
+        <button onclick="loadGamesFromFirestore()" class="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1">
+          <i class="fa-solid fa-rotate-right"></i> ರಿಫ್ರೆಶ್
         </button>
       </div>
-    </div>
 
-    <!-- VIP PLANS CARD (₹150, ₹309, ₹499) -->
-    <div id="vipPricingSection" class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-lg">
-      <div class="text-center mb-3">
-        <h3 class="text-sm font-black text-amber-400 uppercase tracking-wide">Select a plan and pay to unlock VIP games</h3>
-        <p class="text-[11px] text-slate-400">ಖಚಿತವಾದ ಬ್ಲಾಸ್ಟ್ ಗೇಮ್‌ಗಳಿಗಾಗಿ ಪ್ರೀಮಿಯಂ ಪಾಸ್ ಆಯ್ಕೆಮಾಡಿ</p>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2">
-        <!-- Plan 1 -->
-        <div onclick="selectPlan('1 DAY PASS', 150)" class="bg-slate-800/80 hover:border-amber-500 border border-slate-700 rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col justify-between">
-          <div>
-            <span class="text-[9px] bg-slate-700 px-1.5 py-0.5 rounded font-bold text-slate-300">TODAY</span>
-            <div class="text-xs font-black mt-1 text-slate-200">1 DAY PASS</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Today's games unlock</div>
-          </div>
-          <div class="text-base font-black text-amber-400 mt-2">₹150</div>
-        </div>
-
-        <!-- Plan 2 -->
-        <div onclick="selectPlan('7 DAYS VIP', 309)" class="relative bg-gradient-to-b from-amber-950/40 to-slate-800 hover:border-amber-500 border border-amber-500/50 rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col justify-between shadow-md">
-          <div class="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
-            POPULAR
-          </div>
-          <div>
-            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">1 WEEK</span>
-            <div class="text-xs font-black mt-1 text-slate-200">7 DAYS VIP</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Full week access</div>
-          </div>
-          <div class="text-base font-black text-amber-400 mt-2">₹309</div>
-        </div>
-
-        <!-- Plan 3 -->
-        <div onclick="selectPlan('30 DAYS VIP', 499)" class="bg-slate-800/80 hover:border-amber-500 border border-slate-700 rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col justify-between">
-          <div>
-            <span class="text-[9px] bg-slate-700 px-1.5 py-0.5 rounded font-bold text-slate-300">1 MONTH</span>
-            <div class="text-xs font-black mt-1 text-slate-200">30 DAYS VIP</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Full month blast</div>
-          </div>
-          <div class="text-base font-black text-amber-400 mt-2">₹499</div>
+      <!-- Games List -->
+      <div id="gamesListContainer" class="space-y-3.5">
+        <div class="bg-slate-900 rounded-2xl p-6 border border-slate-800 text-center text-slate-500 text-xs animate-pulse">
+          ಗೇಮ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...
         </div>
       </div>
     </div>
 
-    <!-- VIP STATUS BADGE (Shown when unlocked) -->
-    <div id="vipActiveBanner" class="hidden bg-emerald-950/80 border border-emerald-500/50 rounded-xl p-3 text-emerald-300 flex items-center justify-between text-xs font-bold shadow-lg">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span>VIP PASS ACTIVE (ಎಲ್ಲಾ VIP ಗೇಮ್‌ಗಳು ಅನ್‌ಲಾಕ್ ಆಗಿವೆ)</span>
+    <!-- ==================== 2. VIP PLANS TAB ==================== -->
+    <div id="tab-vip" class="space-y-4 hidden">
+      <div class="text-center py-2">
+        <span class="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30">
+          PREMIUM ACCESS
+        </span>
+        <h2 class="text-lg font-black text-white mt-2">VIP ಗೇಮ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ</h2>
+        <p class="text-xs text-slate-400 mt-1">ಖಚಿತವಾದ ಬ್ಲಾಸ್ಟ್ ಜೋಡಿ ಮತ್ತು ಪಾನಾ ಪಡೆಯಲು ಪ್ಲ್ಯಾನ್ ಆಯ್ಕೆಮಾಡಿ</p>
       </div>
-      <span id="vipTimeRemaining" class="text-[10px] bg-emerald-900 px-2 py-1 rounded text-emerald-200 font-mono">ACTIVE</span>
+
+      <!-- Plans Grid -->
+      <div class="space-y-3">
+        <!-- 1 Day Pass -->
+        <div onclick="selectPlan('1 DAY PASS', 150)" class="bg-slate-900 hover:border-amber-500/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400 text-lg font-black">
+              1D
+            </div>
+            <div>
+              <div class="text-sm font-black text-white">1 DAY PASS</div>
+              <div class="text-xs text-slate-400">Today's games unlock</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-black text-amber-400">₹150</div>
+            <span class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-bold">ಇಂದಿಗೆ ಮಾತ್ರ</span>
+          </div>
+        </div>
+
+        <!-- 7 Days VIP (Popular) -->
+        <div onclick="selectPlan('7 DAYS VIP (1 Week)', 309)" class="relative bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-2 border-amber-500/70 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-xl shadow-amber-500/10">
+          <div class="absolute -top-2.5 right-4 bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+            MOST POPULAR
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 text-lg font-black">
+              7D
+            </div>
+            <div>
+              <div class="text-sm font-black text-white">7 DAYS VIP (1 Week)</div>
+              <div class="text-xs text-slate-400">Full week access</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-black text-amber-400">₹309</div>
+            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">1 ವಾರ ಪೂರ್ತಿ</span>
+          </div>
+        </div>
+
+        <!-- 30 Days VIP -->
+        <div onclick="selectPlan('30 DAYS VIP (1 Month)', 499)" class="bg-slate-900 hover:border-amber-500/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400 text-lg font-black">
+              30D
+            </div>
+            <div>
+              <div class="text-sm font-black text-white">30 DAYS VIP (1 Month)</div>
+              <div class="text-xs text-slate-400">Full month blast games</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-black text-amber-400">₹499</div>
+            <span class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-bold">1 ತಿಂಗಳು</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Free Alternative Banner -->
+      <div onclick="switchTab('refer')" class="bg-slate-900/60 border border-dashed border-yellow-500/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-slate-900 transition">
+        <p class="text-xs text-yellow-300 font-bold mb-1">ಹಣ ಪಾವತಿಸಲು ಇಷ್ಟವಿಲ್ಲವೇ?</p>
+        <p class="text-[11px] text-slate-400">ಸ್ನೇಹಿತರಿಗೆ ಶೇರ್ ಮಾಡಿ 100 ಕಾಯಿನ್ ಗಳಿಸಿ ₹150 ಪಾಸ್ ಅನ್ನು ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ!</p>
+      </div>
     </div>
 
-    <!-- SECTION TITLE -->
-    <div class="flex items-center justify-between pt-2">
-      <h2 class="text-sm font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-chart-line text-amber-400"></i> ಇಂದಿನ ಲೈವ್ ಗೇಮ್‌ಗಳು
-      </h2>
-      <button onclick="loadGamesFromFirestore()" class="text-xs text-amber-400 hover:underline flex items-center gap-1">
-        <i class="fa-solid fa-rotate-right"></i> Refresh
-      </button>
+    <!-- ==================== 3. REFER & EARN TAB ==================== -->
+    <div id="tab-refer" class="space-y-4 hidden">
+      <!-- Main Wallet Card -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-yellow-600 to-amber-700 p-5 text-white shadow-2xl border border-yellow-400/50">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <span class="inline-block text-[10px] font-black uppercase tracking-wider bg-black/40 px-2.5 py-1 rounded-full text-yellow-200">
+              🪙 COIN REWARD WALLET
+            </span>
+            <h2 class="text-lg font-black mt-2">ರೆಫರ್ ಮಾಡಿ - ಉಚಿತ VIP ಗೆಲ್ಲಿರಿ!</h2>
+          </div>
+          <div class="text-right bg-black/30 backdrop-blur px-3 py-2 rounded-2xl border border-white/10">
+            <div class="text-[10px] text-yellow-200 uppercase font-bold">ಬ್ಯಾಲೆನ್ಸ್</div>
+            <div class="text-3xl font-black text-yellow-300 leading-none mt-0.5" id="tabCoinBalance">0</div>
+          </div>
+        </div>
+
+        <p class="text-xs text-yellow-100/95 leading-relaxed mb-4">
+          ಪ್ರತಿ ಸ್ನೇಹಿತ ಆ್ಯಪ್ ಓಪನ್ ಮಾಡಿದಾಗ ನಿಮಗೆ <b>20 Coins</b> ಸಿಗುತ್ತದೆ. ಒಟ್ಟು <b>5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ 100 Coins ಗಳಿಸಿ</b> ₹150 ರ 1 Day VIP ಪಾಸ್ ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿಕೊಳ್ಳಿ!
+        </p>
+
+        <!-- Progress -->
+        <div class="space-y-1.5 mb-4">
+          <div class="flex justify-between text-xs font-black text-yellow-100">
+            <span>VIP ಅನ್‌ಲಾಕ್ ಪ್ರಗತಿ</span>
+            <span id="tabCoinProgressText">0 / 100 Coins</span>
+          </div>
+          <div class="w-full bg-black/40 rounded-full h-3 p-0.5 overflow-hidden">
+            <div id="tabCoinProgressBar" class="bg-gradient-to-r from-yellow-300 via-white to-yellow-200 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <button onclick="shareReferralWhatsApp()" class="py-3 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-lg flex items-center justify-center gap-1.5 transition">
+            <i class="fa-brands fa-whatsapp text-lg"></i> ವಾಟ್ಸಾಪ್ ಶೇರ್
+          </button>
+          <button id="tabRedeemBtn" onclick="redeemCoinsForVip()" disabled class="py-3 px-3 rounded-2xl bg-slate-800 text-slate-500 font-black text-xs flex items-center justify-center gap-1.5 transition cursor-not-allowed border border-white/10">
+            <i class="fa-solid fa-gift"></i> Unlock 1D VIP
+          </button>
+        </div>
+      </div>
+
+      <!-- How It Works Instructions -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <h3 class="text-xs font-black text-slate-300 uppercase tracking-wider">ನಿಯಮಗಳು (How it works):</h3>
+        <div class="space-y-2 text-xs text-slate-400">
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
+            <span>ವಾಟ್ಸಾಪ್ ಶೇರ್ ಬಟನ್ ಒತ್ತಿ ನಿಮ್ಮ ಸ್ನೇಹಿತರಿಗೆ ಅಥವಾ ಗ್ರೂಪ್‌ಗಳಿಗೆ ಲಿಂಕ್ ಕಳುಹಿಸಿ.</span>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">2</span>
+            <span>ಅವರು ಆ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ನಿಮ್ಮ ವಾಲೆಟ್‌ಗೆ ತಕ್ಷಣ <b>20 Coins</b> ಜಮೆಯಾಗುತ್ತದೆ.</span>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">3</span>
+            <span>100 Coins ತಲುಪಿದ ತಕ್ಷಣ "Unlock 1D VIP" ಬಟನ್ ಒತ್ತಿ 24 ಗಂಟೆಗಳ ಕಾಲ ಉಚಿತ VIP ನೋಡಿ!</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- GAMES CONTAINER -->
-    <div id="gamesListContainer" class="space-y-3">
-      <!-- Loading Skeleton -->
-      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 animate-pulse text-center text-slate-500 text-xs">
-        ಗೇಮ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...
+    <!-- ==================== 4. ADMIN TAB ==================== -->
+    <div id="tab-admin" class="space-y-4 hidden">
+      <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-xl space-y-4">
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-white">ಅಡ್ಮಿನ್ ಕಂಟ್ರೋಲ್ ಪ್ಯಾನೆಲ್</h3>
+            <p class="text-[10px] text-slate-400">ಹೊಸ ಗೇಮ್‌ಗಳನ್ನು ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ</p>
+          </div>
+        </div>
+
+        <!-- Password Auth Section -->
+        <div id="adminAuthBox" class="space-y-3">
+          <label class="text-xs text-slate-400 font-bold block">ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ:</label>
+          <input type="password" id="adminPinInput" placeholder="Password (Default: 1234)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+          <button onclick="loginAdmin()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition">
+            ಅನ್‌ಲಾಕ್ ಮಾಡಿ
+          </button>
+        </div>
+
+        <!-- Add Game Form -->
+        <form id="adminPostForm" onsubmit="saveGameToFirestore(event)" class="space-y-3 hidden">
+          <div>
+            <label class="text-[11px] text-slate-400 font-bold block mb-1">ಮಾರ್ಕೆಟ್ ಹೆಸರು (ಉದಾ: KALYAN, MAIN BAZAR):</label>
+            <input type="text" id="mName" required placeholder="KALYAN" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase focus:border-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN (4 Digits):</label>
+              <input type="text" id="mOpen" placeholder="1 2 3 4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE (4 Digits):</label>
+              <input type="text" id="mClose" placeholder="5 6 7 8" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 font-bold block mb-1">JODI (Pairs):</label>
+            <input type="text" id="mJodi" placeholder="15 16 27 28 35 48" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN PANA:</label>
+              <input type="text" id="mOpenPana" placeholder="128 137 236" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE PANA:</label>
+              <input type="text" id="mClosePana" placeholder="230 249 357" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 font-bold block mb-1">GAME TYPE:</label>
+            <select id="mType" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
+              <option value="VIP">VIP (ಲಾಕ್ ಆಗಿರುತ್ತದೆ)</option>
+              <option value="FREE">FREE (ಎಲ್ಲರಿಗೂ ಉಚಿತ)</option>
+            </select>
+          </div>
+
+          <button type="submit" id="postGameBtn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-lg transition">
+            ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ (Post Game)
+          </button>
+        </form>
       </div>
     </div>
 
   </main>
 
-  <!-- ADMIN PANEL MODAL -->
-  <div id="adminModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 class="text-sm font-black text-amber-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-shield-halved"></i> ಅಡ್ಮಿನ್ ಪ್ಯಾನೆಲ್ (Add Game)
-        </h3>
-        <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white text-sm">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
+  <!-- ==================== BOTTOM NAVIGATION BAR ==================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-4 py-2">
+    <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
+      
+      <!-- Home Button -->
+      <button onclick="switchTab('home')" id="nav-btn-home" class="nav-item flex flex-col items-center justify-center py-1 text-amber-400 transition">
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="text-[10px] font-black mt-1">Home</span>
+      </button>
 
-      <!-- Admin Pass Key -->
-      <div id="adminAuthSection" class="space-y-2">
-        <label class="text-xs text-slate-400 font-bold">ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಹಾಕಿ:</label>
-        <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-        <button onclick="authenticateAdmin()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs">
-          ಲಾಗಿನ್
-        </button>
-      </div>
+      <!-- VIP Plans Button -->
+      <button onclick="switchTab('vip')" id="nav-btn-vip" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-crown text-lg"></i>
+        <span class="text-[10px] font-black mt-1">VIP Plans</span>
+      </button>
 
-      <!-- Add Game Form (Hidden initially) -->
-      <form id="adminGameForm" onsubmit="handleAdminSubmit(event)" class="space-y-3 hidden">
-        <div>
-          <label class="text-[11px] text-slate-400 font-bold block mb-1">ಮಾರ್ಕೆಟ್ ಹೆಸರು (ಉದಾ: KALYAN, MAIN BAZAR):</label>
-          <input type="text" id="mName" required placeholder="KALYAN" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase focus:border-amber-500">
-        </div>
+      <!-- Refer & Earn Button -->
+      <button onclick="switchTab('refer')" id="nav-btn-refer" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition relative">
+        <span class="absolute -top-1 right-5 flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+        </span>
+        <i class="fa-solid fa-gift text-lg"></i>
+        <span class="text-[10px] font-black mt-1">Refer & 🪙</span>
+      </button>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN (4 Digits):</label>
-            <input type="text" id="mOpen" placeholder="1 2 3 4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE (4 Digits):</label>
-            <input type="text" id="mClose" placeholder="5 6 7 8" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-          </div>
-        </div>
+      <!-- Admin Button -->
+      <button onclick="switchTab('admin')" id="nav-btn-admin" class="nav-item flex flex-col items-center justify-center py-1 text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-lock text-lg"></i>
+        <span class="text-[10px] font-black mt-1">Admin</span>
+      </button>
 
-        <div>
-          <label class="text-[11px] text-slate-400 font-bold block mb-1">JODI (8 Pairs):</label>
-          <input type="text" id="mJodi" placeholder="15 16 27 28" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">OPEN PANA:</label>
-            <input type="text" id="mOpenPana" placeholder="128 137" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 font-bold block mb-1">CLOSE PANA:</label>
-            <input type="text" id="mClosePana" placeholder="230 249" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-[11px] text-slate-400 font-bold block mb-1">GAME TYPE:</label>
-          <select id="mType" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500">
-            <option value="VIP">VIP (ಲಾಕ್ ಆಗಿರುತ್ತದೆ)</option>
-            <option value="FREE">FREE (ಎಲ್ಲರಿಗೂ ಉಚಿತ)</option>
-          </select>
-        </div>
-
-        <button type="submit" id="addGameSubmitBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-lg">
-          ಸೇವ್ ಮಾಡಿ (Post to Live)
-        </button>
-      </form>
     </div>
-  </div>
+  </nav>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
     const FIREBASE_PROJECT_ID = "live--update";
-    const ADMIN_SECRET_PIN = "1234"; // ನಿಮ್ಮ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್
+    const ADMIN_PIN = "1234"; // ನಿಮ್ಮ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್
 
-    // 1. ಬಳಕೆದಾರರ ರೆಫರಲ್ ಐಡಿ ರಚನೆ
-    let currentUserId = localStorage.getItem("app_user_id");
+    let isVipActive = false;
+
+    // 1. ಬಳಕೆದಾರರ ಯೂನಿಕ್ ID ರಚನೆ
+    let currentUserId = localStorage.getItem("mk_user_id");
     if (!currentUserId) {
       currentUserId = "USER_" + Math.random().toString(36).substring(2, 9).toUpperCase();
-      localStorage.setItem("app_user_id", currentUserId);
+      localStorage.setItem("mk_user_id", currentUserId);
     }
 
-    let isVipUnlocked = false;
+    // 2. ಟ್ಯಾಬ್ ಬದಲಾವಣೆ (Tab Switching)
+    function switchTab(tabName) {
+      const tabs = ['home', 'vip', 'refer', 'admin'];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const navBtn = document.getElementById(`nav-btn-${t}`);
+        if (t === tabName) {
+          tabEl.classList.remove('hidden');
+          navBtn.classList.remove('text-slate-400');
+          navBtn.classList.add('text-amber-400');
+        } else {
+          tabEl.classList.add('hidden');
+          navBtn.classList.remove('text-amber-400');
+          navBtn.classList.add('text-slate-400');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    // 2. ರೆಫರಲ್ ಬೋನಸ್ ನಿರ್ವಹಣೆ
+    // 3. ರೆಫರಲ್ ಬೋನಸ್ ನಿರ್ವಹಣೆ
     async function checkReferralReward() {
       const urlParams = new URLSearchParams(window.location.search);
-      const refId = urlParams.get('ref');
-      const alreadyClaimed = localStorage.getItem("ref_claimed_done");
+      const referrerId = urlParams.get('ref');
+      const alreadyClaimed = localStorage.getItem("mk_referral_done");
 
-      if (refId && refId !== currentUserId && !alreadyClaimed) {
+      if (referrerId && referrerId !== currentUserId && !alreadyClaimed) {
         try {
-          const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${refId}`;
+          const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${referrerId}`;
           const res = await fetch(userDocUrl);
           let currentCoins = 0;
           if (res.ok) {
@@ -267,14 +389,14 @@
             body: JSON.stringify({ fields: { coins: { integerValue: newCoins } } })
           });
 
-          localStorage.setItem("ref_claimed_done", "true");
+          localStorage.setItem("mk_referral_done", "true");
         } catch (e) {
           console.error("Referral process error:", e);
         }
       }
     }
 
-    // 3. ಯೂಸರ್ ಕಾಯಿನ್ ಮತ್ತು ವಿಐಪಿ ಸ್ಥಿತಿ ಪರಿಶೀಲನೆ
+    // 4. ಯೂಸರ್ ಕಾಯಿನ್ ಮತ್ತು ವಿಐಪಿ ಸ್ಥಿತಿ ಚೆಕ್
     async function fetchUserStatus() {
       try {
         const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${currentUserId}`;
@@ -288,43 +410,43 @@
           vipExpiry = data.fields && data.fields.vipExpiry ? parseInt(data.fields.vipExpiry.integerValue || 0) : 0;
         }
 
-        // ಕಾಯಿನ್ ಡಿಸ್ಪ್ಲೇ
-        document.getElementById("userCoinsDisplay").innerText = coins;
-        document.getElementById("coinProgressText").innerText = `${coins} / 100`;
+        // ಕಾಯಿನ್ ಅಪ್‌ಡೇಟ್
+        document.getElementById("headerCoinCount").innerText = coins;
+        document.getElementById("tabCoinBalance").innerText = coins;
+        document.getElementById("tabCoinProgressText").innerText = `${coins} / 100 Coins`;
         const percentage = Math.min((coins / 100) * 100, 100);
-        document.getElementById("coinProgressBar").style.width = percentage + "%";
+        document.getElementById("tabCoinProgressBar").style.width = percentage + "%";
 
         // ಅನ್‌ಲಾಕ್ ಬಟನ್
-        const redeemBtn = document.getElementById("redeemVipBtn");
+        const redeemBtn = document.getElementById("tabRedeemBtn");
         if (coins >= 100) {
           redeemBtn.disabled = false;
-          redeemBtn.className = "w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow-md flex items-center justify-center gap-1.5 transition cursor-pointer";
+          redeemBtn.className = "py-3 px-3 rounded-2xl bg-amber-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow-lg flex items-center justify-center gap-1.5 transition cursor-pointer";
         }
 
-        // ವಿಐಪಿ ಚೆಕ್
+        // ವಿಐಪಿ ಪರಿಶೀಲನೆ
         const now = Date.now();
         if (vipExpiry > now) {
-          isVipUnlocked = true;
-          document.getElementById("vipActiveBanner").classList.remove("hidden");
-          document.getElementById("vipPricingSection").classList.add("hidden");
+          isVipActive = true;
+          document.getElementById("homeVipActiveBanner").classList.remove("hidden");
           const hoursLeft = Math.round((vipExpiry - now) / (1000 * 60 * 60));
-          document.getElementById("vipTimeRemaining").innerText = `${hoursLeft}h ಉಳಿದಿದೆ`;
+          document.getElementById("homeVipHours").innerText = `${hoursLeft}h ಉಳಿದಿದೆ`;
         }
       } catch (e) {
         console.error("User status fetch error:", e);
       }
     }
 
-    // 4. WhatsApp ರೆಫರಲ್ ಶೇರ್
+    // 5. WhatsApp ಶೇರ್
     function shareReferralWhatsApp() {
       const shareUrl = window.location.origin + window.location.pathname + `?ref=${currentUserId}`;
-      const msg = `🔥 *MK MATKA VIP GUESSING FREE!* 🔥\n\nಇಂದಿನ ಕಲ್ಯಾಣ್ ಮತ್ತು ಮೇನ್ ಬಜಾರ್ VIP ಗೇಮ್‌ಗಳನ್ನು ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಈ ಕೆಳಗಿನ ಲಿಂಕ್ ಒತ್ತಿ:\n👉 ${shareUrl}\n\n(5 ಜನರಿಗೆ ಶೇರ್ ಮಾಡಿ ₹150 ರ 1 Day VIP ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ!)`;
+      const msg = `🔥 *MK MATKA VIP GUESSING FREE!* 🔥\n\nಇಂದಿನ ಕಲ್ಯಾಣ್ ಮತ್ತು ಮೇನ್ ಬಜಾರ್ VIP ಗೇಮ್‌ಗಳನ್ನು ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಈ ಕೆಳಗಿನ ಲಿಂಕ್ ಒತ್ತಿ ಆ್ಯಪ್ ಓಪನ್ ಮಾಡಿ:\n👉 ${shareUrl}\n\n(ನೀವೂ 5 ಜನರಿಗೆ ಶೇರ್ ಮಾಡಿ ₹150 ಮೌಲ್ಯದ 1 Day VIP ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ!)`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // 5. 100 ಕಾಯಿನ್ ಬಳಸಿ VIP ಅನ್‌ಲಾಕ್ ಮಾಡುವುದು
+    // 6. 100 ಕಾಯಿನ್‌ಗೆ VIP ಅನ್‌ಲಾಕ್
     async function redeemCoinsForVip() {
-      if (!confirm("100 ಕಾಯಿನ್ ಬಳಸಿ 24 ಗಂಟೆಗಳ VIP PASS ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಬಯಸುವಿರಾ?")) return;
+      if (!confirm("100 ಕಾಯಿನ್ ಬಳಸಿ 24 ಗಂಟೆಗಳ ಕಾಲ VIP PASS ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಬಯಸುವಿರಾ?")) return;
 
       try {
         const userDocUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${currentUserId}`;
@@ -336,7 +458,7 @@
 
         if (coins >= 100) {
           const remainingCoins = coins - 100;
-          const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 ಗಂಟೆ
+          const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 ಗಂಟೆಗಳು
 
           await fetch(`${userDocUrl}?updateMask.fieldPaths=coins&updateMask.fieldPaths=vipExpiry`, {
             method: 'PATCH',
@@ -349,7 +471,7 @@
             })
           });
 
-          alert("🎉 1 Day VIP PASS ಯಶಸ್ವಿಯಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗಿದೆ!");
+          alert("🎉 ಅಭಿನಂದನೆಗಳು! 1 Day VIP PASS ಯಶಸ್ವಿಯಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗಿದೆ!");
           window.location.reload();
         }
       } catch (e) {
@@ -357,12 +479,12 @@
       }
     }
 
-    // 6. ಹಣ ಪಾವತಿ ಪ್ಲ್ಯಾನ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ
+    // 7. ಪ್ಲ್ಯಾನ್ ಆಯ್ಕೆಮಾಡುವ ಸಂದೇಶ
     function selectPlan(planName, price) {
       alert(`ನೀವು ${planName} (₹${price}) ಆಯ್ಕೆ ಮಾಡಿದ್ದೀರಿ.\n\nPhonePe/GPay ಮೂಲಕ ಹಣ ಪಾವತಿಸಿ VIP ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಅಡ್ಮಿನ್ ಸಂಪರ್ಕಿಸಿ ಅಥವಾ WhatsApp ಮಾಡಿ.`);
     }
 
-    // 7. ಫೈರ್‌ಬೇಸ್‌ನಿಂದ ಗೇಮ್‌ಗಳನ್ನು ತಂದು ತೋರಿಸುವುದು
+    // 8. ಲೈವ್ ಗೇಮ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡುವುದು
     async function loadGamesFromFirestore() {
       const container = document.getElementById("gamesListContainer");
       try {
@@ -389,7 +511,7 @@
           const isPassed = f.isPassed ? f.isPassed.booleanValue : false;
           const passMessage = f.passMessage ? f.passMessage.stringValue : "";
 
-          const isLocked = (gameType === "VIP" && !isVipUnlocked);
+          const isLocked = (gameType === "VIP" && !isVipActive);
 
           const card = document.createElement("div");
           card.className = `relative overflow-hidden rounded-2xl p-4 transition shadow-lg ${
@@ -420,6 +542,9 @@
                 <i class="fa-solid fa-lock text-amber-400 text-2xl mb-2"></i>
                 <div class="text-xs font-black text-amber-300 uppercase">VIP GAME LOCKED</div>
                 <p class="text-[10px] text-slate-400 mt-1">5 ಜನರಿಗೆ ರೆಫರ್ ಮಾಡಿ ಅಥವಾ VIP ಪಾಸ್ ಖರೀದಿಸಿ</p>
+                <button onclick="switchTab('refer')" class="mt-3 px-4 py-1.5 bg-amber-500 text-slate-950 rounded-lg text-xs font-black">
+                  ಉಚಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿ
+                </button>
               </div>
             ` : `
               <div class="grid grid-cols-2 gap-2 text-xs">
@@ -459,30 +584,20 @@
       }
     }
 
-    // 8. ಅಡ್ಮಿನ್ ಮಾಡಲ್ ಮತ್ತು ಗೇಮ್ ಪೋಸ್ಟ್ ಲಾಜಿಕ್
-    function openAdminModal() {
-      document.getElementById("adminModal").classList.remove("hidden");
-      document.getElementById("adminModal").classList.add("flex");
-    }
-
-    function closeAdminModal() {
-      document.getElementById("adminModal").classList.add("hidden");
-      document.getElementById("adminModal").classList.remove("flex");
-    }
-
-    function authenticateAdmin() {
-      const pin = document.getElementById("adminPasswordInput").value;
-      if (pin === ADMIN_SECRET_PIN) {
-        document.getElementById("adminAuthSection").classList.add("hidden");
-        document.getElementById("adminGameForm").classList.remove("hidden");
+    // 9. ಅಡ್ಮಿನ್ ಲಾಗಿನ್ & ಗೇಮ್ ಸೇವ್
+    function loginAdmin() {
+      const pin = document.getElementById("adminPinInput").value;
+      if (pin === ADMIN_PIN) {
+        document.getElementById("adminAuthBox").classList.add("hidden");
+        document.getElementById("adminPostForm").classList.remove("hidden");
       } else {
         alert("ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್!");
       }
     }
 
-    async function handleAdminSubmit(e) {
+    async function saveGameToFirestore(e) {
       e.preventDefault();
-      const btn = document.getElementById("addGameSubmitBtn");
+      const btn = document.getElementById("postGameBtn");
       btn.disabled = true;
       btn.innerText = "ಸೇವ್ ಮಾಡಲಾಗುತ್ತಿದೆ...";
 
@@ -518,9 +633,9 @@
         });
 
         if (res.ok) {
-          alert(`✅ ${market} ಗೇಮ್ ಯಶಸ್ವಿಯಾಗಿ ಸೇವ್ ಆಗಿದೆ!`);
-          document.getElementById("adminGameForm").reset();
-          closeAdminModal();
+          alert(`✅ ${market} ಗೇಮ್ ಯಶಸ್ವಿಯಾಗಿ ಲೈವ್ ಪೋಸ್ಟ್ ಆಗಿದೆ!`);
+          document.getElementById("adminPostForm").reset();
+          switchTab('home');
           loadGamesFromFirestore();
         } else {
           alert("ಸೇವ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ!");
@@ -529,11 +644,11 @@
         alert("ಎರರ್: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "ಸೇವ್ ಮಾಡಿ (Post to Live)";
+        btn.innerText = "ಲೈವ್ ಪೋಸ್ಟ್ ಮಾಡಿ (Post Game)";
       }
     }
 
-    // ಆ್ಯಪ್ ಆರಂಭ
+    // ಆ್ಯಪ್ ಲೋಡ್ ಆರಂಭ
     window.addEventListener("DOMContentLoaded", async () => {
       await checkReferralReward();
       await fetchUserStatus();
