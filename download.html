@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matka King Pro - Download App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: linear-gradient(145deg, #1e1838 0%, #2e2652 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    .dl-card {
+      background: #ffffff;
+      color: #2d264d;
+      max-width: 420px;
+      width: 100%;
+      border-radius: 24px;
+      padding: 30px 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .app-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #7464b8 0%, #52448f 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 15px;
+      box-shadow: 0 8px 20px rgba(99, 88, 159, 0.4);
+    }
+    h2 { font-size: 1.4rem; color: #4d4285; margin-bottom: 6px; font-weight: 900; }
+    p.sub { font-size: 0.85rem; color: #7b7597; margin-bottom: 20px; }
+    
+    .refer-box {
+      background: #f4f2fb;
+      border: 1.5px dashed #63589f;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+    .refer-lbl { font-size: 0.75rem; color: #7b7597; font-weight: bold; }
+    .refer-code { font-size: 1.5rem; color: #63589f; font-weight: 900; margin: 4px 0; letter-spacing: 1.5px; }
+    .copy-status { font-size: 0.72rem; color: #10b981; font-weight: bold; }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: linear-gradient(135deg, #7464b8 0%, #52448f 100%);
+      color: #fff;
+      text-decoration: none;
+      padding: 15px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 20px rgba(99, 88, 159, 0.35);
+      cursor: pointer;
+      border: none;
+    }
+    .btn-download:active { transform: scale(0.98); }
+    .note { margin-top: 15px; font-size: 0.76rem; color: #948ea8; line-height: 1.4; }
+  </style>
+</head>
+<body>
+
+  <div class="dl-card">
+    <div class="app-icon">👑</div>
+    <h2>MATKA KING PRO</h2>
+    <p class="sub">ಆಫೀಶಿಯಲ್ ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</p>
+
+    <!-- REFERRAL CODE DISPLAY BOX -->
+    <div class="refer-box" id="refCard" style="display:none;">
+      <div class="refer-lbl">ಸ್ನೇಹಿತರ ರೆಫರ್ ಕೋಡ್ (Referral Code):</div>
+      <div class="refer-code" id="showCode">-</div>
+      <div class="copy-status" id="copyMsg">✓ ರೆಫರ್ ಕೋಡ್ ಕಾಪಿ ಆಗಿದೆ!</div>
+    </div>
+
+    <!-- DIRECT MEDIAFIRE DOWNLOAD BUTTON -->
+    <a id="btnMediafire" href="https://www.mediafire.com/file/oex1yhfnbpz5d1x/Matka_King.apk/file" target="_blank" class="btn-download" onclick="startDownload()">
+      <span>📥</span> ಡೌನ್‌ಲೋಡ್ ಆ್ಯಪ್ (DOWNLOAD APK)
+    </a>
+
+    <p class="note">
+      💡 <b>ಸೂಚನೆ:</b> ಆ್ಯಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ. ನಂತರ ಆ್ಯಪ್ ಓಪನ್ ಮಾಡಿ ರಿಜಿಸ್ಟರ್ ಆಗುವಾಗ ಮೇಲೆ ಕಾಣುವ ರೆಫರ್ ಕೋಡ್ ಹಾಕಿದರೆ ಉಚಿತ VIP ಪಾಯಿಂಟ್ಸ್ ಸಿಗುತ್ತದೆ!
+    </p>
+  </div>
+
+  <script>
+    // URL ನಿಂದ ರೆಫರ್ ನಂಬರ್ ಹಿಡಿಯುವುದು (?ref=...)
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+
+    if (ref) {
+      document.getElementById('refCard').style.display = 'block';
+      document.getElementById('showCode').innerText = ref;
+
+      // ಕೋಡ್ ಅನ್ನು ತಾನಾಗಿಯೇ ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ಕಾಪಿ ಮಾಡುವುದು
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(ref).catch(() => {});
+      }
+    }
+
+    function startDownload() {
+      if (ref && navigator.clipboard) {
+        navigator.clipboard.writeText(ref).catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>
