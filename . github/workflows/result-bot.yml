@@ -1,0 +1,31 @@
+name: 24x7 Live Result Checker
+
+on:
+  schedule:
+    # ಪ್ರತಿ 5 ನಿಮಿಷಕ್ಕೆ ಆಟೋಮ್ಯಾಟಿಕ್ ಟ್ರಿಗರ್
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Live Result Loop
+        env:
+          ONESIGNAL_KEY: ${{ secrets.ONESIGNAL_KEY }}
+        run: |
+          for i in {1..5}
+          do
+            echo "--- Checking Results Run #$i ---"
+            node bot.js
+            echo "Waiting 60s..."
+            sleep 60
+          done
