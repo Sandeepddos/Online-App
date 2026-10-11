@@ -1,7 +1,7 @@
 const https = require('https');
 
 const FIREBASE_PROJECT_ID = "live--update";
-const ONESIGNAL_APP_ID = "63d76378-c0b7-4950-af4d-25eb0be82845";
+const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
 // ಹೆಡರ್ ಕ್ಯಾರೆಕ್ಟರ್ ಎರರ್ ಬರದಂತೆ ಸ್ಪೇಸ್ ಮತ್ತು ನ್ಯೂಲೈನ್‌ಗಳನ್ನು ಕ್ಲೀನ್ ಮಾಡುವುದು
 const ONESIGNAL_REST_KEY = (process.env.ONESIGNAL_KEY || "").replace(/[\r\n\t\s]/g, '');
 
