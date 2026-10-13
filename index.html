@@ -31,15 +31,15 @@
   <style>
     /* 🌊 MODERN CYAN, NAVY BLUE & WHITE THEME 🌊 */
     :root {
-      --primary: #00c2cb;            /* ಎಲೆಕ್ಟ್ರಿಕ್ ಸಯಾನ್ / ಆಕ್ವಾ */
-      --primary-dark: #0b1a42;       /* ಡೀಪ್ ನೇವಿ ಬ್ಲೂ */
-      --primary-blue: #1554a8;       /* ರಾಯಲ್ ಕ್ಲಾಸಿಕ್ ಬ್ಲೂ */
-      --primary-light: #38bdf8;      /* ಸ್ಕೈ ಬ್ಲೂ */
+      --primary: #00c2cb;
+      --primary-dark: #0b1a42;
+      --primary-blue: #1554a8;
+      --primary-light: #38bdf8;
       --accent: #00d2de;
-      --bg: #f4f8fb;                 /* ಸಾಫ್ಟ್ ಐಸ್ ಬ್ಲೂ ಹಿನ್ನೆಲೆ */
-      --surface: #ffffff;            /* ಪ್ಯೂರ್ ವೈಟ್ */
+      --bg: #f4f8fb;
+      --surface: #ffffff;
       --card-border: #e1edf6;
-      --text-main: #0b1a42;          /* ಡಾರ್ಕ್ ನೇವಿ ಟೆಕ್ಸ್ಟ್ */
+      --text-main: #0b1a42;
       --text-sub: #627d98;
       --success: #10b981;
       --vip: #f59e0b;
@@ -683,7 +683,7 @@
     .status-approved { background: #10b981; color: #fff; }
     .status-rejected { background: #ef4444; color: #fff; }
 
-    /* CURVED BOTTOM NAVIGATION (MATCHING IMAGE BOTTOM BAR) */
+    /* CURVED BOTTOM NAVIGATION */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -737,7 +737,7 @@
           <span style="cursor:pointer; color:#0284c7; font-size:0.9rem;" onclick="togglePassVisibility('userPass')">👁️</span>
         </div>
 
-        <!-- REFERRAL CODE INPUT (AUTO OR MANUAL) -->
+        <!-- REFERRAL CODE INPUT -->
         <div id="referInputWrap" class="auth-input-line-group" style="display: none;">
           <span class="icon">🎁</span>
           <input type="tel" id="userReferCodeInput" placeholder="Referral Code / Friend Mobile (Optional)">
@@ -858,7 +858,7 @@
     <div class="game-card" style="border-color: #fbbf24; padding: 22px;">
       <h2 id="txtVipHeader" style="color: var(--primary-dark); margin-bottom: 4px; text-align: center; font-weight:900;">🌟 VIP Membership</h2>
       <p id="txtVipSub" style="font-size: 0.82rem; color: #627d98; margin-bottom: 16px; text-align: center;">Select a plan and pay to unlock VIP games</p>
-      
+
       <div class="plan-card selected" id="p1Card" onclick="selectPlan(1)">
         <div>
           <b>1 DAY PASS</b>
@@ -890,16 +890,17 @@
           <button style="background:var(--cyan-gradient); color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:0.75rem; font-weight:900; cursor:pointer;" onclick="copyUpi()">COPY</button>
         </div>
 
+        <!-- ⚡ DUAL INPUT: UTR OR VIP KEY -->
         <div style="margin-top: 15px;">
-          <label id="txtTrxLabel" style="font-size:0.8rem; color:var(--text-main); display:block; margin-bottom:6px;">Enter Transaction ID / UTR:</label>
-          <input type="text" id="userTrxId" placeholder="Enter 12-digit UTR number">
-          <button id="btnSubmitTrx" class="btn" onclick="submitPaymentRequest()">Submit for Approval</button>
+          <label id="txtTrxLabel" style="font-size:0.8rem; color:var(--text-main); font-weight:600; display:block; margin-bottom:6px;">Enter Transaction ID / UTR or VIP Key:</label>
+          <input type="text" id="userTrxId" placeholder="Enter 12-digit UTR or VIP Key">
+          <button id="btnSubmitTrx" class="btn" onclick="submitPaymentOrKey()">Submit</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TAB 4: REFER & EARN (SEPARATE TAB) -->
+  <!-- TAB 4: REFER & EARN -->
   <div id="tabRefer" class="tab-view">
     <div class="refer-box-card" style="border: 2px solid #00c2cb;">
       <div style="text-align: center; margin-bottom: 16px;">
@@ -1007,9 +1008,10 @@
 
     <div class="admin-subnav">
       <button class="admin-subnav-btn active" onclick="switchAdminTab('admSecGames', this)">🎯 Games</button>
-      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecDpboss', this)">⚡ DPBoss Auto Result</button>
-      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users & Referrals</button>
-      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice & Alert</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecDpboss', this)">⚡ DPBoss Auto</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecKeys', this)">🔑 VIP Keys</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users</button>
+      <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecApprovals', this)">🔔 Approvals</button>
       <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
     </div>
@@ -1074,7 +1076,53 @@
       </div>
     </div>
 
-    <!-- 3. ADMIN USERS & REFERRALS SECTION -->
+    <!-- 🔑 3. ADMIN VIP KEYS GENERATOR & MANAGER SECTION -->
+    <div id="admSecKeys" class="admin-section">
+      <div class="game-card" style="border: 2px solid var(--vip); background: #fffcf0;">
+        <h3 style="color: var(--primary-dark); font-size: 1.15rem; font-weight: 900; margin-bottom: 6px;">
+          🔑 Generate Custom VIP Keys
+        </h3>
+        <p style="font-size: 0.8rem; color: #627d98; margin-bottom: 14px;">
+          Set validity in days (e.g. 1, 7, 15, 30, 90 days) and generate instant key to give users.
+        </p>
+
+        <label style="font-size:0.8rem; font-weight:bold; color:var(--primary-dark); display:block; margin-bottom:4px;">
+          Select or Type VIP Days:
+        </label>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <input type="number" id="admKeyDays" placeholder="Enter days (e.g. 7)" value="7" min="1" style="font-weight:bold; font-size:1.05rem;">
+          <select id="admKeyPreset" onchange="applyPresetDays(this.value)" style="width: 140px; font-size:0.85rem; font-weight:bold;">
+            <option value="">Presets</option>
+            <option value="1">1 Day</option>
+            <option value="3">3 Days</option>
+            <option value="7">7 Days</option>
+            <option value="15">15 Days</option>
+            <option value="30">30 Days</option>
+            <option value="90">90 Days</option>
+          </select>
+        </div>
+
+        <button class="btn" style="background: var(--gold-gradient); color: #000; font-weight: 900; margin-top:0;" onclick="generateVipKey()">
+          ⚡ Generate VIP Key
+        </button>
+
+        <div id="admGeneratedKeyBox" style="display:none; background:#ffffff; border:2px dashed #fbbf24; border-radius:14px; padding:14px; margin-top:14px; text-align:center;">
+          <span style="font-size:0.75rem; color:#627d98; font-weight:bold; display:block;">NEWLY GENERATED KEY:</span>
+          <b id="admKeyResultText" style="font-size:1.25rem; font-family:monospace; color:#0b1a42; letter-spacing:1.5px; display:block; margin:6px 0;">-</b>
+          <button class="btn" style="width:auto; padding:6px 20px; font-size:0.8rem; margin:0;" onclick="copyGeneratedKey()">
+            📋 Copy Key
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin: 16px 0 10px;">
+        <h4 style="color: var(--primary-dark);">Generated VIP Keys List</h4>
+        <button onclick="renderAdminVipKeys()" style="background:none; border:none; color:var(--primary-blue); font-size:0.8rem; font-weight:bold; cursor:pointer;">🔄 Refresh</button>
+      </div>
+      <div id="admVipKeysList"><p style="color:#627d98;">Loading keys...</p></div>
+    </div>
+
+    <!-- 4. ADMIN USERS & REFERRALS SECTION (WITH TIME-LEFT & DEDUCT BUTTONS) -->
     <div id="admSecUsers" class="admin-section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
         <h4 style="color: var(--primary-dark);">Registered Users & Referrals</h4>
@@ -1083,7 +1131,7 @@
       <div id="admUsersList"><p style="color:#627d98;">Loading users...</p></div>
     </div>
 
-    <!-- 4. ADMIN NOTICE & BROADCAST -->
+    <!-- 5. ADMIN NOTICE & BROADCAST -->
     <div id="admSecBroadcast" class="admin-section">
       <div class="game-card">
         <h4 style="color:var(--primary-dark); margin-bottom:8px;">📢 App Top Highlight Notice Banner</h4>
@@ -1101,13 +1149,13 @@
       </div>
     </div>
 
-    <!-- 5. ADMIN APPROVALS SECTION -->
+    <!-- 6. ADMIN APPROVALS SECTION -->
     <div id="admSecApprovals" class="admin-section">
       <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Payment Requests</h4>
       <div id="adminApprovalsList">Loading...</div>
     </div>
 
-    <!-- 6. ADMIN SETTINGS SECTION -->
+    <!-- 7. ADMIN SETTINGS SECTION -->
     <div id="admSecSettings" class="admin-section">
       <div class="game-card">
         <h4 style="color: var(--primary-dark); margin-bottom: 10px;">VIP Prices & UPI Setup</h4>
@@ -1160,7 +1208,6 @@
     let usersCache = [];
     let dpbossCache = {};
 
-    // Get referral code from URL parameter (?ref=...)
     const urlParams = new URLSearchParams(window.location.search);
     const incomingReferrer = urlParams.get('ref');
 
@@ -1179,8 +1226,8 @@
         p7Sub: "Full week access",
         p30Sub: "Full month blast games",
         upiNotice: "Pay to Official UPI ID:",
-        trxLabel: "Enter Transaction ID / UTR:",
-        submitTrxBtn: "Submit for Approval",
+        trxLabel: "Enter Transaction ID / UTR or VIP Key:",
+        submitTrxBtn: "Submit",
         memStatusLbl: "MEMBERSHIP STATUS",
         expLbl: "VIP EXPIRY DATE",
         editProfTitle: "Edit Profile",
@@ -1210,8 +1257,8 @@
         p7Sub: "ವಾರ ಪೂರ್ತಿ ಕಂಟಿನ್ಯೂ ಗೇಮ್ಸ್",
         p30Sub: "ತಿಂಗಳು ಪೂರ್ತಿ ಧಮಾಕ ಆಟಗಳು",
         upiNotice: "ಅಧಿಕೃತ UPI ID ಗೆ ಹಣ ಪಾವತಿಸಿ:",
-        trxLabel: "ಪಾವತಿಸಿದ Transaction ID / UTR ನಂಬರ್ ಹಾಕಿ:",
-        submitTrxBtn: "ಅಪ್ರೂವಲ್‌ಗಾಗಿ ಸಬ್ಮಿಟ್ ಮಾಡಿ",
+        trxLabel: "Transaction ID / UTR ಅಥವಾ VIP Key ಹಾಕಿ:",
+        submitTrxBtn: "ಸಬ್ಮಿಟ್ ಮಾಡಿ",
         memStatusLbl: "ಸದಸ್ಯತ್ವ ಸ್ಟೇಟಸ್",
         expLbl: "VIP ಮುಕ್ತಾಯ ದಿನಾಂಕ",
         editProfTitle: "ಪ್ರೊಫೈಲ್ ಎಡಿಟ್ ಮಾಡಿ",
@@ -1313,7 +1360,6 @@
       document.getElementById("userReferCountDisplay").innerText = refCount;
       document.getElementById("userPointsDisplay").innerText = points;
 
-      // Link pointing to download.html which opens MediaFire download
       const myRefLink = `https://sandeepddos.github.io/Online-App/download.html?ref=${currentUser.phone}`;
       document.getElementById("userReferralLinkInput").value = myRefLink;
 
@@ -1388,6 +1434,194 @@
       });
     }
 
+    // ==========================================
+    // ⚡ SMART INPUT: HANDLES BOTH UTR & VIP KEYS
+    // ==========================================
+    function submitPaymentOrKey() {
+      const inputVal = document.getElementById("userTrxId").value.trim();
+      if (!inputVal) {
+        alert(currentLang === "kn" ? "ದಯವಿಟ್ಟು Transaction ID ಅಥವಾ VIP Key ನಮೂದಿಸಿ!" : "Please enter Transaction ID / UTR or VIP Key!");
+        return;
+      }
+
+      const keyVal = inputVal.toUpperCase();
+
+      if (keyVal.startsWith("VIP-") || keyVal.length >= 8) {
+        db.collection("vip_keys").doc(keyVal).get().then(doc => {
+          if (doc.exists) {
+            const keyData = doc.data();
+            if (keyData.isUsed === true) {
+              alert(currentLang === "kn" ? "⚠️ ಈ VIP Key ಈಗಾಗಲೇ ಬಳಕೆಯಾಗಿದೆ (Already Used)!" : "⚠️ This VIP Key has already been used!");
+              return;
+            }
+
+            const days = parseInt(keyData.days || 1);
+            const now = new Date();
+            let baseTime = now.getTime();
+
+            if (currentUser.isVip && currentUser.vipExpiry && new Date(currentUser.vipExpiry) > now) {
+              baseTime = new Date(currentUser.vipExpiry).getTime();
+            }
+
+            const newExpiry = new Date(baseTime + (days * 24 * 60 * 60 * 1000));
+
+            const batch = db.batch();
+            const keyRef = db.collection("vip_keys").doc(keyVal);
+            const userRef = db.collection("users").doc(currentUser.phone);
+
+            batch.update(keyRef, {
+              isUsed: true,
+              usedByPhone: currentUser.phone,
+              usedByName: currentUser.name || "User",
+              usedAt: Date.now()
+            });
+
+            batch.update(userRef, {
+              isVip: true,
+              vipExpiry: newExpiry.toISOString()
+            });
+
+            batch.commit().then(() => {
+              currentUser.isVip = true;
+              currentUser.vipExpiry = newExpiry.toISOString();
+              localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+
+              document.getElementById("userTrxId").value = "";
+              renderProfile();
+              listenRealtimeGames();
+
+              alert(currentLang === "kn" 
+                ? `🎉 ಅಭಿನಂದನೆಗಳು! VIP Key ಮೂಲಕ ${days} ದಿನಗಳ VIP ತಕ್ಷಣವೇ ಆಕ್ಟಿವೇಟ್ ಆಗಿದೆ!` 
+                : `🎉 Congratulations! VIP membership activated for ${days} days via VIP Key!`);
+            }).catch(err => {
+              alert("Error activating key: " + err.message);
+            });
+            return;
+          } else {
+            processAsNormalUtr(inputVal);
+          }
+        }).catch(() => {
+          processAsNormalUtr(inputVal);
+        });
+      } else {
+        processAsNormalUtr(inputVal);
+      }
+    }
+
+    function processAsNormalUtr(trxId) {
+      db.collection("vip_requests").add({
+        userName: currentUser.name,
+        userPhone: currentUser.phone,
+        trxId: trxId,
+        days: selectedPlanDays,
+        status: "PENDING",
+        createdTime: Date.now()
+      }).then(() => {
+        alert(currentLang === "kn" ? "ಟ್ರಾನ್ಸಾಕ್ಷನ್ ಐಡಿ ಸಬ್ಮಿಟ್ ಆಗಿದೆ! ಅಡ್ಮಿನ್ ಅಪ್ರೂವ್ ಮಾಡಿದ ತಕ್ಷಣ VIP ಆನ್ ಆಗುತ್ತದೆ." : "Payment ID submitted! VIP will unlock as soon as Admin approves.");
+        document.getElementById("userTrxId").value = "";
+      }).catch(err => alert("Error: " + err.message));
+    }
+
+    // ==========================================
+    // 🔑 ADMIN VIP KEY GENERATOR
+    // ==========================================
+    function applyPresetDays(val) {
+      if (val) {
+        document.getElementById("admKeyDays").value = val;
+      }
+    }
+
+    function generateVipKey() {
+      const daysInput = document.getElementById("admKeyDays").value.trim();
+      const days = parseInt(daysInput);
+
+      if (!days || days <= 0) {
+        alert("Please enter a valid number of days (e.g. 1, 7, 15, 30)!");
+        return;
+      }
+
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let p1 = "", p2 = "";
+      for (let i = 0; i < 4; i++) p1 += chars.charAt(Math.floor(Math.random() * chars.length));
+      for (let i = 0; i < 4; i++) p2 += chars.charAt(Math.floor(Math.random() * chars.length));
+
+      const newKey = `VIP-${p1}-${p2}`;
+
+      db.collection("vip_keys").doc(newKey).set({
+        key: newKey,
+        days: days,
+        isUsed: false,
+        usedByPhone: null,
+        usedByName: null,
+        usedAt: null,
+        createdTime: Date.now()
+      }).then(() => {
+        document.getElementById("admGeneratedKeyBox").style.display = "block";
+        document.getElementById("admKeyResultText").innerText = newKey;
+        renderAdminVipKeys();
+        alert(`VIP Key generated successfully for ${days} days!`);
+      }).catch(err => alert("Error generating key: " + err.message));
+    }
+
+    function copyGeneratedKey() {
+      const key = document.getElementById("admKeyResultText").innerText;
+      if (key && key !== "-") {
+        navigator.clipboard.writeText(key);
+        alert("Key copied to clipboard: " + key);
+      }
+    }
+
+    function copyCustomKey(key) {
+      navigator.clipboard.writeText(key);
+      alert("Key copied: " + key);
+    }
+
+    function renderAdminVipKeys() {
+      const box = document.getElementById("admVipKeysList");
+      box.innerHTML = "<p style='color:#627d98;'>Loading VIP keys...</p>";
+
+      db.collection("vip_keys").orderBy("createdTime", "desc").limit(30).get().then(snapshot => {
+        box.innerHTML = "";
+        if (snapshot.empty) {
+          box.innerHTML = "<p style='color:#627d98;'>No VIP keys generated yet.</p>";
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const k = docSnap.data();
+          const isUsed = k.isUsed === true;
+
+          box.innerHTML += `
+            <div style="background:#ffffff; border:1.5px solid var(--card-border); padding:12px 14px; border-radius:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div>
+                <b style="font-family:monospace; font-size:1.05rem; color:var(--primary-dark);">${k.key}</b>
+                <span class="badge" style="background:${isUsed ? '#ef4444' : '#10b981'}; color:#fff; margin-left:6px;">
+                  ${isUsed ? 'USED' : 'ACTIVE'}
+                </span>
+                <div style="font-size:0.75rem; color:#0284c7; margin-top:2px; font-weight:700;">
+                  ⏳ Validity: ${k.days} Days ${isUsed ? `• Used by: ${k.usedByName || ''} (${k.usedByPhone || ''})` : ''}
+                </div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                ${!isUsed ? `<button class="btn" style="width:auto; padding:5px 12px; font-size:0.75rem; margin:0;" onclick="copyCustomKey('${k.key}')">📋 Copy</button>` : ''}
+                <button class="btn-danger" style="padding:5px 10px; font-size:0.75rem;" onclick="deleteVipKey('${k.key}')">🗑</button>
+              </div>
+            </div>
+          `;
+        });
+      }).catch(err => {
+        box.innerHTML = "<p style='color:#ef4444;'>Error loading keys: " + err.message + "</p>";
+      });
+    }
+
+    function deleteVipKey(key) {
+      if (confirm("Delete VIP Key: " + key + "?")) {
+        db.collection("vip_keys").doc(key).delete().then(() => {
+          renderAdminVipKeys();
+        });
+      }
+    }
+
     function toggleAuth() {
       isRegister = !isRegister;
       document.getElementById("authHeading").innerText = isRegister ? "Register" : "Login";
@@ -1436,7 +1670,6 @@
             };
 
             db.collection("users").doc(phone).set(newUser).then(() => {
-              // Reward referrer with +30 Points and +1 Count
               if (finalReferrer && finalReferrer !== phone) {
                 db.collection("users").doc(finalReferrer).get().then(refDoc => {
                   if (refDoc.exists) {
@@ -1692,26 +1925,6 @@
       const upi = document.getElementById("vipUpiText").innerText;
       navigator.clipboard.writeText(upi);
       alert("UPI ID Copied: " + upi);
-    }
-
-    function submitPaymentRequest() {
-      const trxId = document.getElementById("userTrxId").value.trim();
-      if (!trxId) {
-        alert(currentLang === "kn" ? "ದಯವಿಟ್ಟು Transaction ID ನಮೂದಿಸಿ!" : "Please enter the Transaction ID / UTR!");
-        return;
-      }
-
-      db.collection("vip_requests").add({
-        userName: currentUser.name,
-        userPhone: currentUser.phone,
-        trxId: trxId,
-        days: selectedPlanDays,
-        status: "PENDING",
-        createdTime: Date.now()
-      }).then(() => {
-        alert(currentLang === "kn" ? "ಟ್ರಾನ್ಸಾಕ್ಷನ್ ಐಡಿ ಸಬ್ಮಿಟ್ ಆಗಿದೆ! ಅಡ್ಮಿನ್ ಅಪ್ರೂವ್ ಮಾಡಿದ ತಕ್ಷಣ VIP ಆನ್ ಆಗುತ್ತದೆ." : "Payment ID submitted! VIP will unlock as soon as Admin approves.");
-        document.getElementById("userTrxId").value = "";
-      }).catch(err => alert("Error: " + err.message));
     }
 
     function splitNumbers(rawInput) {
@@ -2008,6 +2221,7 @@
         if (pass === "admin123") {
           navigate('tabAdmin');
           renderAdminGames();
+          renderAdminVipKeys();
           renderAdminUsers();
           renderVipApprovals();
         } else if (pass !== null) {
@@ -2026,6 +2240,8 @@
 
       document.querySelectorAll('.admin-subnav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+
+      if (secId === 'admSecKeys') renderAdminVipKeys();
     }
 
     function saveGame() {
@@ -2257,6 +2473,7 @@
       }
     }
 
+    // 👥 RENDER ADMIN USERS (DISPLAYS TIME LEFT & DEDUCT BUTTONS)
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
@@ -2292,6 +2509,15 @@
           const totalRefers = u.referralCount || 0;
           const currentPts = u.points || 0;
 
+          // Format remaining time for Admin visibility
+          let remainingVipStr = "ಉಚಿತ ಖಾತೆ (No VIP)";
+          if (isVip) {
+            const diffMs = new Date(u.vipExpiry).getTime() - now;
+            const remDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const remHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            remainingVipStr = `⏳ <b>${remDays} ದಿನ ${remHours} ಗಂಟೆ ಬಾಕಿ</b>`;
+          }
+
           box.innerHTML += `
             <div class="admin-user-card">
               <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -2312,30 +2538,82 @@
                 </div>
               </div>
 
+              <!-- REALTIME VIP REMAINING TIME -->
+              <div style="background:#eef7fb; border:1px solid #d0e4f2; padding:8px 12px; border-radius:10px; margin-bottom:10px; font-size:0.82rem;">
+                <div style="color:var(--primary-dark);">VIP ಬಾಕಿ ಅವಧಿ: <span style="color:#0284c7;">${remainingVipStr}</span></div>
+                <div style="color:#627d98; font-size:0.75rem; margin-top:2px;">Expiry: ${expText}</div>
+              </div>
+
               <!-- REALTIME REFERRAL STATS IN ADMIN -->
               <div style="display:flex; gap:8px; background:#f0f7fb; padding:8px 12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border); font-size:0.8rem;">
                 <div style="flex:1;">👥 Refers: <b style="color:var(--primary-dark); font-size:0.95rem;">${totalRefers}</b></div>
                 <div style="flex:1;">🪙 Points: <b style="color:#0284c7; font-size:0.95rem;">${currentPts} pts</b></div>
               </div>
 
-              <div style="font-size:0.75rem; color:#627d98; margin-bottom:10px;">
-                Expiry: <b style="color:${isVip ? 'var(--vip)' : 'var(--text-main)'};">${expText}</b>
-              </div>
-
               <div style="margin-bottom:8px;">
                 <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Referral Stats</button>
               </div>
 
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
-                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
-                <button class="btn" style="padding:6px 8px; font-size:0.75rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
-                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem;" onclick="removeVip('${u.phone}')">Cancel VIP</button>
-                <button class="btn-danger" style="padding:6px 8px; font-size:0.75rem; background:#b91c1c;" onclick="deleteUserAccount('${u.phone}')">🗑 Delete</button>
+              <!-- VIP ADD BUTTONS -->
+              <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:6px;">
+                <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
+                <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
+                <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
+              </div>
+
+              <!-- 🤫 SILENT DEDUCT & CANCEL BUTTONS -->
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                ${isVip ? `
+                  <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:#f59e0b; color:#fff; flex:1;" title="Deduct half day silently" onclick="deductVipTime('${u.phone}', 0.5)">-½ Day</button>
+                  <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:#ea580c; color:#fff; flex:1;" title="Deduct 1 day silently" onclick="deductVipTime('${u.phone}', 1)">-1 Day</button>
+                ` : ''}
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.72rem; flex:1;" onclick="removeVip('${u.phone}')">Cancel VIP</button>
+                <button class="btn-danger" style="padding:6px 8px; font-size:0.72rem; background:#b91c1c;" onclick="deleteUserAccount('${u.phone}')">🗑</button>
               </div>
             </div>
           `;
         });
+      });
+    }
+
+    // 🤫 SILENT DEDUCT VIP FUNCTION (USER WILL NEVER KNOW)
+    function deductVipTime(phone, daysToDeduct) {
+      db.collection("users").doc(phone).get().then(doc => {
+        if (!doc.exists) return;
+        const u = doc.data();
+
+        if (!u.isVip || !u.vipExpiry) {
+          alert("ಈ ಯೂಸರ್‌ಗೆ VIP ಆಕ್ಟಿವ್ ಇಲ್ಲ!");
+          return;
+        }
+
+        const now = Date.now();
+        const currentExpiryMs = new Date(u.vipExpiry).getTime();
+
+        if (currentExpiryMs <= now) {
+          alert("ಈ ಯೂಸರ್‌ನ VIP ಈಗಾಗಲೇ ಮುಕ್ತಾಯವಾಗಿದೆ!");
+          return;
+        }
+
+        const deductMs = daysToDeduct * 24 * 60 * 60 * 1000;
+        const newExpiryMs = currentExpiryMs - deductMs;
+
+        if (newExpiryMs <= now) {
+          // If reduced time is below now, expire user completely
+          db.collection("users").doc(phone).update({
+            isVip: false,
+            vipExpiry: null
+          }).then(() => {
+            alert(`ಯೂಸರ್ VIP ಮುಕ್ತಾಯಗೊಂಡಿದೆ (${daysToDeduct} ದಿನ ಕಡಿತಗೊಳಿಸಲಾಗಿದೆ).`);
+          });
+        } else {
+          const newExpDate = new Date(newExpiryMs);
+          db.collection("users").doc(phone).update({
+            vipExpiry: newExpDate.toISOString()
+          }).then(() => {
+            alert(`ಸೈಲೆಂಟ್ ಆಗಿ ${daysToDeduct} ದಿನ VIP ಕಡಿಮೆ ಮಾಡಲಾಗಿದೆ! ಹೊಸ ಮುಕ್ತಾಯ: ${newExpDate.toLocaleString()}`);
+          });
+        }
       });
     }
 
@@ -2463,7 +2741,7 @@
                 <b style="color:var(--primary-blue); font-size:0.95rem;">${req.days} Days Pass</b>
               </div>
               <div style="font-size:0.8rem; color:#627d98; margin-bottom:8px;">
-                Trx ID: <b style="color:var(--primary-dark);">${req.trxId}</b>
+                Trx ID / Key: <b style="color:var(--primary-dark);">${req.trxId}</b>
               </div>
               <div style="display:flex; gap:6px;">
                 <button class="btn" style="background:var(--success); color:#fff; flex:1; padding:8px; font-size:0.82rem; margin-top:0;" onclick="approveVipRequest('${req.id}', '${req.userPhone}', ${req.days})">✓ Approve (Success)</button>
