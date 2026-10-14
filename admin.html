@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - Matka King Pro</title>
   
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -28,6 +29,17 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text-main); padding: 16px; min-height: 100vh; }
+
+    /* ADMIN AUTH LOCK SCREEN */
+    #adminAuthGate {
+      position: fixed; inset: 0; background: #0b1a42; z-index: 9999;
+      display: flex; justify-content: center; align-items: center; padding: 20px;
+    }
+    .admin-login-box {
+      background: #ffffff; border-radius: 24px; padding: 30px; width: 100%;
+      max-width: 380px; text-align: center; border: 2px solid var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 194, 203, 0.3);
+    }
 
     header {
       background: #ffffff; padding: 14px 18px; border-radius: 16px;
@@ -99,9 +111,22 @@
 </head>
 <body>
 
+  <!-- ADMIN PASS GATE -->
+  <div id="adminAuthGate">
+    <div class="admin-login-box">
+      <h2 style="color:var(--primary-dark); font-weight:900; margin-bottom:10px;">👑 Admin Login</h2>
+      <p style="color:var(--text-sub); font-size:0.85rem; margin-bottom:15px;">Enter Master Security Password</p>
+      <input type="password" id="admMasterPass" placeholder="Admin Password" style="text-align:center; font-size:1.1rem; font-weight:bold;">
+      <button class="btn" onclick="checkAdminPassword()">Unlock Admin Panel</button>
+    </div>
+  </div>
+
   <header>
-    <h2 style="font-size: 1.25rem; font-weight: 900; color: var(--primary-dark);">⚙️ Matka King - Admin Panel</h2>
-    <span style="font-size: 0.8rem; font-weight: bold; color: var(--success);">● Active Session</span>
+    <div>
+      <h2 style="font-size: 1.25rem; font-weight: 900; color: var(--primary-dark);">⚙️ Matka King - Admin Panel</h2>
+      <span style="font-size: 0.75rem; color: var(--primary-blue); font-weight:bold;">Project: live--update</span>
+    </div>
+    <button onclick="lockAdmin()" class="btn-danger" style="padding:6px 12px;">Lock Panel</button>
   </header>
 
   <div class="admin-subnav">
@@ -166,6 +191,7 @@
         <select id="admKeyPreset" onchange="applyPresetDays(this.value)" style="width: 140px;">
           <option value="">Presets</option>
           <option value="1">1 Day</option>
+          <option value="3">3 Days</option>
           <option value="7">7 Days</option>
           <option value="15">15 Days</option>
           <option value="30">30 Days</option>
@@ -187,7 +213,7 @@
   <!-- 4. USERS SECTION -->
   <div id="admSecUsers" class="admin-section">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-      <h4>Registered Users</h4>
+      <h4>Registered Users & Controls</h4>
       <span id="onlineCountBadge" style="font-size:0.8rem; color:#10b981; font-weight:bold;">Online: 0</span>
     </div>
     <div id="admUsersList"></div>
@@ -246,6 +272,7 @@
   </div>
 
   <script>
+    // ನಿಮ್ಮ ನಿಖರವಾದ Firebase ಕಾನ್ಫಿಗರೇಶನ್
     const firebaseConfig = {
       apiKey: "AIzaSyBr47Pc-j_IWkDBn7LIruxGsPTTgrV1LR4",
       authDomain: "live--update.firebaseapp.com",
@@ -267,14 +294,38 @@
     let dpbossCache = {};
     let autoSyncInterval = null;
 
+    // PASSWORD PROTECTION LOGIC
+    function checkAdminPassword() {
+      const pass = document.getElementById("admMasterPass").value.trim();
+      if (pass === "admin123") {
+        sessionStorage.setItem("adm_authed", "true");
+        document.getElementById("adminAuthGate").style.display = "none";
+        initAdminDashboard();
+      } else {
+        alert("ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್! ಸರಿಯಾದ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಹಾಕಿ.");
+      }
+    }
+
+    function lockAdmin() {
+      sessionStorage.removeItem("adm_authed");
+      window.location.reload();
+    }
+
     window.onload = function() {
+      if (sessionStorage.getItem("adm_authed") === "true") {
+        document.getElementById("adminAuthGate").style.display = "none";
+        initAdminDashboard();
+      }
+    };
+
+    function initAdminDashboard() {
       renderAdminGames();
       renderAdminVipKeys();
       renderAdminUsers();
       renderVipApprovals();
       fetchVipConfig();
       startDPBossAutoEngine();
-    };
+    }
 
     function switchAdminTab(secId, btn) {
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
@@ -421,7 +472,7 @@
       if (confirm("Delete this game?")) db.collection("games").doc(id).delete().then(() => renderAdminGames());
     }
 
-    // USERS RENDERING
+    // USERS RENDERING WITH SILENT DEDUCT CONTROLS
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
@@ -445,7 +496,13 @@
 
         usersCache.forEach(u => {
           const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
-          let remStr = isVip ? `⏳ ${Math.floor((new Date(u.vipExpiry).getTime() - now)/(1000*60*60*24))}d left` : "Free User";
+          let remStr = "Free User";
+          if (isVip) {
+            const diffMs = new Date(u.vipExpiry).getTime() - now;
+            const remDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const remHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            remStr = `⏳ ${remDays}d ${remHours}h left`;
+          }
 
           box.innerHTML += `
             <div class="game-card">
@@ -460,15 +517,46 @@
                 Status: <b>${remStr}</b> | Refers: <b>${u.referralCount || 0}</b> | Points: <b>${u.points || 0}</b>
               </div>
               <button class="btn-info" style="width:100%; margin-bottom:6px;" onclick="openUserDetail('${u.phone}')">👁️ View Details</button>
-              <div style="display:flex; gap:4px;">
+              
+              <div style="display:flex; gap:4px; margin-bottom:5px;">
                 <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gold-gradient); color:#000;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
                 <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gold-gradient); color:#000;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
+                <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gold-gradient); color:#000;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
+              </div>
+
+              <!-- SILENT DEDUCT & CANCEL CONTROLS -->
+              <div style="display:flex; gap:4px;">
+                ${isVip ? `
+                  <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:#f59e0b; color:#fff;" onclick="deductVipTime('${u.phone}', 0.5)">-½ Day</button>
+                  <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:#ea580c; color:#fff;" onclick="deductVipTime('${u.phone}', 1)">-1 Day</button>
+                ` : ''}
                 <button class="btn-danger" style="flex:1; padding:6px;" onclick="removeVip('${u.phone}')">Cancel</button>
                 <button class="btn-danger" style="background:#b91c1c; padding:6px;" onclick="deleteUserAccount('${u.phone}')">🗑</button>
               </div>
             </div>
           `;
         });
+      });
+    }
+
+    function deductVipTime(phone, daysToDeduct) {
+      db.collection("users").doc(phone).get().then(doc => {
+        if (!doc.exists) return;
+        const u = doc.data();
+        if (!u.isVip || !u.vipExpiry) return alert("ಯೂಸರ್‌ಗೆ VIP ಆಕ್ಟಿವ್ ಇಲ್ಲ!");
+
+        const now = Date.now();
+        const currentExpMs = new Date(u.vipExpiry).getTime();
+        const newExpMs = currentExpMs - (daysToDeduct * 24 * 60 * 60 * 1000);
+
+        if (newExpMs <= now) {
+          db.collection("users").doc(phone).update({ isVip: false, vipExpiry: null }).then(() => alert("VIP ಮುಕ್ತಾಯಗೊಂಡಿದೆ."));
+        } else {
+          const newExpDate = new Date(newExpMs);
+          db.collection("users").doc(phone).update({ vipExpiry: newExpDate.toISOString() }).then(() => {
+            alert(`ಸೈಲೆಂಟ್ ಆಗಿ ${daysToDeduct} ದಿನ ಕಡಿಮೆ ಮಾಡಲಾಗಿದೆ! ಹೊಸ ಮುಕ್ತಾಯ: ${newExpDate.toLocaleString()}`);
+          });
+        }
       });
     }
 
@@ -482,7 +570,7 @@
     }
 
     function deleteUserAccount(phone) {
-      if (confirm("Delete user?")) db.collection("users").doc(phone).delete().then(() => alert("User Deleted"));
+      if (confirm("Delete user permanently?")) db.collection("users").doc(phone).delete().then(() => alert("User Deleted"));
     }
 
     function openUserDetail(phone) {
@@ -656,7 +744,11 @@
       autoSyncInterval = setInterval(fetchDPBossLiveResults, 60000);
     }
 
-    async function fetchDPBossLiveResults() {
+    function manualSyncDPBoss() {
+      fetchDPBossLiveResults(true);
+    }
+
+    async function fetchDPBossLiveResults(isManual = false) {
       const feed = document.getElementById("dpbossLiveFeed");
       try {
         const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://sattamatkadpboss.org/") + "&timestamp=" + Date.now());
@@ -673,6 +765,7 @@
           for (let m in extracted) html += `<div><b>${m}</b>: ${extracted[m]}</div>`;
           feed.innerHTML = html || "No live results found.";
         }
+        if (isManual) alert("DPBoss Synced!");
       } catch (e) {
         if (feed) feed.innerHTML = "Auto-sync waiting...";
       }
