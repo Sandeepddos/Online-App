@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Matka King Pro</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <style>
+    :root {
+      --primary: #00c2cb;
+      --primary-dark: #0b1a42;
+      --primary-blue: #1554a8;
+      --bg: #f4f8fb;
+      --surface: #ffffff;
+      --card-border: #e1edf6;
+      --text-main: #0b1a42;
+      --text-sub: #627d98;
+      --success: #10b981;
+      --vip: #f59e0b;
+      --danger: #ef4444;
+      --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      --cyan-gradient: linear-gradient(135deg, #00c2cb 0%, #0284c7 100%);
+      --navy-gradient: linear-gradient(135deg, #0b1a42 0%, #1554a8 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding: 16px; min-height: 100vh; }
+
+    header {
+      background: #ffffff; padding: 14px 18px; border-radius: 16px;
+      margin-bottom: 16px; border: 1.5px solid var(--card-border);
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 15px rgba(11, 26, 66, 0.05);
+    }
+    
+    input, select, textarea {
+      width: 100%; padding: 12px 14px; background: #ffffff;
+      border: 1.5px solid var(--card-border); color: var(--text-main);
+      border-radius: 14px; font-size: 0.92rem; margin-bottom: 8px;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+
+    .btn {
+      width: 100%; padding: 12px; background: var(--navy-gradient);
+      color: #fff; border: 1px solid var(--primary); border-radius: 14px;
+      font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 6px;
+    }
+    .btn-danger { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+    .btn-info { background: var(--primary-blue); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 0.82rem; font-weight: bold; }
+
+    .game-card {
+      background: #ffffff; border: 1.5px solid var(--card-border);
+      border-radius: 20px; padding: 18px; margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(11, 26, 66, 0.05);
+    }
+
+    .admin-subnav {
+      display: flex; gap: 6px; margin-bottom: 16px; background: #ffffff;
+      padding: 6px; border-radius: 14px; border: 1.5px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .admin-subnav-btn {
+      flex: 1; padding: 10px 12px; background: transparent; border: none;
+      color: var(--text-sub); font-size: 0.78rem; font-weight: 800;
+      border-radius: 10px; cursor: pointer; white-space: nowrap;
+    }
+    .admin-subnav-btn.active { background: var(--navy-gradient); color: #00c2cb; border: 1px solid var(--primary); }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+
+    .admin-pass-tag {
+      display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5;
+      color: #065f46; border: 1px solid #10b981; padding: 4px 8px;
+      border-radius: 6px; font-size: 0.76rem; font-weight: bold; margin: 3px 4px 3px 0;
+    }
+    .admin-pass-tag button {
+      background: #ef4444; color: #fff; border: none; border-radius: 50%;
+      width: 16px; height: 16px; cursor: pointer;
+    }
+
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; }
+    .badge-free { background: var(--navy-gradient); color: #00c2cb; }
+    .badge-vip { background: var(--gold-gradient); color: #000; }
+
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+    .status-online { background: #10b981; color: #fff; }
+    .status-offline { background: #94a3b8; color: #fff; }
+
+    #userDetailModal {
+      position: fixed; inset: 0; background: rgba(11, 26, 66, 0.75);
+      z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px;
+    }
+    .detail-card { background: #ffffff; border: 2px solid var(--primary); border-radius: 24px; padding: 24px; width: 100%; max-width: 440px; }
+    .user-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eef5fa; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2 style="font-size: 1.25rem; font-weight: 900; color: var(--primary-dark);">⚙️ Matka King - Admin Panel</h2>
+    <span style="font-size: 0.8rem; font-weight: bold; color: var(--success);">● Active Session</span>
+  </header>
+
+  <div class="admin-subnav">
+    <button class="admin-subnav-btn active" onclick="switchAdminTab('admSecGames', this)">🎯 Games</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecDpboss', this)">⚡ DPBoss Auto</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecKeys', this)">🔑 VIP Keys</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecUsers', this)">👥 Users</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecBroadcast', this)">📢 Notice</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecApprovals', this)">🔔 Approvals</button>
+    <button class="admin-subnav-btn" onclick="switchAdminTab('admSecSettings', this)">⚙️ Settings</button>
+  </div>
+
+  <!-- 1. GAMES SECTION -->
+  <div id="admSecGames" class="admin-section active">
+    <div class="game-card" style="border: 2px dashed var(--primary); background: #f7fcfe;">
+      <h4 style="margin-bottom: 8px;">🪄 Paste Full Copied Game (Auto-Clean)</h4>
+      <textarea id="admRawInput" rows="4" placeholder="Paste copied game text here..."></textarea>
+      <button class="btn" onclick="magicParseAndFill()">⚡ Auto-Clean & Fill Game</button>
+    </div>
+
+    <div class="game-card">
+      <h4 style="margin-bottom: 10px;">Post Numbers</h4>
+      <input type="text" id="admMarket" placeholder="Game Name (e.g. MILAN MORNING)">
+      <select id="admType">
+        <option value="FREE">Free Game (FREE)</option>
+        <option value="VIP">Premium Game (VIP)</option>
+      </select>
+      <input type="text" id="admOpenPana" placeholder="Open Pana (e.g. 246, 178)">
+      <input type="text" id="admOpen" placeholder="Open Digits (e.g. 2, 6, 8)">
+      <input type="text" id="admJodi" placeholder="Jodi Numbers (e.g. 21, 60)">
+      <input type="text" id="admClose" placeholder="Close Digits (e.g. 1, 0, 3)">
+      <input type="text" id="admClosePana" placeholder="Close Pana (e.g. 570, 367)">
+      <button class="btn" onclick="saveGame()">Publish Game</button>
+    </div>
+
+    <h4 style="margin: 16px 0 10px;">Live Games</h4>
+    <div id="admGamesList"></div>
+  </div>
+
+  <!-- 2. DPBOSS SECTION -->
+  <div id="admSecDpboss" class="admin-section">
+    <div class="game-card" style="border: 2px solid var(--primary);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div>
+          <h3>🌐 DPBoss Live Auto-Sync</h3>
+          <span style="font-size:0.75rem; color:#10b981; font-weight:bold;">● Auto Sync Every 60s</span>
+        </div>
+        <button class="btn" style="width:auto; padding:6px 14px; margin:0;" onclick="manualSyncDPBoss()">⚡ Sync Now</button>
+      </div>
+      <div id="dpbossLiveFeed" style="max-height:280px; overflow-y:auto; background:#f0f7fb; padding:10px; border-radius:12px; font-size:0.85rem;">
+        Loading DPBoss feed...
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. VIP KEYS SECTION -->
+  <div id="admSecKeys" class="admin-section">
+    <div class="game-card" style="border: 2px solid var(--vip);">
+      <h3 style="margin-bottom: 6px;">🔑 Generate VIP Keys</h3>
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <input type="number" id="admKeyDays" placeholder="Days (e.g. 7)" value="7">
+        <select id="admKeyPreset" onchange="applyPresetDays(this.value)" style="width: 140px;">
+          <option value="">Presets</option>
+          <option value="1">1 Day</option>
+          <option value="7">7 Days</option>
+          <option value="15">15 Days</option>
+          <option value="30">30 Days</option>
+        </select>
+      </div>
+      <button class="btn" style="background:var(--gold-gradient); color:#000;" onclick="generateVipKey()">⚡ Generate VIP Key</button>
+
+      <div id="admGeneratedKeyBox" style="display:none; background:#fff; border:2px dashed #fbbf24; border-radius:12px; padding:12px; margin-top:12px; text-align:center;">
+        <span style="font-size:0.75rem; color:#627d98;">GENERATED KEY:</span>
+        <b id="admKeyResultText" style="font-size:1.2rem; font-family:monospace; display:block; margin:4px 0;">-</b>
+        <button class="btn" style="width:auto; padding:6px 16px; margin:0;" onclick="copyGeneratedKey()">📋 Copy Key</button>
+      </div>
+    </div>
+
+    <h4 style="margin: 16px 0 10px;">Generated VIP Keys</h4>
+    <div id="admVipKeysList"></div>
+  </div>
+
+  <!-- 4. USERS SECTION -->
+  <div id="admSecUsers" class="admin-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+      <h4>Registered Users</h4>
+      <span id="onlineCountBadge" style="font-size:0.8rem; color:#10b981; font-weight:bold;">Online: 0</span>
+    </div>
+    <div id="admUsersList"></div>
+  </div>
+
+  <!-- 5. NOTICE SECTION -->
+  <div id="admSecBroadcast" class="admin-section">
+    <div class="game-card">
+      <h4 style="margin-bottom: 8px;">📢 Top Notice Banner</h4>
+      <input type="text" id="admTopNoticeText" placeholder="Enter notice text">
+      <div style="display:flex; gap:8px;">
+        <button class="btn" style="flex:2;" onclick="saveTopNotice()">Show Banner</button>
+        <button class="btn-danger" style="flex:1;" onclick="clearTopNotice()">Hide Banner</button>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <h4 style="margin-bottom: 8px;">🔔 Instant Push Notification</h4>
+      <input type="text" id="admAlertMsg" placeholder="Alert message">
+      <button class="btn" onclick="sendInstantBroadcast()">Send Push Alert Now</button>
+    </div>
+  </div>
+
+  <!-- 6. APPROVALS SECTION -->
+  <div id="admSecApprovals" class="admin-section">
+    <h4 style="margin-bottom: 10px;">Payment Approvals</h4>
+    <div id="adminApprovalsList"></div>
+  </div>
+
+  <!-- 7. SETTINGS SECTION -->
+  <div id="admSecSettings" class="admin-section">
+    <div class="game-card">
+      <h4 style="margin-bottom: 10px;">VIP Prices & UPI</h4>
+      <input type="number" id="admP1" placeholder="1 Day Price">
+      <input type="number" id="admP7" placeholder="7 Days Price">
+      <input type="number" id="admP30" placeholder="30 Days Price">
+      <input type="text" id="admUpi" placeholder="UPI ID">
+      <button class="btn" onclick="updateVipConfig()">Save Settings</button>
+    </div>
+  </div>
+
+  <!-- USER DETAIL MODAL -->
+  <div id="userDetailModal">
+    <div class="detail-card">
+      <h3 style="margin-bottom: 12px; color: var(--primary-dark);">👤 User Full Details</h3>
+      <div class="user-detail-row"><span>Name:</span><b id="mdlName">-</b></div>
+      <div class="user-detail-row"><span>Mobile:</span><b id="mdlPhone">-</b></div>
+      <div class="user-detail-row"><span>Password:</span><b id="mdlPassword">-</b></div>
+      <div class="user-detail-row"><span>Referrals:</span><b id="mdlRefers">-</b></div>
+      <div class="user-detail-row"><span>Points:</span><b id="mdlPoints">-</b></div>
+      <div class="user-detail-row"><span>Referred By:</span><b id="mdlReferredBy">-</b></div>
+      <div class="user-detail-row"><span>Status:</span><b id="mdlStatus">-</b></div>
+      <div class="user-detail-row"><span>VIP Expiry:</span><b id="mdlExpiry">-</b></div>
+      <button class="btn" style="margin-top: 15px;" onclick="closeUserDetailModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBr47Pc-j_IWkDBn7LIruxGsPTTgrV1LR4",
+      authDomain: "live--update.firebaseapp.com",
+      databaseURL: "https://live--update-default-rtdb.firebaseio.com",
+      projectId: "live--update",
+      storageBucket: "live--update.firebasestorage.app",
+      messagingSenderId: "870310390365",
+      appId: "1:870310390365:web:4312203fc5b9947451fbb4",
+      measurementId: "G-6ZRXKLGJJX"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
+    const ONESIGNAL_REST_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
+
+    let usersCache = [];
+    let dpbossCache = {};
+    let autoSyncInterval = null;
+
+    window.onload = function() {
+      renderAdminGames();
+      renderAdminVipKeys();
+      renderAdminUsers();
+      renderVipApprovals();
+      fetchVipConfig();
+      startDPBossAutoEngine();
+    };
+
+    function switchAdminTab(secId, btn) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(secId).classList.add('active');
+      document.querySelectorAll('.admin-subnav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (secId === 'admSecKeys') renderAdminVipKeys();
+    }
+
+    function splitNumbers(rawInput) {
+      if (!rawInput) return [];
+      if (Array.isArray(rawInput)) return rawInput;
+      return rawInput.toString().split(/[\s,]+/).filter(x => x && x.trim() !== "");
+    }
+
+    function getGamePasses(g) {
+      let list = [];
+      if (Array.isArray(g.passes) && g.passes.length > 0) list = g.passes;
+      else if (g.isPassed && g.passType && g.passedNumber) list = [{ type: g.passType, number: g.passedNumber }];
+      return list;
+    }
+
+    function saveGame() {
+      const market = document.getElementById("admMarket").value.trim().toUpperCase();
+      const type = document.getElementById("admType").value;
+      const openPana = document.getElementById("admOpenPana").value.trim();
+      const open = document.getElementById("admOpen").value.trim();
+      const jodi = document.getElementById("admJodi").value.trim();
+      const close = document.getElementById("admClose").value.trim();
+      const closePana = document.getElementById("admClosePana").value.trim();
+
+      if (!market) { alert("Please enter game name!"); return; }
+
+      const now = new Date();
+      const today = now.toLocaleDateString('en-GB');
+      const postTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+      const docId = market.replace(/\s+/g, '_') + "_" + Date.now();
+
+      db.collection("games").doc(docId).set({
+        market, type, openPana, open, jodi, close, closePana,
+        date: today, postTime, isPassed: false, passes: [], createdTime: Date.now()
+      }).then(() => {
+        sendPushNotification(`🎯 ${market} (${type}) LIVE!`, `Open: ${open || '-'} | Jodi: ${jodi || '-'} | Close: ${close || '-'}`);
+        alert("Game posted successfully!");
+        document.getElementById("admMarket").value = "";
+        document.getElementById("admOpenPana").value = "";
+        document.getElementById("admOpen").value = "";
+        document.getElementById("admJodi").value = "";
+        document.getElementById("admClose").value = "";
+        document.getElementById("admClosePana").value = "";
+        document.getElementById("admRawInput").value = "";
+        renderAdminGames();
+      });
+    }
+
+    function renderAdminGames() {
+      const box = document.getElementById("admGamesList");
+      db.collection("games").get().then(snapshot => {
+        box.innerHTML = "";
+        if (snapshot.empty) { box.innerHTML = "<p style='color:#627d98;'>No games posted.</p>"; return; }
+
+        let games = [];
+        snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
+        games.sort((a,b) => (b.createdTime || 0) - (a.createdTime || 0));
+
+        games.forEach(g => {
+          const openNums = splitNumbers(g.open);
+          const jodiNums = splitNumbers(g.jodi);
+          const closeNums = splitNumbers(g.close);
+          const openPanaNums = splitNumbers(g.openPana);
+          const closePanaNums = splitNumbers(g.closePana);
+
+          let dropdownOptions = "";
+          openPanaNums.forEach(n => dropdownOptions += `<option value="OPEN_PANA:${n}">Open Pana: ${n}</option>`);
+          openNums.forEach(n => dropdownOptions += `<option value="OPEN:${n}">Open Digit: ${n}</option>`);
+          jodiNums.forEach(n => dropdownOptions += `<option value="JODI:${n}">Jodi: ${n}</option>`);
+          closeNums.forEach(n => dropdownOptions += `<option value="CLOSE:${n}">Close Digit: ${n}</option>`);
+          closePanaNums.forEach(n => dropdownOptions += `<option value="CLOSE_PANA:${n}">Close Pana: ${n}</option>`);
+
+          const allPasses = getGamePasses(g);
+          let passTagsHTML = allPasses.length > 0 ? allPasses.map((p, idx) => `
+            <span class="admin-pass-tag">✓ ${p.type}: [${p.number}]
+              <button onclick="removeSpecificPass('${g.id}', ${idx})">✕</button>
+            </span>
+          `).join("") : "<span style='font-size:0.75rem; color:#94a9ba;'>No passes yet.</span>";
+
+          box.innerHTML += `
+            <div class="game-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span class="badge ${g.type === 'VIP' ? 'badge-vip' : 'badge-free'}">${g.type}</span>
+                  <b style="color:var(--primary-dark); font-size:1.1rem; margin-left:4px;">${g.market}</b>
+                  <span style="font-size:0.75rem; color:#0284c7;">(${g.date})</span>
+                </div>
+                <button class="btn-danger" onclick="deleteGame('${g.id}')">Delete</button>
+              </div>
+
+              <div style="font-size:0.82rem; margin:10px 0; line-height:1.5;">
+                Open: <b>[${openNums.join(', ')}]</b> | Jodi: <b>[${jodiNums.join(', ')}]</b> | Close: <b>[${closeNums.join(', ')}]</b>
+              </div>
+
+              <div style="background:#f0f7fb; padding:10px; border-radius:12px;">
+                <div style="display:flex; gap:6px;">
+                  <select id="selPass_${g.id}">${dropdownOptions}</select>
+                  <button class="btn" style="width:auto; margin:0;" onclick="confirmAddPass('${g.id}', '${g.market}')">Add Pass</button>
+                </div>
+                <div style="margin-top:6px;">${passTagsHTML}</div>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function confirmAddPass(docId, marketName) {
+      const sel = document.getElementById("selPass_" + docId);
+      if (!sel || !sel.value) return;
+      const [type, number] = sel.value.split(":");
+
+      db.collection("games").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        let passes = getGamePasses(doc.data());
+        if (passes.some(p => p.type === type && p.number === number)) return alert("Already passed!");
+
+        passes.push({ type, number });
+        db.collection("games").doc(docId).update({ isPassed: true, passes, passType: type, passedNumber: number }).then(() => {
+          sendPushNotification(`🏆 ${marketName} BLAST RESULT!`, `${type} Number [${number}] PASSED!`);
+          renderAdminGames();
+        });
+      });
+    }
+
+    function removeSpecificPass(docId, indexToRemove) {
+      db.collection("games").doc(docId).get().then(doc => {
+        let passes = getGamePasses(doc.data());
+        passes.splice(indexToRemove, 1);
+        db.collection("games").doc(docId).update({
+          isPassed: passes.length > 0, passes, passType: passes.length ? passes[passes.length-1].type : "NONE", passedNumber: passes.length ? passes[passes.length-1].number : null
+        }).then(() => renderAdminGames());
+      });
+    }
+
+    function deleteGame(id) {
+      if (confirm("Delete this game?")) db.collection("games").doc(id).delete().then(() => renderAdminGames());
+    }
+
+    // USERS RENDERING
+    function renderAdminUsers() {
+      const box = document.getElementById("admUsersList");
+      const onlineBadge = document.getElementById("onlineCountBadge");
+
+      db.collection("users").onSnapshot(snapshot => {
+        box.innerHTML = "";
+        usersCache = [];
+        let onlineCount = 0;
+        const now = Date.now();
+
+        snapshot.forEach(doc => {
+          const u = { id: doc.id, ...doc.data() };
+          const isUserOnline = (u.isOnline === true) && (u.lastSeen && (now - u.lastSeen < 60000));
+          if (isUserOnline) onlineCount++;
+          u.activeOnline = isUserOnline;
+          usersCache.push(u);
+        });
+
+        onlineBadge.innerText = `Online: ${onlineCount} / Total: ${usersCache.length}`;
+        usersCache.sort((a,b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+
+        usersCache.forEach(u => {
+          const isVip = u.isVip === true && u.vipExpiry && new Date(u.vipExpiry) > new Date();
+          let remStr = isVip ? `⏳ ${Math.floor((new Date(u.vipExpiry).getTime() - now)/(1000*60*60*24))}d left` : "Free User";
+
+          box.innerHTML += `
+            <div class="game-card">
+              <div style="display:flex; justify-content:space-between;">
+                <div>
+                  <b>${u.name || 'User'}</b> (+91 ${u.phone})
+                  <div style="color:var(--primary-blue); font-size:0.8rem;">Pass: <b>${u.password || 'N/A'}</b></div>
+                </div>
+                <div><span class="status-badge ${u.activeOnline ? 'status-online' : 'status-offline'}">${u.activeOnline ? 'Online' : 'Offline'}</span></div>
+              </div>
+              <div style="margin:8px 0; font-size:0.8rem; background:#f0f7fb; padding:6px 10px; border-radius:8px;">
+                Status: <b>${remStr}</b> | Refers: <b>${u.referralCount || 0}</b> | Points: <b>${u.points || 0}</b>
+              </div>
+              <button class="btn-info" style="width:100%; margin-bottom:6px;" onclick="openUserDetail('${u.phone}')">👁️ View Details</button>
+              <div style="display:flex; gap:4px;">
+                <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gold-gradient); color:#000;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
+                <button class="btn" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gold-gradient); color:#000;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
+                <button class="btn-danger" style="flex:1; padding:6px;" onclick="removeVip('${u.phone}')">Cancel</button>
+                <button class="btn-danger" style="background:#b91c1c; padding:6px;" onclick="deleteUserAccount('${u.phone}')">🗑</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function setVipDuration(phone, days) {
+      const expDate = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+      db.collection("users").doc(phone).update({ isVip: true, vipExpiry: expDate.toISOString() }).then(() => alert(days + " Days VIP Activated!"));
+    }
+
+    function removeVip(phone) {
+      db.collection("users").doc(phone).update({ isVip: false, vipExpiry: null }).then(() => alert("VIP Cancelled"));
+    }
+
+    function deleteUserAccount(phone) {
+      if (confirm("Delete user?")) db.collection("users").doc(phone).delete().then(() => alert("User Deleted"));
+    }
+
+    function openUserDetail(phone) {
+      const u = usersCache.find(x => x.phone === phone);
+      if (!u) return;
+      document.getElementById("mdlName").innerText = u.name || "-";
+      document.getElementById("mdlPhone").innerText = "+91 " + u.phone;
+      document.getElementById("mdlPassword").innerText = u.password || "-";
+      document.getElementById("mdlRefers").innerText = u.referralCount || "0";
+      document.getElementById("mdlPoints").innerText = (u.points || 0) + " pts";
+      document.getElementById("mdlReferredBy").innerText = u.referredBy || "None";
+      document.getElementById("mdlStatus").innerText = u.activeOnline ? "Online" : "Offline";
+      document.getElementById("mdlExpiry").innerText = u.vipExpiry ? new Date(u.vipExpiry).toLocaleString() : "None";
+      document.getElementById("userDetailModal").style.display = "flex";
+    }
+
+    function closeUserDetailModal() { document.getElementById("userDetailModal").style.display = "none"; }
+
+    // KEYS & APPROVALS & NOTICE
+    function generateVipKey() {
+      const days = parseInt(document.getElementById("admKeyDays").value) || 7;
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let p1 = "", p2 = "";
+      for (let i = 0; i < 4; i++) p1 += chars.charAt(Math.floor(Math.random() * chars.length));
+      for (let i = 0; i < 4; i++) p2 += chars.charAt(Math.floor(Math.random() * chars.length));
+      const newKey = `VIP-${p1}-${p2}`;
+
+      db.collection("vip_keys").doc(newKey).set({ key: newKey, days, isUsed: false, createdTime: Date.now() }).then(() => {
+        document.getElementById("admGeneratedKeyBox").style.display = "block";
+        document.getElementById("admKeyResultText").innerText = newKey;
+        renderAdminVipKeys();
+      });
+    }
+
+    function copyGeneratedKey() {
+      navigator.clipboard.writeText(document.getElementById("admKeyResultText").innerText);
+      alert("Key copied!");
+    }
+
+    function applyPresetDays(val) { if (val) document.getElementById("admKeyDays").value = val; }
+
+    function renderAdminVipKeys() {
+      const box = document.getElementById("admVipKeysList");
+      db.collection("vip_keys").orderBy("createdTime", "desc").limit(30).get().then(snapshot => {
+        box.innerHTML = "";
+        snapshot.forEach(docSnap => {
+          const k = docSnap.data();
+          box.innerHTML += `
+            <div style="background:#fff; border:1px solid var(--card-border); padding:10px; border-radius:12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+              <div><b>${k.key}</b> <span class="badge" style="background:${k.isUsed ? '#ef4444' : '#10b981'}; color:#fff;">${k.isUsed ? 'USED' : 'ACTIVE'}</span> (${k.days} Days)</div>
+              <button class="btn-danger" onclick="db.collection('vip_keys').doc('${k.key}').delete().then(()=>renderAdminVipKeys())">🗑</button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function renderVipApprovals() {
+      const box = document.getElementById("adminApprovalsList");
+      db.collection("vip_requests").onSnapshot(snapshot => {
+        box.innerHTML = "";
+        let pending = [];
+        snapshot.forEach(doc => { if (doc.data().status === "PENDING") pending.push({ id: doc.id, ...doc.data() }); });
+        if (pending.length === 0) { box.innerHTML = "<p style='color:#627d98;'>No pending requests.</p>"; return; }
+
+        pending.forEach(r => {
+          box.innerHTML += `
+            <div class="game-card">
+              <div><b>${r.userName}</b> (${r.userPhone}) - ${r.days} Days Pass</div>
+              <div style="font-size:0.8rem; margin:6px 0;">Trx ID: <b>${r.trxId}</b></div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn" style="background:var(--success); color:#fff; flex:1; margin:0;" onclick="approveVip('${r.id}', '${r.userPhone}', ${r.days})">✓ Approve</button>
+                <button class="btn-danger" style="flex:1;" onclick="db.collection('vip_requests').doc('${r.id}').update({status:'REJECTED'})">✕ Reject</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function approveVip(id, phone, days) {
+      const expDate = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+      db.collection("users").doc(phone).update({ isVip: true, vipExpiry: expDate.toISOString() }).then(() => {
+        db.collection("vip_requests").doc(id).update({ status: "APPROVED" });
+        alert("Approved!");
+      });
+    }
+
+    function saveTopNotice() {
+      db.collection("settings").doc("notice").set({ text: document.getElementById("admTopNoticeText").value.trim(), show: true, updatedTime: Date.now() });
+      alert("Notice shown!");
+    }
+
+    function clearTopNotice() {
+      db.collection("settings").doc("notice").set({ text: "", show: false });
+      alert("Notice cleared!");
+    }
+
+    function sendInstantBroadcast() {
+      const msg = document.getElementById("admAlertMsg").value.trim();
+      sendPushNotification("📢 IMPORTANT ALERT", msg);
+      alert("Broadcast sent!");
+    }
+
+    function fetchVipConfig() {
+      db.collection("settings").doc("vip").get().then(doc => {
+        if (doc.exists) {
+          const c = doc.data();
+          document.getElementById("admP1").value = c.plan1 || "";
+          document.getElementById("admP7").value = c.plan7 || "";
+          document.getElementById("admP30").value = c.plan30 || "";
+          document.getElementById("admUpi").value = c.upi || "";
+        }
+      });
+    }
+
+    function updateVipConfig() {
+      db.collection("settings").doc("vip").set({
+        plan1: document.getElementById("admP1").value.trim(),
+        plan7: document.getElementById("admP7").value.trim(),
+        plan30: document.getElementById("admP30").value.trim(),
+        upi: document.getElementById("admUpi").value.trim()
+      }, { merge: true }).then(() => alert("Settings saved!"));
+    }
+
+    function magicParseAndFill() {
+      const rawText = document.getElementById("admRawInput").value;
+      if (!rawText) return;
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let marketName = "", openDigits = new Set(), jodiList = new Set(), panaList = new Set();
+
+      for (let l of lines) {
+        let cleanL = l.replace(/[^\w\s]/gi, ' ').trim();
+        if (/http|play|download|luck|date/i.test(cleanL) || /^\d+$/.test(cleanL)) continue;
+        if (/[A-Za-z]{3,}/.test(cleanL)) { marketName = cleanL.toUpperCase(); break; }
+      }
+
+      for (let line of lines) {
+        let tokens = line.replace(/[^\d\s]/g, ' ').split(/\s+/).filter(Boolean);
+        for (let tok of tokens) {
+          if (tok.length === 4 && tok.startsWith("202")) continue;
+          if (/^\d{3}$/.test(tok)) panaList.add(tok);
+          else if (/^\d{2}$/.test(tok)) jodiList.add(tok);
+          else if (/^\d{1}$/.test(tok)) openDigits.add(tok);
+        }
+      }
+
+      if (marketName) document.getElementById("admMarket").value = marketName;
+      if (openDigits.size) document.getElementById("admOpen").value = Array.from(openDigits).join(", ");
+      if (jodiList.size) document.getElementById("admJodi").value = Array.from(jodiList).join(", ");
+      if (panaList.size) document.getElementById("admOpenPana").value = Array.from(panaList).join(", ");
+      alert("Filled automatically!");
+    }
+
+    function sendPushNotification(title, message) {
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Key " + ONESIGNAL_REST_KEY },
+        body: JSON.stringify({
+          app_id: ONESIGNAL_APP_ID,
+          included_segments: ["Total Subscriptions"],
+          headings: { "en": title },
+          contents: { "en": message }
+        })
+      });
+    }
+
+    function startDPBossAutoEngine() {
+      fetchDPBossLiveResults();
+      clearInterval(autoSyncInterval);
+      autoSyncInterval = setInterval(fetchDPBossLiveResults, 60000);
+    }
+
+    async function fetchDPBossLiveResults() {
+      const feed = document.getElementById("dpbossLiveFeed");
+      try {
+        const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://sattamatkadpboss.org/") + "&timestamp=" + Date.now());
+        const data = await res.json();
+        const text = data.contents || "";
+        const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?)/gi;
+        let match, extracted = {};
+        while ((match = regex.exec(text)) !== null) {
+          const mkt = match[1].trim().toUpperCase();
+          if (mkt.length >= 3 && !/HTTP|WWW|DATE|TODAY/i.test(mkt)) extracted[mkt] = match[2].replace(/\s+/g, '');
+        }
+        if (feed) {
+          let html = "";
+          for (let m in extracted) html += `<div><b>${m}</b>: ${extracted[m]}</div>`;
+          feed.innerHTML = html || "No live results found.";
+        }
+      } catch (e) {
+        if (feed) feed.innerHTML = "Auto-sync waiting...";
+      }
+    }
+  </script>
+</body>
+</html>
