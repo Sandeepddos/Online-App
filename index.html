@@ -708,9 +708,175 @@
     }
     .nav-btn.active { color: #00c2cb; font-weight: 900; transform: translateY(-4px); }
     .nav-btn span { display: block; font-size: 1.3rem; margin-bottom: 2px; }
+
+    /* 🎁 SPECIAL TOP-UP DISCOUNT MODAL STYLES (SAME AS SCREENSHOT) */
+    #specialOfferModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 26, 66, 0.85);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .offer-ticket-container {
+      position: relative;
+      background: linear-gradient(135deg, #3802ce 0%, #150075 100%);
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 16px 45px rgba(56, 2, 206, 0.5);
+      color: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .ticket-cut-left, .ticket-cut-right {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background-color: rgba(11, 26, 66, 0.85);
+      border-radius: 50%;
+      top: 54%;
+      transform: translateY(-50%);
+      z-index: 20;
+    }
+    .ticket-cut-left { left: -11px; }
+    .ticket-cut-right { right: -11px; }
+
+    .ticket-dashed-line {
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.25);
+      margin: 12px 0 14px 0;
+    }
+
+    .timer-digit-box {
+      background: rgba(10, 10, 25, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 4px 7px;
+      font-size: 15px;
+      font-weight: 900;
+      font-family: monospace;
+      color: #ffffff;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .btn-get-glow {
+      background: radial-gradient(circle, #ffb800 0%, #ff8c00 100%);
+      box-shadow: 0 0 20px rgba(255, 184, 0, 0.65);
+      border: 2px solid #fff275;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .btn-get-glow:active { transform: scale(0.92); }
+
+    .floating-gift-anim {
+      animation: giftFloat 2.5s infinite ease-in-out;
+    }
+    @keyframes giftFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(4deg); }
+    }
   </style>
 </head>
 <body>
+
+  <!-- 🎁 SPECIAL FIRST TOP-UP DISCOUNT MODAL POPUP (NEW) -->
+  <div id="specialOfferModal">
+    <div class="offer-ticket-container">
+      
+      <!-- ⏱️ 10 SECONDS TIMED SKIP / CLOSE BUTTON -->
+      <div style="position: absolute; top: 12px; right: 14px; z-index: 30;">
+        <span id="popSkipDelayBadge" style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.18); font-size: 0.68rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; color: #d8b4fe;">
+          Skip in <b id="popSkipSecText" style="color:#ffffff;">10</b>s
+        </span>
+        <button id="popCloseBtn" onclick="closeSpecialOfferModal()" style="display: none; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.22); border: 1.5px solid rgba(255,255,255,0.4); color: #fff; font-size: 0.95rem; font-weight: 900; align-items: center; justify-content: center; cursor: pointer;">
+          ✕
+        </button>
+      </div>
+
+      <!-- SIDE CUT NOTCHES -->
+      <div class="ticket-cut-left"></div>
+      <div class="ticket-cut-right"></div>
+
+      <!-- HEADER & GIFT BOX -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-right: 40px;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 900; letter-spacing: 0.3px; color: #ffffff;">Congratulations!</h2>
+          <p style="font-size: 0.78rem; color: #ddd6fe; font-weight: 700; margin-top: 2px;">You get the first top-up discount!</p>
+        </div>
+        <div class="floating-gift-anim" style="font-size: 2.8rem; margin-top: -6px; margin-right: -25px; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.4));">
+          🎁
+        </div>
+      </div>
+
+      <!-- DASHED LINE -->
+      <div class="ticket-dashed-line"></div>
+
+      <!-- PRICE, COUNTDOWN & GET BUTTON -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        
+        <!-- PRICE -->
+        <div>
+          <span style="font-size: 0.7rem; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 0.5px;">Special price</span>
+          <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 2px;">
+            <span style="font-size: 2rem; font-weight: 900; color: #fef08a; line-height: 1;">₹69</span>
+            <span style="font-size: 0.8rem; font-weight: 800; color: #e9d5ff;">/1 Month</span>
+          </div>
+          <div style="font-size: 0.72rem; color: #c4b5fd; text-decoration: line-through; margin-top: 2px;">
+            Original price ₹182
+          </div>
+        </div>
+
+        <!-- COUNTDOWN -->
+        <div style="text-align: center;">
+          <span style="font-size: 0.65rem; font-weight: 800; color: #ddd6fe; display: block; margin-bottom: 4px;">Countdown to the offer</span>
+          <div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+            <span id="popHourBox" class="timer-digit-box">00</span>
+            <span style="font-weight: 900; color: #fff; font-size: 0.75rem;">:</span>
+            <span id="popMinBox" class="timer-digit-box">59</span>
+            <span style="font-weight: 900; color: #fff; font-size: 0.75rem;">:</span>
+            <span id="popSecBox" class="timer-digit-box">35</span>
+          </div>
+        </div>
+
+        <!-- GET BUTTON -->
+        <div>
+          <button class="btn-get-glow" onclick="onClaimSpecialOffer()">
+            Get
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FOOTER PERKS -->
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: #e9d5ff; font-weight: 800;">
+        <span style="display: flex; align-items: center; gap: 4px;"><span style="color: #fde047;">⚡</span> Unlimited Passes</span>
+        <span style="display: flex; align-items: center; gap: 4px;"><span style="color: #fde047;">👑</span> Premium First</span>
+        <span style="display: flex; align-items: center; gap: 4px;"><span style="color: #fde047;">🚫</span> Ad - Free</span>
+      </div>
+
+    </div>
+  </div>
 
   <!-- TOP HIGHLIGHT NOTICE BANNER -->
   <div id="topNoticeBanner"></div>
@@ -858,6 +1024,18 @@
     <div class="game-card" style="border-color: #fbbf24; padding: 22px;">
       <h2 id="txtVipHeader" style="color: var(--primary-dark); margin-bottom: 4px; text-align: center; font-weight:900;">🌟 VIP Membership</h2>
       <p id="txtVipSub" style="font-size: 0.82rem; color: #627d98; margin-bottom: 16px; text-align: center;">Select a plan and pay to unlock VIP games</p>
+
+      <!-- 🎁 SPECIAL ₹69 PROMO PLAN CARD (AUTOSELECTABLE) -->
+      <div class="plan-card" id="pOfferCard" onclick="selectPlan(30, 69)" style="border: 2px solid #a855f7; background: #faf5ff;">
+        <div>
+          <b style="color: #6b21a8;">🎉 SPECIAL OFFER (1 Month)</b>
+          <div style="font-size:0.75rem; color:#9333ea; font-weight: bold;">First Top-up Discount Pass</div>
+        </div>
+        <div style="text-align: right;">
+          <b style="color:#7e22ce; font-size:1.35rem;">₹69</b>
+          <div style="font-size:0.7rem; color:#9ca3af; text-decoration: line-through;">₹182</div>
+        </div>
+      </div>
 
       <div class="plan-card selected" id="p1Card" onclick="selectPlan(1)">
         <div>
@@ -1122,7 +1300,7 @@
       <div id="admVipKeysList"><p style="color:#627d98;">Loading keys...</p></div>
     </div>
 
-    <!-- 4. ADMIN USERS & REFERRALS SECTION (WITH TIME-LEFT & DEDUCT BUTTONS) -->
+    <!-- 4. ADMIN USERS & REFERRALS SECTION -->
     <div id="admSecUsers" class="admin-section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
         <h4 style="color: var(--primary-dark);">Registered Users & Referrals</h4>
@@ -1201,6 +1379,7 @@
     let currentLang = localStorage.getItem("app_lang") || "en";
     let isRegister = false;
     let selectedPlanDays = 1;
+    let selectedPlanPrice = 150;
     let timerInterval = null;
     let presenceInterval = null;
     let autoSyncInterval = null;
@@ -1288,6 +1467,9 @@
         listenUserPayments();
         renderReferralUI();
         startPresenceTracking(currentUser.phone);
+
+        // 🎁 ಆ್ಯಪ್ ಓಪನ್ ಆದಾಗ ಸ್ಪೆಷಲ್ ಆಫರ್ ಪಾಪ್-ಅಪ್ ತೋರಿಸು
+        checkAndShowSpecialOffer();
       } else {
         if (incomingReferrer) {
           isRegister = false;
@@ -1296,7 +1478,87 @@
       }
 
       startDPBossAutoEngine();
+      initOfferCountdownTimer();
     };
+
+    // ==========================================================
+    // 🎁 SPECIAL FIRST TOP-UP OFFER POPUP & 10s CLOSE LOGIC
+    // ==========================================================
+    function checkAndShowSpecialOffer() {
+      // ಯೂಸರ್‌ಗೆ ಈಗಾಗಲೇ VIP ಇದ್ದರೆ ತೋರಿಸಬೇಡಿ
+      if (isVipActive()) return;
+
+      setTimeout(() => {
+        const modal = document.getElementById("specialOfferModal");
+        if (modal) {
+          modal.style.display = "flex";
+          startTenSecondSkipTimer();
+        }
+      }, 800);
+    }
+
+    function startTenSecondSkipTimer() {
+      let secondsLeft = 10;
+      const skipBadge = document.getElementById("popSkipDelayBadge");
+      const skipText = document.getElementById("popSkipSecText");
+      const closeBtn = document.getElementById("popCloseBtn");
+
+      skipBadge.style.display = "inline-block";
+      closeBtn.style.display = "none";
+      skipText.innerText = secondsLeft;
+
+      const countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (skipText) skipText.innerText = secondsLeft;
+
+        if (secondsLeft <= 0) {
+          clearInterval(countdownInterval);
+          skipBadge.style.display = "none";
+          closeBtn.style.display = "flex"; // 10 ಸೆಕೆಂಡ್ ನಂತರ ಕ್ಲೋಸ್ ಬಟನ್ ತೋರಿಸು
+        }
+      }, 1000);
+    }
+
+    function closeSpecialOfferModal() {
+      const modal = document.getElementById("specialOfferModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    function onClaimSpecialOffer() {
+      closeSpecialOfferModal();
+      navigate('tabVip', document.querySelectorAll('.nav-btn')[2]);
+      selectPlan(30, 69);
+      alert(currentLang === "kn" 
+        ? "🎉 ಸ್ಪೆಷಲ್ ಆಫರ್ ಸೆಲೆಕ್ಟ್ ಆಗಿದೆ!\nಬೆಲೆ: ₹69 / 1 ತಿಂಗಳ VIP\nದಯವಿಟ್ಟು UPI ಗೆ ₹69 ಪಾವತಿಸಿ UTR ನಮೂದಿಸಿ."
+        : "🎉 Special Offer Selected!\nPrice: ₹69 / 1 Month VIP\nPlease pay ₹69 to our UPI ID and submit UTR.");
+    }
+
+    // ಆಫರ್ ಟೈಮರ್ (00:59:35 ಲೈವ್ ರನ್)
+    function initOfferCountdownTimer() {
+      let totalSeconds = 60 * 60; // 1 ಗಂಟೆ
+      if (localStorage.getItem("matka_offer_seconds")) {
+        totalSeconds = parseInt(localStorage.getItem("matka_offer_seconds"), 10);
+      }
+
+      setInterval(() => {
+        if (totalSeconds <= 0) totalSeconds = 60 * 60;
+
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+
+        const hBox = document.getElementById("popHourBox");
+        const mBox = document.getElementById("popMinBox");
+        const sBox = document.getElementById("popSecBox");
+
+        if (hBox) hBox.innerText = String(h).padStart(2, '0');
+        if (mBox) mBox.innerText = String(m).padStart(2, '0');
+        if (sBox) sBox.innerText = String(s).padStart(2, '0');
+
+        totalSeconds--;
+        localStorage.setItem("matka_offer_seconds", totalSeconds);
+      }, 1000);
+    }
 
     function requestNotificationPermission() {
       if (window.OneSignalDeferred) {
@@ -1514,6 +1776,7 @@
         userPhone: currentUser.phone,
         trxId: trxId,
         days: selectedPlanDays,
+        price: selectedPlanPrice,
         status: "PENDING",
         createdTime: Date.now()
       }).then(() => {
@@ -1714,6 +1977,9 @@
       listenRealtimeGames();
       listenUserPayments();
       requestNotificationPermission();
+
+      // 🎁 ಲಾಗಿನ್ ಆದ ತಕ್ಷಣ ಸ್ಪೆಷಲ್ ಆಫರ್ ಚೆಕ್ ಮಾಡಿ
+      checkAndShowSpecialOffer();
     }
 
     function syncUserData(phone) {
@@ -1904,7 +2170,7 @@
             box.innerHTML += `
               <div style="background:#ffffff; border:1.5px solid var(--card-border); padding:10px 14px; border-radius:12px; margin-bottom:8px; font-size:0.85rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                  <b>${r.days} Days VIP Pass</b>
+                  <b>${r.days} Days VIP Pass ${r.price ? `(₹${r.price})` : ''}</b>
                   ${statusPill}
                 </div>
                 <div style="color:#627d98; font-size:0.75rem;">UTR / Trx ID: <span style="color:var(--primary-blue); font-family:monospace; font-weight:bold;">${r.trxId}</span></div>
@@ -1914,11 +2180,26 @@
         });
     }
 
-    function selectPlan(days) {
+    function selectPlan(days, customPrice = null) {
       selectedPlanDays = days;
-      document.getElementById("p1Card").classList.toggle("selected", days === 1);
-      document.getElementById("p7Card").classList.toggle("selected", days === 7);
-      document.getElementById("p30Card").classList.toggle("selected", days === 30);
+      selectedPlanPrice = customPrice || (days === 1 ? 150 : (days === 7 ? 499 : 1499));
+
+      const pOffer = document.getElementById("pOfferCard");
+      const p1 = document.getElementById("p1Card");
+      const p7 = document.getElementById("p7Card");
+      const p30 = document.getElementById("p30Card");
+
+      if (customPrice === 69) {
+        if (pOffer) pOffer.classList.add("selected");
+        if (p1) p1.classList.remove("selected");
+        if (p7) p7.classList.remove("selected");
+        if (p30) p30.classList.remove("selected");
+      } else {
+        if (pOffer) pOffer.classList.remove("selected");
+        if (p1) p1.classList.toggle("selected", days === 1);
+        if (p7) p7.classList.toggle("selected", days === 7);
+        if (p30) p30.classList.toggle("selected", days === 30);
+      }
     }
 
     function copyUpi() {
@@ -2473,7 +2754,7 @@
       }
     }
 
-    // 👥 RENDER ADMIN USERS (DISPLAYS TIME LEFT & DEDUCT BUTTONS)
+    // 👥 RENDER ADMIN USERS
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
@@ -2509,7 +2790,6 @@
           const totalRefers = u.referralCount || 0;
           const currentPts = u.points || 0;
 
-          // Format remaining time for Admin visibility
           let remainingVipStr = "ಉಚಿತ ಖಾತೆ (No VIP)";
           if (isVip) {
             const diffMs = new Date(u.vipExpiry).getTime() - now;
@@ -2538,13 +2818,11 @@
                 </div>
               </div>
 
-              <!-- REALTIME VIP REMAINING TIME -->
               <div style="background:#eef7fb; border:1px solid #d0e4f2; padding:8px 12px; border-radius:10px; margin-bottom:10px; font-size:0.82rem;">
                 <div style="color:var(--primary-dark);">VIP ಬಾಕಿ ಅವಧಿ: <span style="color:#0284c7;">${remainingVipStr}</span></div>
                 <div style="color:#627d98; font-size:0.75rem; margin-top:2px;">Expiry: ${expText}</div>
               </div>
 
-              <!-- REALTIME REFERRAL STATS IN ADMIN -->
               <div style="display:flex; gap:8px; background:#f0f7fb; padding:8px 12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border); font-size:0.8rem;">
                 <div style="flex:1;">👥 Refers: <b style="color:var(--primary-dark); font-size:0.95rem;">${totalRefers}</b></div>
                 <div style="flex:1;">🪙 Points: <b style="color:#0284c7; font-size:0.95rem;">${currentPts} pts</b></div>
@@ -2554,14 +2832,12 @@
                 <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Referral Stats</button>
               </div>
 
-              <!-- VIP ADD BUTTONS -->
               <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:6px;">
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
               </div>
 
-              <!-- 🤫 SILENT DEDUCT & CANCEL BUTTONS -->
               <div style="display:flex; gap:5px; flex-wrap:wrap;">
                 ${isVip ? `
                   <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:#f59e0b; color:#fff; flex:1;" title="Deduct half day silently" onclick="deductVipTime('${u.phone}', 0.5)">-½ Day</button>
@@ -2576,7 +2852,6 @@
       });
     }
 
-    // 🤫 SILENT DEDUCT VIP FUNCTION (USER WILL NEVER KNOW)
     function deductVipTime(phone, daysToDeduct) {
       db.collection("users").doc(phone).get().then(doc => {
         if (!doc.exists) return;
@@ -2599,7 +2874,6 @@
         const newExpiryMs = currentExpiryMs - deductMs;
 
         if (newExpiryMs <= now) {
-          // If reduced time is below now, expire user completely
           db.collection("users").doc(phone).update({
             isVip: false,
             vipExpiry: null
@@ -2738,7 +3012,7 @@
             <div style="background:#ffffff; padding:14px; border-radius:14px; margin-bottom:10px; border:1.5px solid var(--card-border);">
               <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                 <b>${req.userName} (${req.userPhone})</b>
-                <b style="color:var(--primary-blue); font-size:0.95rem;">${req.days} Days Pass</b>
+                <b style="color:var(--primary-blue); font-size:0.95rem;">${req.days} Days Pass ${req.price ? `(₹${req.price})` : ''}</b>
               </div>
               <div style="font-size:0.8rem; color:#627d98; margin-bottom:8px;">
                 Trx ID / Key: <b style="color:var(--primary-dark);">${req.trxId}</b>
@@ -3005,7 +3279,9 @@
 
           if (/^\d{3}$/.test(tok)) {
             panaList.add(tok);
-          } else if (/^\d{2}$/.test(tok)) {             jodiList.add(tok);           } else if (/^\d{1}$/.test(tok)) {
+          } else if (/^\d{2}$/.test(tok)) {
+            jodiList.add(tok);
+          } else if (/^\d{1}$/.test(tok)) {
             openDigits.add(tok);
           }
         }
