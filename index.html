@@ -24,7 +24,6 @@
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false }
       });
-      // ಆ್ಯಪ್ ಓಪನ್ ಆದಾಗ ತಾನಾಗಿಯೇ ಪರ್ಮಿಷನ್ ಪಾಪ್-ಅಪ್ ಕೇಳಲು
       try {
         await OneSignal.Slidedown.promptPush();
       } catch (e) {
@@ -588,11 +587,18 @@
       gap: 10px;
       box-shadow: 0 4px 18px rgba(11, 26, 66, 0.04);
       transition: transform 0.2s ease, border-color 0.2s ease;
+      position: relative;
     }
     .dpboss-chart-card.is-running {
-      border: 1.5px solid #10b981;
+      border: 1.8px solid #10b981;
       background: #f9fefb;
-      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+    }
+    .dpboss-chart-card.is-main {
+      border-left: 5px solid #00c2cb;
+    }
+    .dpboss-chart-card.is-main.is-running {
+      border-left: 5px solid #10b981;
     }
     .dpboss-chart-card:active { transform: scale(0.99); }
     .chart-market-name {
@@ -600,6 +606,9 @@
       font-weight: 900;
       color: var(--primary-dark);
       letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .chart-result-display {
       background: #f0f7fb;
@@ -1276,6 +1285,18 @@
     // ⚡ OFFICIAL GOOGLE APPS SCRIPT DPBOSS API
     const CHART_API_URL = "https://script.google.com/macros/s/AKfycbwMYR29OabLRUVu6y8FvNdP_5UAzYHPVt1OJF_nJ6wmeoOVWG58eQvl1gj3i0zVzNsetA/exec";
 
+    // 🌟 ಜನಪ್ರಿಯ ಮುಖ್ಯ ಆಟಗಳ ಪಟ್ಟಿ (Main Popular Markets List)
+    const MAIN_PRIORITY_MARKETS = [
+      "KALYAN", "KALYAN NIGHT", "KALYAN MORNING",
+      "MILAN DAY", "MILAN NIGHT", "MILAN MORNING",
+      "TIME BAZAR", "TIME BAZAR MORNING", "MAIN BAZAR",
+      "SRIDEVI", "SRIDEVI NIGHT", "SRIDEVI MORNING",
+      "RAJDHANI DAY", "RAJDHANI NIGHT",
+      "SUPREME DAY", "SUPREME NIGHT",
+      "MADHUR DAY", "MADHUR NIGHT", "MADHUR MORNING",
+      "TARA MUMBAI DAY", "TARA MUMBAI NIGHT"
+    ];
+
     const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
     const ONESIGNAL_REST_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
 
@@ -1371,7 +1392,6 @@
       fetchVipConfig();
       listenBroadcastAndNotices();
 
-      // ಆಟೋ ನೋಟಿಫಿಕೇಶನ್ ಪರ್ಮಿಷನ್ ಕೇಳ್ತದೆ
       autoPromptNotificationPermission();
 
       if (currentUser) {
@@ -1394,7 +1414,6 @@
       chartAutoInterval = setInterval(() => { fetchLiveChartData(false); }, 45000);
     };
 
-    // 🔔 AUTO PROMPT PUSH PERMISSION ON APP OPEN
     function autoPromptNotificationPermission() {
       if (window.OneSignalDeferred) {
         window.OneSignalDeferred.push(async function(OneSignal) {
@@ -1464,9 +1483,17 @@
       document.getElementById("txtHowItWorks").innerText = t.howItWorks;
     }
 
-    // ==========================================
-    // 📊 DPBOSS LIVE CHART SYSTEM (API BASED)
-    // ==========================================
+    // ========================================================
+    // 📊 DPBOSS LIVE CHART SYSTEM (MAIN MARKETS + RUNNING FIRST)
+    // ========================================================
+    function isMainMarket(marketName) {
+      const cleanName = (marketName || "").toUpperCase().replace(/[^A-Z0-9]/g, '');
+      return MAIN_PRIORITY_MARKETS.some(m => {
+        const cleanM = m.replace(/[^A-Z0-9]/g, '');
+        return cleanName === cleanM || cleanName.includes(cleanM) || cleanM.includes(cleanName);
+      });
+    }
+
     async function fetchLiveChartData(isManual = false) {
       const container = document.getElementById("chartContainer");
       if (isManual && container) {
@@ -1485,6 +1512,7 @@
           if (typeof item === 'object') {
             const rawStatus = (item.status || "").toUpperCase();
             const isClosed = rawStatus.includes("CLOSED");
+            const isMain = isMainMarket(mName);
 
             list.push({
               market: mName,
@@ -1493,16 +1521,33 @@
               jodi: item.jodi || '**',
               closePana: item.close || '***',
               status: isClosed ? "CLOSED" : "RUNNING",
+              isMain: isMain,
               openTime: item.open_time || item.openTime || '',
               closeTime: item.close_time || item.closeTime || ''
             });
           }
         }
 
-        // ⚡ RUNNING ಗೇಮ್‌ಗಳನ್ನು ಮೇಲ್ಭಾಗದಲ್ಲಿ (TOP) ತೋರಿಸಲು SORT ಮಾಡಲಾಗಿದೆ
+        // 🌟 ನಿಖರವಾದ ಸಾರ್ಟಿಂಗ್:
+        // 1: Main Market + RUNNING (ಅತ್ಯುನ್ನತ ಆದ್ಯತೆ)
+        // 2: Other Market + RUNNING
+        // 3: Main Market + CLOSED
+        // 4: Other Market + CLOSED
         list.sort((a, b) => {
-          if (a.status === 'RUNNING' && b.status !== 'RUNNING') return -1;
-          if (a.status !== 'RUNNING' && b.status === 'RUNNING') return 1;
+          const getRank = (item) => {
+            const running = (item.status === 'RUNNING');
+            if (item.isMain && running) return 1;
+            if (!item.isMain && running) return 2;
+            if (item.isMain && !running) return 3;
+            return 4;
+          };
+
+          const rankA = getRank(a);
+          const rankB = getRank(b);
+
+          if (rankA !== rankB) {
+            return rankA - rankB;
+          }
           return a.market.localeCompare(b.market);
         });
 
@@ -1553,11 +1598,19 @@
           timeStr = `<div style="font-size:0.75rem; color:#627d98; font-weight:700;">⏰ ${m.openTime || ''} - ${m.closeTime || ''}</div>`;
         }
 
+        // ಮೆನ್ ಆಟಗಳಿಗೆ ವಿಶೇಷ ಸ್ಟಾರ್ ಬ್ಯಾಡ್ಜ್
+        let mainStarBadge = m.isMain 
+          ? `<span style="font-size:0.7rem; background:#e6f9fa; color:#0284c7; border:1px solid #00c2cb; padding:2px 6px; border-radius:6px; font-weight:800;">★ MAIN</span>` 
+          : '';
+
         container.innerHTML += `
-          <div class="dpboss-chart-card ${isRunning ? 'is-running' : ''}">
+          <div class="dpboss-chart-card ${isRunning ? 'is-running' : ''} ${m.isMain ? 'is-main' : ''}">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div>
-                <div class="chart-market-name">${m.market}</div>
+                <div class="chart-market-name">
+                  <span>${m.market}</span>
+                  ${mainStarBadge}
+                </div>
                 ${timeStr}
               </div>
               ${statusBadge}
