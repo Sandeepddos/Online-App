@@ -571,6 +571,52 @@
       color: var(--primary-dark);
     }
 
+    /* 📊 DPBOSS LIVE CHART CARD STYLES */
+    .dpboss-chart-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(11, 26, 66, 0.04);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .dpboss-chart-card:active { transform: scale(0.99); }
+    .chart-market-name {
+      font-size: 1.08rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+      letter-spacing: 0.5px;
+    }
+    .chart-result-display {
+      background: #f0f7fb;
+      border: 1.5px solid #d4e7f5;
+      padding: 10px 14px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .chart-panna { color: var(--primary-blue); font-size: 1.05rem; }
+    .chart-jodi {
+      color: #0b1a42;
+      background: #ffffff;
+      border: 1.5px solid var(--primary);
+      padding: 2px 10px;
+      border-radius: 8px;
+      font-size: 1.35rem;
+      color: #00c2cb;
+      background: var(--primary-dark);
+    }
+
     /* ADMIN DASHBOARD */
     .admin-subnav {
       display: flex;
@@ -683,7 +729,7 @@
     .status-approved { background: #10b981; color: #fff; }
     .status-rejected { background: #ef4444; color: #fff; }
 
-    /* CURVED BOTTOM NAVIGATION */
+    /* CURVED BOTTOM NAVIGATION (6 TABS) */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -697,17 +743,19 @@
       align-items: center;
       z-index: 100;
       box-shadow: 0 -5px 25px rgba(11, 26, 66, 0.35);
+      padding: 0 4px;
     }
     .nav-btn {
       flex: 1;
       text-align: center;
       color: #7d9cb8;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       cursor: pointer;
       transition: all 0.2s;
+      min-width: 48px;
     }
     .nav-btn.active { color: #00c2cb; font-weight: 900; transform: translateY(-4px); }
-    .nav-btn span { display: block; font-size: 1.3rem; margin-bottom: 2px; }
+    .nav-btn span { display: block; font-size: 1.25rem; margin-bottom: 2px; }
   </style>
 </head>
 <body>
@@ -845,6 +893,28 @@
   <!-- TAB 1: GAMES -->
   <div id="tabGames" class="tab-view active">
     <div id="gamesContainer"><p style="text-align:center; color:#627d98; margin-top:20px;">Loading games...</p></div>
+  </div>
+
+  <!-- 📊 TAB: LIVE RESULTS CHART (DPBOSS STYLE) -->
+  <div id="tabChart" class="tab-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+      <div>
+        <h3 id="txtChartHeader" style="color: var(--primary-dark); font-weight:900; font-size:1.25rem;">📊 DPBoss Live Results</h3>
+        <span id="txtChartSub" style="font-size:0.75rem; color:#0284c7; font-weight:bold;">⚡ Fast Live Result Update</span>
+      </div>
+      <button class="btn" style="width:auto; padding:7px 14px; font-size:0.78rem; margin:0;" onclick="fetchLiveChartData(true)">
+        🔄 Refresh
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div style="margin-bottom: 14px;">
+      <input type="text" id="chartSearchInput" placeholder="🔍 Search market (e.g. KALYAN, SRIDEVI)..." oninput="filterChartMarkets()" style="background:#ffffff; font-weight:bold; font-size:0.88rem;">
+    </div>
+
+    <div id="chartContainer">
+      <p style="text-align:center; color:#627d98; margin-top:20px;">Loading live DPBoss results...</p>
+    </div>
   </div>
 
   <!-- TAB 2: PERMANENT HISTORY -->
@@ -1122,7 +1192,7 @@
       <div id="admVipKeysList"><p style="color:#627d98;">Loading keys...</p></div>
     </div>
 
-    <!-- 4. ADMIN USERS & REFERRALS SECTION (WITH TIME-LEFT & DEDUCT BUTTONS) -->
+    <!-- 4. ADMIN USERS & REFERRALS SECTION -->
     <div id="admSecUsers" class="admin-section">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
         <h4 style="color: var(--primary-dark);">Registered Users & Referrals</h4>
@@ -1168,9 +1238,10 @@
     </div>
   </div>
 
-  <!-- CURVED BOTTOM NAVIGATION (5 TABS) -->
+  <!-- CURVED BOTTOM NAVIGATION (6 TABS WITH CHART) -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
+    <div class="nav-btn" onclick="navigate('tabChart', this)"><span id="navIconChart">📊</span><div id="navLblChart">Chart</div></div>
     <div class="nav-btn" onclick="navigate('tabHistory', this)"><span id="navIcon2">🏆</span><div id="navLbl2">History</div></div>
     <div class="nav-btn" onclick="navigate('tabVip', this)"><span id="navIcon3">⭐</span><div id="navLbl3">VIP</div></div>
     <div class="nav-btn" onclick="navigate('tabRefer', this)"><span id="navIconRefer">🎁</span><div id="navLblRefer">Refer</div></div>
@@ -1194,6 +1265,9 @@
     }
     const db = firebase.firestore();
 
+    // ⚡ OFFICIAL GOOGLE APPS SCRIPT DPBOSS API
+    const CHART_API_URL = "https://script.google.com/macros/s/AKfycbwMYR29OabLRUVu6y8FvNdP_5UAzYHPVt1OJF_nJ6wmeoOVWG58eQvl1gj3i0zVzNsetA/exec";
+
     const ONESIGNAL_APP_ID = "39ffebaf-3ca2-445a-b1e9-04a9732357d9";
     const ONESIGNAL_REST_KEY = "os_v2_app_hh76xlz4ujcfvmpjasuxgi2x3hkmgwjfl6tuu7mxsr6fjubf2l2ul64buzzy767k45xroappzd6vhmquavplz7mel5ahlwjttjhcq4i";
 
@@ -1204,9 +1278,11 @@
     let timerInterval = null;
     let presenceInterval = null;
     let autoSyncInterval = null;
+    let chartAutoInterval = null;
     let lastHandledNoticeId = localStorage.getItem("last_alert_id") || "";
     let usersCache = [];
     let dpbossCache = {};
+    let liveChartMarketsCache = [];
 
     const urlParams = new URLSearchParams(window.location.search);
     const incomingReferrer = urlParams.get('ref');
@@ -1215,10 +1291,13 @@
       en: {
         appTitle: "MATKA KING",
         gamesTab: "Games",
+        chartTab: "Chart",
         historyTab: "History",
         vipTab: "VIP",
         referTab: "Refer",
         profileTab: "Profile",
+        chartHeader: "📊 DPBoss Live Results",
+        chartSub: "⚡ Fast Live Result Update",
         historyHeader: "🏆 All-Time Success History",
         vipHeader: "🌟 VIP Membership",
         vipSub: "Select a plan and pay to unlock VIP games",
@@ -1246,10 +1325,13 @@
       kn: {
         appTitle: "ಮಟ್ಕಾ ಕಿಂಗ್",
         gamesTab: "ಗೇಮ್ಸ್",
+        chartTab: "ಚಾರ್ಟ್",
         historyTab: "ಹಿಸ್ಟರಿ",
         vipTab: "ವಿಐಪಿ",
         referTab: "ರೆಫರ್",
         profileTab: "ಪ್ರೊಫೈಲ್",
+        chartHeader: "📊 ಡಿಪಿಬಾಸ್ ಲೈವ್ ಚಾರ್ಟ್",
+        chartSub: "⚡ ಕ್ಷಣ ಕ್ಷಣದ ವೇಗದ ಲೈವ್ ರಿಸಲ್ಟ್",
         historyHeader: "🏆 ಶಾಶ್ವತ ಸಕ್ಸಸ್ ಹಿಸ್ಟರಿ",
         vipHeader: "🌟 VIP ಪ್ರೀಮಿಯಂ ಸದಸ್ಯತ್ವ",
         vipSub: "ಯಾವುದಾದರೂ ಒಂದು ಪ್ಲಾನ್ ಆಯ್ಕೆ ಮಾಡಿ ಹಣ ಪಾವತಿಸಿ",
@@ -1296,6 +1378,9 @@
       }
 
       startDPBossAutoEngine();
+      fetchLiveChartData();
+      clearInterval(chartAutoInterval);
+      chartAutoInterval = setInterval(() => { fetchLiveChartData(false); }, 45000);
     };
 
     function requestNotificationPermission() {
@@ -1313,6 +1398,7 @@
       renderProfile();
       renderReferralUI();
       listenRealtimeGames();
+      renderLiveChart(liveChartMarketsCache);
     }
 
     function applyLanguage(lang) {
@@ -1320,10 +1406,14 @@
       document.getElementById("langToggleBtn").innerText = lang.toUpperCase();
       document.getElementById("txtAppTitle").innerText = t.appTitle;
       document.getElementById("navLbl1").innerText = t.gamesTab;
+      document.getElementById("navLblChart").innerText = t.chartTab;
       document.getElementById("navLbl2").innerText = t.historyTab;
       document.getElementById("navLbl3").innerText = t.vipTab;
       document.getElementById("navLblRefer").innerText = t.referTab;
       document.getElementById("navLbl4").innerText = t.profileTab;
+      
+      document.getElementById("txtChartHeader").innerText = t.chartHeader;
+      document.getElementById("txtChartSub").innerText = t.chartSub;
       document.getElementById("txtHistoryHeader").innerText = t.historyHeader;
       document.getElementById("txtVipHeader").innerText = t.vipHeader;
       document.getElementById("txtVipSub").innerText = t.vipSub;
@@ -1348,6 +1438,115 @@
       document.getElementById("btnRedeemVip").innerText = t.btnRedeem;
       document.getElementById("txtYourLinkLbl").innerText = t.yourLinkLbl;
       document.getElementById("txtHowItWorks").innerText = t.howItWorks;
+    }
+
+    // ==========================================
+    // 📊 DPBOSS LIVE CHART SYSTEM (API BASED)
+    // ==========================================
+    async function fetchLiveChartData(isManual = false) {
+      const container = document.getElementById("chartContainer");
+      if (isManual && container) {
+        container.innerHTML = "<p style='text-align:center; color:#0284c7; padding:20px 0;'>Fetching latest results...</p>";
+      }
+
+      try {
+        const response = await fetch(CHART_API_URL);
+        const data = await response.json();
+
+        const marketsObj = data.markets || data;
+        let list = [];
+
+        for (let mName in marketsObj) {
+          const item = marketsObj[mName];
+          if (typeof item === 'object') {
+            list.push({
+              market: mName,
+              result: item.result || `${item.open || '***'}-${item.jodi || '**'}-${item.close || '***'}`,
+              openPana: item.open || '***',
+              jodi: item.jodi || '**',
+              closePana: item.close || '***',
+              status: item.status || 'CLOSED',
+              openTime: item.open_time || item.openTime || '',
+              closeTime: item.close_time || item.closeTime || ''
+            });
+          }
+        }
+
+        liveChartMarketsCache = list;
+        renderLiveChart(list);
+
+        if (isManual) {
+          alert(currentLang === 'kn' ? "ಲೈವ್ ಚಾರ್ಟ್ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ!" : "Live chart refreshed successfully!");
+        }
+      } catch (err) {
+        console.error("Live chart fetch error:", err);
+        if (container && (!liveChartMarketsCache || liveChartMarketsCache.length === 0)) {
+          container.innerHTML = "<p style='text-align:center; color:#ef4444; padding:20px 0;'>Failed to load live results. Retrying in few seconds...</p>";
+        }
+      }
+    }
+
+    function renderLiveChart(marketsList) {
+      const container = document.getElementById("chartContainer");
+      if (!container) return;
+
+      if (!marketsList || marketsList.length === 0) {
+        container.innerHTML = "<p style='text-align:center; color:#627d98; padding:25px 0;'>No live markets found.</p>";
+        return;
+      }
+
+      container.innerHTML = "";
+
+      marketsList.forEach(m => {
+        let isClosed = (m.status || "").toUpperCase() === "CLOSED";
+        let statusBadge = isClosed 
+          ? `<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #f87171;">CLOSED</span>`
+          : `<span class="badge" style="background:#d1fae5; color:#065f46; border:1px solid #34d399;">● RUNNING</span>`;
+
+        let openP = m.openPana || '***';
+        let jodi = m.jodi || '**';
+        let closeP = m.closePana || '***';
+
+        if (m.result && m.result.includes('-')) {
+          const p = m.result.split('-');
+          if (p[0]) openP = p[0];
+          if (p[1]) jodi = p[1];
+          if (p[2]) closeP = p[2];
+        }
+
+        let timeStr = "";
+        if (m.openTime || m.closeTime) {
+          timeStr = `<div style="font-size:0.75rem; color:#627d98; font-weight:700;">⏰ ${m.openTime || ''} - ${m.closeTime || ''}</div>`;
+        }
+
+        container.innerHTML += `
+          <div class="dpboss-chart-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div class="chart-market-name">${m.market}</div>
+                ${timeStr}
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div class="chart-result-display">
+              <span class="chart-panna">${openP}</span>
+              <span class="chart-jodi">${jodi}</span>
+              <span class="chart-panna">${closeP}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterChartMarkets() {
+      const q = (document.getElementById("chartSearchInput").value || "").trim().toUpperCase();
+      if (!q) {
+        renderLiveChart(liveChartMarketsCache);
+        return;
+      }
+      const filtered = liveChartMarketsCache.filter(m => m.market.toUpperCase().includes(q));
+      renderLiveChart(filtered);
     }
 
     // 🎁 REFERRAL & DOWNLOAD LINK LOGIC
@@ -1434,9 +1633,6 @@
       });
     }
 
-    // ==========================================
-    // ⚡ SMART INPUT: HANDLES BOTH UTR & VIP KEYS
-    // ==========================================
     function submitPaymentOrKey() {
       const inputVal = document.getElementById("userTrxId").value.trim();
       if (!inputVal) {
@@ -1522,9 +1718,6 @@
       }).catch(err => alert("Error: " + err.message));
     }
 
-    // ==========================================
-    // 🔑 ADMIN VIP KEY GENERATOR
-    // ==========================================
     function applyPresetDays(val) {
       if (val) {
         document.getElementById("admKeyDays").value = val;
@@ -1738,6 +1931,7 @@
       }
 
       if (tabId === 'tabGames') listenRealtimeGames();
+      if (tabId === 'tabChart') fetchLiveChartData(false);
       if (tabId === 'tabHistory') loadAllHistory();
       if (tabId === 'tabVip') fetchVipConfig();
       if (tabId === 'tabRefer') renderReferralUI();
@@ -2473,7 +2667,6 @@
       }
     }
 
-    // 👥 RENDER ADMIN USERS (DISPLAYS TIME LEFT & DEDUCT BUTTONS)
     function renderAdminUsers() {
       const box = document.getElementById("admUsersList");
       const onlineBadge = document.getElementById("onlineCountBadge");
@@ -2509,7 +2702,6 @@
           const totalRefers = u.referralCount || 0;
           const currentPts = u.points || 0;
 
-          // Format remaining time for Admin visibility
           let remainingVipStr = "ಉಚಿತ ಖಾತೆ (No VIP)";
           if (isVip) {
             const diffMs = new Date(u.vipExpiry).getTime() - now;
@@ -2538,13 +2730,11 @@
                 </div>
               </div>
 
-              <!-- REALTIME VIP REMAINING TIME -->
               <div style="background:#eef7fb; border:1px solid #d0e4f2; padding:8px 12px; border-radius:10px; margin-bottom:10px; font-size:0.82rem;">
                 <div style="color:var(--primary-dark);">VIP ಬಾಕಿ ಅವಧಿ: <span style="color:#0284c7;">${remainingVipStr}</span></div>
                 <div style="color:#627d98; font-size:0.75rem; margin-top:2px;">Expiry: ${expText}</div>
               </div>
 
-              <!-- REALTIME REFERRAL STATS IN ADMIN -->
               <div style="display:flex; gap:8px; background:#f0f7fb; padding:8px 12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border); font-size:0.8rem;">
                 <div style="flex:1;">👥 Refers: <b style="color:var(--primary-dark); font-size:0.95rem;">${totalRefers}</b></div>
                 <div style="flex:1;">🪙 Points: <b style="color:#0284c7; font-size:0.95rem;">${currentPts} pts</b></div>
@@ -2554,14 +2744,12 @@
                 <button class="btn-info" style="width:100%;" onclick="openUserDetail('${u.phone}')">👁️ View Full Details & Referral Stats</button>
               </div>
 
-              <!-- VIP ADD BUTTONS -->
               <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:6px;">
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 1)">+1 Day</button>
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 7)">+7 Days</button>
                 <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:var(--gold-gradient); color:#000; flex:1;" onclick="setVipDuration('${u.phone}', 30)">+30 Days</button>
               </div>
 
-              <!-- 🤫 SILENT DEDUCT & CANCEL BUTTONS -->
               <div style="display:flex; gap:5px; flex-wrap:wrap;">
                 ${isVip ? `
                   <button class="btn" style="padding:6px 6px; font-size:0.72rem; background:#f59e0b; color:#fff; flex:1;" title="Deduct half day silently" onclick="deductVipTime('${u.phone}', 0.5)">-½ Day</button>
@@ -2576,7 +2764,6 @@
       });
     }
 
-    // 🤫 SILENT DEDUCT VIP FUNCTION (USER WILL NEVER KNOW)
     function deductVipTime(phone, daysToDeduct) {
       db.collection("users").doc(phone).get().then(doc => {
         if (!doc.exists) return;
@@ -2599,7 +2786,6 @@
         const newExpiryMs = currentExpiryMs - deductMs;
 
         if (newExpiryMs <= now) {
-          // If reduced time is below now, expire user completely
           db.collection("users").doc(phone).update({
             isVip: false,
             vipExpiry: null
@@ -2840,31 +3026,17 @@
 
     async function fetchDPBossLiveResults(isManual = false) {
       const feed = document.getElementById("dpbossLiveFeed");
-      const targetUrl = "https://sattamatkadpboss.org/";
-      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl) + "&timestamp=" + Date.now();
-
       try {
-        const response = await fetch(proxyUrl);
+        const response = await fetch(CHART_API_URL);
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
-        const html = data.contents;
-
-        if (!html) throw new Error("Empty content");
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
+        const marketsObj = data.markets || data;
 
         let extracted = {};
-        let textContent = doc.body.innerText || "";
-
-        const regex = /([A-Z\s]{3,25})\s*[:\-–]?\s*(\d{3}\s*[-–]\s*\d{1,2}(?:\s*[-–]\s*\d{3})?|\d{1,2}\s*[-–]\s*\d{3}|\d{3}\s*[-–]\s*\d{1,2})/gi;
-        let match;
-
-        while ((match = regex.exec(textContent)) !== null) {
-          const rawMkt = match[1].replace(/[\*\_\:\(\)]/g, '').trim().toUpperCase();
-          const rawScore = match[2].replace(/\s+/g, '').replace(/[–]/g, '-');
-          if (rawMkt.length >= 3 && !/HTTP|WWW|DATE|TODAY|LUCKY|JODI|PANEL/i.test(rawMkt)) {
-            extracted[rawMkt] = rawScore;
+        for (let mName in marketsObj) {
+          const item = marketsObj[mName];
+          if (item && item.result) {
+            extracted[mName.toUpperCase()] = item.result;
           }
         }
 
@@ -2879,9 +3051,7 @@
         }
 
         autoEvaluateAgainstDPBoss(extracted);
-
         if (isManual) alert("DPBoss Live Sync Complete!");
-
       } catch (err) {
         console.error("DPBoss Auto-Fetch Error:", err);
         if (feed) feed.innerHTML = "<span style='color:#ef4444;'>Failed to auto-fetch DPBoss. Retrying in 60s...</span>";
