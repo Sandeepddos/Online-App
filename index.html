@@ -24,7 +24,12 @@
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false }
       });
-      await OneSignal.Slidedown.promptPush();
+      // ಆ್ಯಪ್ ಓಪನ್ ಆದಾಗ ತಾನಾಗಿಯೇ ಪರ್ಮಿಷನ್ ಪಾಪ್-ಅಪ್ ಕೇಳಲು
+      try {
+        await OneSignal.Slidedown.promptPush();
+      } catch (e) {
+        console.log("Push Prompt init:", e);
+      }
     });
   </script>
 
@@ -584,6 +589,11 @@
       box-shadow: 0 4px 18px rgba(11, 26, 66, 0.04);
       transition: transform 0.2s ease, border-color 0.2s ease;
     }
+    .dpboss-chart-card.is-running {
+      border: 1.5px solid #10b981;
+      background: #f9fefb;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+    }
     .dpboss-chart-card:active { transform: scale(0.99); }
     .chart-market-name {
       font-size: 1.08rem;
@@ -607,14 +617,12 @@
     }
     .chart-panna { color: var(--primary-blue); font-size: 1.05rem; }
     .chart-jodi {
-      color: #0b1a42;
-      background: #ffffff;
+      background: var(--primary-dark);
       border: 1.5px solid var(--primary);
       padding: 2px 10px;
       border-radius: 8px;
       font-size: 1.35rem;
       color: #00c2cb;
-      background: var(--primary-dark);
     }
 
     /* ADMIN DASHBOARD */
@@ -1363,6 +1371,9 @@
       fetchVipConfig();
       listenBroadcastAndNotices();
 
+      // ಆಟೋ ನೋಟಿಫಿಕೇಶನ್ ಪರ್ಮಿಷನ್ ಕೇಳ್ತದೆ
+      autoPromptNotificationPermission();
+
       if (currentUser) {
         syncUserData(currentUser.phone);
         document.getElementById("authOverlay").style.display = "none";
@@ -1382,6 +1393,19 @@
       clearInterval(chartAutoInterval);
       chartAutoInterval = setInterval(() => { fetchLiveChartData(false); }, 45000);
     };
+
+    // 🔔 AUTO PROMPT PUSH PERMISSION ON APP OPEN
+    function autoPromptNotificationPermission() {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            await OneSignal.Slidedown.promptPush();
+          } catch (e) {
+            console.log("Auto prompt error:", e);
+          }
+        });
+      }
+    }
 
     function requestNotificationPermission() {
       if (window.OneSignalDeferred) {
@@ -1459,18 +1483,28 @@
         for (let mName in marketsObj) {
           const item = marketsObj[mName];
           if (typeof item === 'object') {
+            const rawStatus = (item.status || "").toUpperCase();
+            const isClosed = rawStatus.includes("CLOSED");
+
             list.push({
               market: mName,
               result: item.result || `${item.open || '***'}-${item.jodi || '**'}-${item.close || '***'}`,
               openPana: item.open || '***',
               jodi: item.jodi || '**',
               closePana: item.close || '***',
-              status: item.status || 'CLOSED',
+              status: isClosed ? "CLOSED" : "RUNNING",
               openTime: item.open_time || item.openTime || '',
               closeTime: item.close_time || item.closeTime || ''
             });
           }
         }
+
+        // ⚡ RUNNING ಗೇಮ್‌ಗಳನ್ನು ಮೇಲ್ಭಾಗದಲ್ಲಿ (TOP) ತೋರಿಸಲು SORT ಮಾಡಲಾಗಿದೆ
+        list.sort((a, b) => {
+          if (a.status === 'RUNNING' && b.status !== 'RUNNING') return -1;
+          if (a.status !== 'RUNNING' && b.status === 'RUNNING') return 1;
+          return a.market.localeCompare(b.market);
+        });
 
         liveChartMarketsCache = list;
         renderLiveChart(list);
@@ -1498,10 +1532,10 @@
       container.innerHTML = "";
 
       marketsList.forEach(m => {
-        let isClosed = (m.status || "").toUpperCase() === "CLOSED";
-        let statusBadge = isClosed 
-          ? `<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #f87171;">CLOSED</span>`
-          : `<span class="badge" style="background:#d1fae5; color:#065f46; border:1px solid #34d399;">● RUNNING</span>`;
+        let isRunning = (m.status === "RUNNING");
+        let statusBadge = isRunning 
+          ? `<span class="badge" style="background:#10b981; color:#ffffff; font-weight:900; animation: pulse 1.5s infinite;">● RUNNING</span>`
+          : `<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #f87171;">CLOSED</span>`;
 
         let openP = m.openPana || '***';
         let jodi = m.jodi || '**';
@@ -1520,7 +1554,7 @@
         }
 
         container.innerHTML += `
-          <div class="dpboss-chart-card">
+          <div class="dpboss-chart-card ${isRunning ? 'is-running' : ''}">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div>
                 <div class="chart-market-name">${m.market}</div>
@@ -1906,7 +1940,7 @@
       renderReferralUI();
       listenRealtimeGames();
       listenUserPayments();
-      requestNotificationPermission();
+      autoPromptNotificationPermission();
     }
 
     function syncUserData(phone) {
