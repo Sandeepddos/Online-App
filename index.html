@@ -33,7 +33,6 @@
   </script>
 
   <style>
-    /* 🌊 MODERN CYAN, NAVY BLUE & WHITE THEME 🌊 */
     :root {
       --primary: #00c2cb;
       --primary-dark: #0b1a42;
@@ -65,7 +64,6 @@
       min-height: 100vh;
     }
 
-    /* HEADER */
     header {
       background: #ffffff;
       padding: 12px 18px;
@@ -149,7 +147,6 @@
       box-shadow: 0 4px 12px rgba(11, 26, 66, 0.25);
     }
 
-    /* AUTH SCREEN */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -177,10 +174,8 @@
 
     .auth-curved-white-bg {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 88%;
-      height: 80%;
+      top: 0; left: 0;
+      width: 88%; height: 80%;
       background: #ffffff;
       border-bottom-right-radius: 200px 220px;
       z-index: 1;
@@ -198,11 +193,7 @@
       padding-bottom: 5px;
       position: relative;
     }
-    .auth-input-line-group span.icon {
-      font-size: 1.15rem;
-      color: #0284c7;
-      margin-right: 12px;
-    }
+    .auth-input-line-group span.icon { font-size: 1.15rem; color: #0284c7; margin-right: 12px; }
     .auth-input-line-group input {
       border: none !important;
       background: transparent !important;
@@ -214,10 +205,7 @@
       border-radius: 0 !important;
       box-shadow: none !important;
     }
-    .auth-input-line-group input::placeholder {
-      color: #94a9ba;
-      font-weight: 500;
-    }
+    .auth-input-line-group input::placeholder { color: #94a9ba; font-weight: 500; }
 
     .btn-login-now {
       margin-top: 14px;
@@ -250,27 +238,15 @@
 
     .auth-bottom-social {
       position: absolute;
-      bottom: 28px;
-      right: 28px;
+      bottom: 28px; right: 28px;
       z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       color: #00c2cb;
     }
-    .auth-bottom-social span.lbl {
-      font-size: 0.88rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      letter-spacing: 0.5px;
-      color: #ffffff;
-    }
-    .auth-social-icons {
-      display: flex;
-      gap: 14px;
-      font-size: 1.25rem;
-      color: #00c2cb;
-    }
+    .auth-bottom-social span.lbl { font-size: 0.88rem; font-weight: 800; margin-bottom: 10px; color: #ffffff; }
+    .auth-social-icons { display: flex; gap: 14px; font-size: 1.25rem; color: #00c2cb; }
 
     input, select, textarea {
       width: 100%;
@@ -314,7 +290,6 @@
     .tab-view { display: none; padding: 16px; max-width: 650px; margin: 0 auto; }
     .tab-view.active { display: block; }
 
-    /* CARD STYLING */
     .game-card {
       background: #ffffff;
       border: 1.5px solid var(--card-border);
@@ -466,7 +441,6 @@
       box-shadow: 0 8px 25px rgba(0, 194, 203, 0.4);
     }
 
-    /* VIP CARD & PROFILE */
     .rich-vip-card {
       background: var(--mosaic-pattern);
       border: 1.5px solid var(--primary);
@@ -501,12 +475,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    .timer-text {
-      font-family: monospace;
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #fbbf24;
-    }
+    .timer-text { font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #fbbf24; }
 
     .plan-card {
       background: #ffffff;
@@ -526,7 +495,6 @@
       box-shadow: 0 4px 15px rgba(0, 194, 203, 0.2);
     }
 
-    /* REFERRAL CARD STYLING */
     .refer-box-card {
       background: #ffffff;
       border: 1.5px solid var(--card-border);
@@ -550,10 +518,7 @@
       font-weight: 700;
       margin-bottom: 4px;
     }
-    .refer-stat-badge b {
-      font-size: 1.4rem;
-      color: var(--primary-dark);
-    }
+    .refer-stat-badge b { font-size: 1.4rem; color: var(--primary-dark); }
 
     /* 📊 DPBOSS LIVE CHART CARD STYLES */
     .dpboss-chart-card {
@@ -614,7 +579,6 @@
       color: #00c2cb;
     }
 
-    /* CURVED BOTTOM NAVIGATION (6 TABS) */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -724,7 +688,7 @@
     <div id="gamesContainer"><p style="text-align:center; color:#627d98; margin-top:20px;">Loading games...</p></div>
   </div>
 
-  <!-- 📊 TAB: LIVE RESULTS CHART (DPBOSS STYLE) -->
+  <!-- 📊 TAB: LIVE RESULTS CHART (DPBOSS STYLE + JODI/PANEL BUTTONS) -->
   <div id="tabChart" class="tab-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
       <div>
@@ -736,7 +700,6 @@
       </button>
     </div>
 
-    <!-- Search Input -->
     <div style="margin-bottom: 14px;">
       <input type="text" id="chartSearchInput" placeholder="🔍 Search market (e.g. KALYAN, SRIDEVI)..." oninput="filterChartMarkets()" style="background:#ffffff; font-weight:bold; font-size:0.88rem;">
     </div>
@@ -885,6 +848,27 @@
     <button id="btnLogout" class="btn btn-secondary" onclick="logOut()" style="background:#e8f3fa; color:#ef4444; font-weight:bold; cursor:pointer;">Logout Account</button>
   </div>
 
+  <!-- 📊 HISTORY CHART MODAL POPUP (JODI & PANEL VIEW) -->
+  <div id="chartDataModal" style="display:none; position:fixed; inset:0; background:rgba(11,26,66,0.85); z-index:3000; justify-content:center; align-items:center; padding:12px; backdrop-filter:blur(6px);">
+    <div style="background:#ffffff; border:2px solid #00c2cb; border-radius:24px; width:100%; max-width:550px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+      
+      <!-- Modal Header -->
+      <div style="padding:14px 18px; border-bottom:1.5px solid #e1edf6; display:flex; justify-content:space-between; align-items:center; background:#f8fbfe;">
+        <div>
+          <h3 id="modalChartTitle" style="color:#0b1a42; font-size:1.05rem; font-weight:900;">Market Chart</h3>
+          <span id="modalChartSub" style="font-size:0.72rem; color:#0284c7; font-weight:bold;">Loading historical records...</span>
+        </div>
+        <button onclick="closeChartModal()" style="width:34px; height:34px; border-radius:50%; background:#e8f3fa; border:none; font-weight:bold; font-size:1.1rem; color:#0b1a42; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Modal Table Body -->
+      <div id="modalChartContent" style="padding:12px; overflow-y:auto; overflow-x:auto; flex:1; font-size:0.8rem;">
+        <p style="text-align:center; color:#627d98; padding:30px 0;">Loading chart data...</p>
+      </div>
+
+    </div>
+  </div>
+
   <!-- CURVED BOTTOM NAVIGATION -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="navigate('tabGames', this)"><span id="navIcon1">🎯</span><div id="navLbl1">Games</div></div>
@@ -1023,7 +1007,6 @@
         }
       }
 
-      // ಯೂಸರ್ ಆ್ಯಪ್ ಕೇವಲ ಚಾರ್ಟ್ ಡಿಸ್ಪ್ಲೇ ಮಾಡುತ್ತದೆ, ಆಟೋ-ಪಾಸ್ ಮಾಡುವುದಿಲ್ಲ!
       fetchLiveChartData();
       clearInterval(chartAutoInterval);
       chartAutoInterval = setInterval(() => { fetchLiveChartData(false); }, 45000);
@@ -1220,6 +1203,18 @@
               <span class="chart-jodi">${jodi}</span>
               <span class="chart-panna">${closeP}</span>
             </div>
+
+            <!-- 🎯 JODI & PANEL CHART BUTTONS -->
+            <div style="display:flex; gap:8px; margin-top:4px;">
+              <button onclick="openChartModal('${m.market}', 'jodi')" 
+                style="flex:1; background:#f0f7fb; border:1.5px solid #00c2cb; color:#0b1a42; font-weight:900; font-size:0.75rem; padding:8px 4px; border-radius:12px; cursor:pointer; transition:0.2s;">
+                📊 JODI CHART
+              </button>
+              <button onclick="openChartModal('${m.market}', 'panel')" 
+                style="flex:1; background:#0b1a42; border:1.5px solid #00c2cb; color:#00c2cb; font-weight:900; font-size:0.75rem; padding:8px 4px; border-radius:12px; cursor:pointer; transition:0.2s;">
+                📋 PANEL CHART
+              </button>
+            </div>
           </div>
         `;
       });
@@ -1233,6 +1228,56 @@
       }
       const filtered = liveChartMarketsCache.filter(m => m.market.toUpperCase().includes(q));
       renderLiveChart(filtered);
+    }
+
+    // ========================================================
+    // 📊 IN-APP HISTORY CHART MODAL POPUP ENGINE
+    // ========================================================
+    async function openChartModal(marketName, type) {
+      const modal = document.getElementById("chartDataModal");
+      const title = document.getElementById("modalChartTitle");
+      const sub = document.getElementById("modalChartSub");
+      const content = document.getElementById("modalChartContent");
+
+      title.innerText = marketName + " " + (type === 'jodi' ? 'JODI' : 'PANEL') + " CHART";
+      sub.innerText = "ಡೇಟಾ ಲೋಡ್ ಆಗುತ್ತಿದೆ...";
+      content.innerHTML = "<p style='text-align:center; color:#0284c7; padding:40px 0; font-weight:bold;'>ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ, ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ...</p>";
+      
+      modal.style.display = "flex";
+
+      try {
+        const fetchUrl = `${CHART_API_URL}?action=chart&market=${encodeURIComponent(marketName)}&type=${type}`;
+        const res = await fetch(fetchUrl);
+        const result = await res.json();
+
+        if (result.status !== "success" || !result.data || result.data.length === 0) {
+          content.innerHTML = "<p style='text-align:center; color:#ef4444; padding:30px 0;'>ಈ ಮಾರ್ಕೆಟ್‌ಗೆ ಚಾರ್ಟ್ ಲಭ್ಯವಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.</p>";
+          sub.innerText = "ಡೇಟಾ ಸಿಕ್ಕಿಲ್ಲ";
+          return;
+        }
+
+        sub.innerText = "ಸಂಪೂರ್ಣ ಹಿಸ್ಟರಿ ದಾಖಲೆಗಳು";
+
+        let tableHTML = `<table style="width:100%; border-collapse:collapse; text-align:center; font-family:monospace; min-width:320px;">`;
+        result.data.forEach((row, rIdx) => {
+          let isHeader = (rIdx === 0);
+          tableHTML += `<tr style="${isHeader ? 'background:#0b1a42; color:#00c2cb; font-weight:bold;' : 'border-bottom:1px solid #e1edf6;'}">`;
+          row.forEach(cell => {
+            tableHTML += `<td style="padding:8px 4px; border:1px solid #e1edf6; ${isHeader ? 'color:#00c2cb; font-weight:900;' : 'color:#0b1a42; font-weight:700;'}">${cell}</td>`;
+          });
+          tableHTML += `</tr>`;
+        });
+        tableHTML += `</table>`;
+
+        content.innerHTML = tableHTML;
+      } catch (err) {
+        console.error("Chart load error:", err);
+        content.innerHTML = `<p style='text-align:center; color:#ef4444; padding:30px 0;'>ದೋಷ: ${err.message}</p>`;
+      }
+    }
+
+    function closeChartModal() {
+      document.getElementById("chartDataModal").style.display = "none";
     }
 
     function renderReferralUI() {
@@ -1479,7 +1524,6 @@
       return [];
     }
 
-    // 🎯 ಕೇವಲ ಅಡ್ಮಿನ್ ಕಳುಹಿಸಿದ ರಿಸಲ್ಟ್ ಡಿಸ್ಪ್ಲೇ ಮಾಡುವ ಪಕ್ಕಾ ಲಿಸನರ್
     function listenRealtimeGames() {
       db.collection("games").onSnapshot(snapshot => {
         const box = document.getElementById("gamesContainer");
