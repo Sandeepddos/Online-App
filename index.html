@@ -1285,7 +1285,7 @@
     // ⚡ OFFICIAL GOOGLE APPS SCRIPT DPBOSS API
     const CHART_API_URL = "https://script.google.com/macros/s/AKfycbwMYR29OabLRUVu6y8FvNdP_5UAzYHPVt1OJF_nJ6wmeoOVWG58eQvl1gj3i0zVzNsetA/exec";
 
-    // 🌟 ಜನಪ್ರಿಯ ಮುಖ್ಯ ಆಟಗಳ ಪಟ್ಟಿ (Main Popular Markets List)
+    // 🌟 ಜನಪ್ರಿಯ ಮುಖ್ಯ ಆಟಗಳ ಪಟ್ಟಿ
     const MAIN_PRIORITY_MARKETS = [
       "KALYAN", "KALYAN NIGHT", "KALYAN MORNING",
       "MILAN DAY", "MILAN NIGHT", "MILAN MORNING",
@@ -1483,14 +1483,11 @@
       document.getElementById("txtHowItWorks").innerText = t.howItWorks;
     }
 
-    // ========================================================
-    // 📊 DPBOSS LIVE CHART SYSTEM (MAIN MARKETS + RUNNING FIRST)
-    // ========================================================
     function isMainMarket(marketName) {
       const cleanName = (marketName || "").toUpperCase().replace(/[^A-Z0-9]/g, '');
       return MAIN_PRIORITY_MARKETS.some(m => {
         const cleanM = m.replace(/[^A-Z0-9]/g, '');
-        return cleanName === cleanM || cleanName.includes(cleanM) || cleanM.includes(cleanName);
+        return cleanName === cleanM;
       });
     }
 
@@ -1528,11 +1525,6 @@
           }
         }
 
-        // 🌟 ನಿಖರವಾದ ಸಾರ್ಟಿಂಗ್:
-        // 1: Main Market + RUNNING (ಅತ್ಯುನ್ನತ ಆದ್ಯತೆ)
-        // 2: Other Market + RUNNING
-        // 3: Main Market + CLOSED
-        // 4: Other Market + CLOSED
         list.sort((a, b) => {
           const getRank = (item) => {
             const running = (item.status === 'RUNNING');
@@ -1598,7 +1590,6 @@
           timeStr = `<div style="font-size:0.75rem; color:#627d98; font-weight:700;">⏰ ${m.openTime || ''} - ${m.closeTime || ''}</div>`;
         }
 
-        // ಮೆನ್ ಆಟಗಳಿಗೆ ವಿಶೇಷ ಸ್ಟಾರ್ ಬ್ಯಾಡ್ಜ್
         let mainStarBadge = m.isMain 
           ? `<span style="font-size:0.7rem; background:#e6f9fa; color:#0284c7; border:1px solid #00c2cb; padding:2px 6px; border-radius:6px; font-weight:800;">★ MAIN</span>` 
           : '';
@@ -1636,7 +1627,6 @@
       renderLiveChart(filtered);
     }
 
-    // 🎁 REFERRAL & DOWNLOAD LINK LOGIC
     function renderReferralUI() {
       if (!currentUser) return;
 
@@ -3119,30 +3109,36 @@
         const data = await response.json();
         const marketsObj = data.markets || data;
 
-        let extracted = {};
-        for (let mName in marketsObj) {
-          const item = marketsObj[mName];
-          if (item && item.result) {
-            extracted[mName.toUpperCase()] = item.result;
-          }
-        }
-
-        dpbossCache = extracted;
+        dpbossCache = marketsObj;
 
         if (feed) {
           let feedHtml = "<b>Live Detected Markets:</b><br>";
-          for (let m in extracted) {
-            feedHtml += `<div style="padding:4px 0; border-bottom:1px solid #dce8f0;"><b>${m}</b>: <span style="color:#0284c7; font-family:monospace; font-weight:bold;">${extracted[m]}</span></div>`;
+          for (let m in marketsObj) {
+            const item = marketsObj[m];
+            if (item && item.result) {
+              feedHtml += `<div style="padding:4px 0; border-bottom:1px solid #dce8f0;"><b>${m}</b>: <span style="color:#0284c7; font-family:monospace; font-weight:bold;">${item.result}</span> [${item.status || 'WAITING'}]</div>`;
+            }
           }
-          feed.innerHTML = Object.keys(extracted).length ? feedHtml : "No active results found at this minute. Retrying in 60s...";
+          feed.innerHTML = Object.keys(marketsObj).length ? feedHtml : "No active results found at this minute. Retrying in 60s...";
         }
 
-        autoEvaluateAgainstDPBoss(extracted);
+        autoEvaluateAgainstDPBoss(marketsObj);
         if (isManual) alert("DPBoss Live Sync Complete!");
       } catch (err) {
         console.error("DPBoss Auto-Fetch Error:", err);
         if (feed) feed.innerHTML = "<span style='color:#ef4444;'>Failed to auto-fetch DPBoss. Retrying in 60s...</span>";
       }
+    }
+
+    // ========================================================
+    // 🎯 100% ACCURATE & STRICT AUTO-PASS EVALUATION ENGINE
+    // ========================================================
+    function cleanMarketNameStrict(str) {
+      return (str || "")
+        .toUpperCase()
+        .replace(/\[.*?\]/g, '')
+        .replace(/[^A-Z0-9]/g, '')
+        .trim();
     }
 
     function autoEvaluateAgainstDPBoss(dpbossData) {
@@ -3152,19 +3148,46 @@
         snapshot.forEach(docSnap => {
           const g = docSnap.data();
           const docId = docSnap.id;
-          const gameMarket = (g.market || "").trim().toUpperCase();
+          const gameMarketClean = cleanMarketNameStrict(g.market);
 
-          let matchingResult = null;
-          for (let mkt in dpbossData) {
-            if (mkt.includes(gameMarket) || gameMarket.includes(mkt)) {
-              matchingResult = dpbossData[mkt];
-              break;
-            }
+          // 1. ಸ್ಟ್ರಿಕ್ಟ್ ನಿಖರ ಮ್ಯಾಚಿಂಗ್ (Exact Match Only)
+          let matchedKey = Object.keys(dpbossData).find(k => {
+            return cleanMarketNameStrict(k) === gameMarketClean;
+          });
+
+          if (!matchedKey) return;
+
+          const resObj = dpbossData[matchedKey];
+          if (!resObj) return;
+
+          // 2. ಆಟ ಇನ್ನೂ WAITING ನಲ್ಲಿದ್ದರೆ ಪಾಸ್ ಚೆಕ್ ಮಾಡಬಾರದು
+          const marketStatus = (resObj.status || "").toUpperCase();
+          if (marketStatus === "WAITING" || !marketStatus) {
+            return;
           }
 
-          if (!matchingResult) return;
+          let resOpenPana = (resObj.open && resObj.open !== "***") ? resObj.open.toString().trim() : "";
+          let resClosePana = (resObj.close && resObj.close !== "***") ? resObj.close.toString().trim() : "";
+          let resJodi = (resObj.jodi && resObj.jodi !== "**") ? resObj.jodi.toString().trim() : "";
 
-          const parts = matchingResult.split(/[-–\s]+/).filter(Boolean);
+          const resultStr = resObj.result || "";
+          if (resultStr && resultStr.includes('-')) {
+            const parts = resultStr.split('-');
+            if (parts[0] && parts[0] !== '***' && parts[0].length === 3) resOpenPana = parts[0].trim();
+            if (parts[1] && parts[1] !== '**') resJodi = parts[1].trim();
+            if (parts[2] && parts[2] !== '***' && parts[2].length === 3) resClosePana = parts[2].trim();
+          }
+
+          let resOpenDigit = "";
+          let resCloseDigit = "";
+
+          if (resJodi && resJodi.length >= 1 && resJodi[0] !== '*' && resJodi[0] !== '_') {
+            resOpenDigit = resJodi[0];
+          }
+          if (resJodi && resJodi.length >= 2 && resJodi[1] !== '*' && resJodi[1] !== '_') {
+            resCloseDigit = resJodi[1];
+          }
+
           const openPanaList = splitNumbers(g.openPana);
           const openDigitList = splitNumbers(g.open);
           const jodiList = splitNumbers(g.jodi);
@@ -3174,49 +3197,59 @@
           let passes = getGamePasses(g);
           let matchFound = false;
 
-          parts.forEach(part => {
-            if (/^\d{3}$/.test(part)) {
-              if (openPanaList.includes(part) && !passes.some(p => p.type === "OPEN_PANA" && p.number === part)) {
-                passes.push({ type: "OPEN_PANA", number: part });
-                matchFound = true;
-              }
-              if (closePanaList.includes(part) && !passes.some(p => p.type === "CLOSE_PANA" && p.number === part)) {
-                passes.push({ type: "CLOSE_PANA", number: part });
-                matchFound = true;
-              }
-            } else if (/^\d{2}$/.test(part)) {
-              if (jodiList.includes(part) && !passes.some(p => p.type === "JODI" && p.number === part)) {
-                passes.push({ type: "JODI", number: part });
-                matchFound = true;
-              }
-              const d1 = part[0], d2 = part[1];
-              if (openDigitList.includes(d1) && !passes.some(p => p.type === "OPEN" && p.number === d1)) {
-                passes.push({ type: "OPEN", number: d1 });
-                matchFound = true;
-              }
-              if (closeDigitList.includes(d2) && !passes.some(p => p.type === "CLOSE" && p.number === d2)) {
-                passes.push({ type: "CLOSE", number: d2 });
-                matchFound = true;
-              }
-            } else if (/^\d{1}$/.test(part)) {
-              if (openDigitList.includes(part) && !passes.some(p => p.type === "OPEN" && p.number === part)) {
-                passes.push({ type: "OPEN", number: part });
-                matchFound = true;
-              }
-              if (closeDigitList.includes(part) && !passes.some(p => p.type === "CLOSE" && p.number === part)) {
-                passes.push({ type: "CLOSE", number: part });
+          // 1. OPEN Check (ಕೇವಲ ಒಂದು ಓಪನ್ ಅಂಕಿ ಮಾತ್ರ)
+          if (resOpenDigit && openDigitList.includes(resOpenDigit)) {
+            if (!passes.some(p => p.type === "OPEN")) {
+              passes.push({ type: "OPEN", number: resOpenDigit });
+              matchFound = true;
+            }
+          }
+
+          // 2. OPEN PANA Check
+          if (resOpenPana && resOpenPana.length === 3 && openPanaList.includes(resOpenPana)) {
+            if (!passes.some(p => p.type === "OPEN_PANA")) {
+              passes.push({ type: "OPEN_PANA", number: resOpenPana });
+              matchFound = true;
+            }
+          }
+
+          // 3. JODI & CLOSE Checks (ಮಾರುಕಟ್ಟೆ CLOSED ಆದಾಗ ಮಾತ್ರ)
+          if (marketStatus === "CLOSED") {
+            // JODI Check
+            if (resJodi && resJodi.length === 2 && !resJodi.includes('*') && jodiList.includes(resJodi)) {
+              if (!passes.some(p => p.type === "JODI")) {
+                passes.push({ type: "JODI", number: resJodi });
                 matchFound = true;
               }
             }
-          });
+
+            // CLOSE Check (ಕ್ಲೋಸ್ ಅಂಕಿ ಓಪನ್‌ನಲ್ಲಿ ಮಿಕ್ಸ್ ಆಗುವುದಿಲ್ಲ)
+            if (resCloseDigit && closeDigitList.includes(resCloseDigit)) {
+              if (!passes.some(p => p.type === "CLOSE")) {
+                passes.push({ type: "CLOSE", number: resCloseDigit });
+                matchFound = true;
+              }
+            }
+
+            // CLOSE PANA Check
+            if (resClosePana && resClosePana.length === 3 && closePanaList.includes(resClosePana)) {
+              if (!passes.some(p => p.type === "CLOSE_PANA")) {
+                passes.push({ type: "CLOSE_PANA", number: resClosePana });
+                matchFound = true;
+              }
+            }
+          }
 
           if (matchFound) {
+            const lastPass = passes[passes.length - 1];
             db.collection("games").doc(docId).update({
               isPassed: true,
               passes: passes,
-              autoDeclaredResult: matchingResult
+              passType: lastPass.type,
+              passedNumber: lastPass.number,
+              autoDeclaredResult: resultStr || `${resOpenPana}-${resJodi}-${resClosePana}`
             }).then(() => {
-              sendPushNotification(`🏆 ${g.market} BLAST RESULT!`, `DPBoss Result: [${matchingResult}] PASSED! Check App Now!`);
+              sendPushNotification(`🏆 ${g.market} BLAST RESULT!`, `${lastPass.type} [${lastPass.number}] PASSED! Check App Now!`);
             });
           }
         });
@@ -3262,7 +3295,9 @@
 
           if (/^\d{3}$/.test(tok)) {
             panaList.add(tok);
-          } else if (/^\d{2}$/.test(tok)) {             jodiList.add(tok);           } else if (/^\d{1}$/.test(tok)) {
+          } else if (/^\d{2}$/.test(tok)) {
+            jodiList.add(tok);
+          } else if (/^\d{1}$/.test(tok)) {
             openDigits.add(tok);
           }
         }
